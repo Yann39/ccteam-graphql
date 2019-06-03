@@ -1,0 +1,50 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Event {
+    id: ID!
+    titleFr: String!
+    titleEn: String!
+    startDate: String
+    endDate: String
+    location: String
+    status: String
+    email: String
+    confirmationEmailFr: String
+    confirmationEmailEn: String
+    imageFileName: String
+    image: String
+    urlInformationEn: String
+    urlInformationFr: String
+    participants: [Participant]!
+}
+
+type Participant {
+    firstName: String!
+    lastName: String!
+    email: String!
+    phone: String
+    numberOfGuests: Int
+    validated: Boolean
+    aperitif: Boolean
+    byCar: Boolean
+    accessGranted: Boolean
+    numberOfAccessGranted: Int
+    acceptedConditions: Boolean
+    registrationDate: String
+    ticketSentDate: String
+    event: Event
+}
+
+type Query {
+    allEvents: [Event]
+    eventByTitleFr(titleFr: String!): [Event]
+    allParticipants: [Participant]
+}
+
+type Mutation {
+    newEvent(titleFr: String!, titleEn: String!, email: String!): Event
+    newParticipant(firstName: String!, lastName: String!, email: String!): Participant
+}
