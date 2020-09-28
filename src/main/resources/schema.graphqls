@@ -17,7 +17,7 @@ type Query {
 
 type Mutation {
     newEvent(title: String!, description: String!): Event
-    newParticipant(firstName: String!, lastName: String!, email: String!): Member
+    newMember(firstName: String!, lastName: String!, email: String!): Member
 }
 
 type Event {
