@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg?style=for-the-badge)
 
 ![Version](https://img.shields.io/badge/JDK-11-red.svg)
-![Version](https://img.shields.io/badge/Spring%20Boot-2.1.5-green.svg)
+![Version](https://img.shields.io/badge/Spring%20Boot-2.3.4-green.svg)
 
 ## Documentation
 

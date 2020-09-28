@@ -5,19 +5,19 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.5.RELEASE</version>
+		<version>2.3.4.RELEASE</version>
 		<relativePath/>
 	</parent>
 	<groupId>com.chachatte</groupId>
 	<artifactId>chachatte-graphql</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>chachatte-graphql</name>
-	<description>Spring Boot application to expose APIs for Chachatte team mobile application</description>
+	<description>Spring Boot application to expose GraphQL endpoint for Chachatte team mobile application</description>
 
 	<properties>
 		<java.version>11</java.version>
-		<mariadb-client.version>2.3.0</mariadb-client.version>
-        <lombok.version>1.18.8</lombok.version>
+		<mariadb-client.version>2.7.0</mariadb-client.version>
+        <lombok.version>1.18.12</lombok.version>
 		<graphql-starters.version>5.0.2</graphql-starters.version>
 		<graphql-java-tools.version>5.2.4</graphql-java-tools.version>
 	</properties>
@@ -37,6 +37,13 @@
 			<groupId>com.graphql-java</groupId>
 			<artifactId>graphiql-spring-boot-starter</artifactId>
 			<version>${graphql-starters.version}</version>
+		</dependency>
+
+		<!-- Model mapper -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>2.3.8</version>
 		</dependency>
 
 		<!-- Lombok -->

@@ -3,48 +3,118 @@ schema {
     mutation: Mutation
 }
 
-type Event {
-    id: ID!
-    titleFr: String!
-    titleEn: String!
-    startDate: String
-    endDate: String
-    location: String
-    status: String
-    email: String
-    confirmationEmailFr: String
-    confirmationEmailEn: String
-    imageFileName: String
-    image: String
-    urlInformationEn: String
-    urlInformationFr: String
-    participants: [Participant]!
-}
-
-type Participant {
-    firstName: String!
-    lastName: String!
-    email: String!
-    phone: String
-    numberOfGuests: Int
-    validated: Boolean
-    aperitif: Boolean
-    byCar: Boolean
-    accessGranted: Boolean
-    numberOfAccessGranted: Int
-    acceptedConditions: Boolean
-    registrationDate: String
-    ticketSentDate: String
-    event: Event
-}
+# java.time.LocalDateTime implementation
+scalar LocalDateTime
 
 type Query {
+    allNews: [News]
     allEvents: [Event]
-    eventByTitleFr(titleFr: String!): [Event]
-    allParticipants: [Participant]
+    allMembers: [Member]
+    newsByTitle(title: String!): [News]
+    eventsByTitle(title: String!): [Event]
+    membersFiltered(text: String!): [Member]
 }
 
 type Mutation {
-    newEvent(titleFr: String!, titleEn: String!, email: String!): Event
-    newParticipant(firstName: String!, lastName: String!, email: String!): Participant
+    newEvent(title: String!, description: String!): Event
+    newParticipant(firstName: String!, lastName: String!, email: String!): Member
 }
+
+type Event {
+    id: ID!
+    title: String!
+    description: String
+    startDate: String!
+    endDate: String!
+    track: Track
+    organizer: String
+    price: Float
+    createdOn: String!
+    createdBy: Member!
+    modifiedOn: String
+    modifiedBy: Member
+}
+
+type EventMember {
+    id: ID!
+    member: Member!
+    event: Event!
+    createdOn: String!
+}
+
+type Gallery {
+    id: ID!
+    title: String!
+    description: String
+    createdOn: String!
+    modifiedOn: String
+}
+
+type LapRecord {
+    id: ID!
+    track: Track!
+    member: Member
+    lapTime: Int!
+    recordDate: String!
+    conditions: String!
+    comments: String
+    createdOn: String!
+    modifiedOn: String
+}
+
+type LikedNews {
+    id: ID!
+    member: Member
+    news: News!
+    createdOn: String!
+}
+
+type Member {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    phone: String
+    avatarUrl: String
+    bike: String
+    active: Boolean!
+    admin: Boolean!
+    registrationDate: String!
+    createdOn: String!
+    modifiedOn: String
+}
+
+type News {
+    id: ID!
+    title: String!
+    catchLine: String!
+    content: String!
+    newsDate: LocalDateTime
+    likedMembers: [Member]
+    createdOn: LocalDateTime!
+    createdBy: Member!
+    modifiedOn: LocalDateTime
+    modifiedBy: Member
+}
+
+type Photo {
+    id: ID!
+    title: String!
+    description: String
+    link: String!
+    gallery: Gallery!
+    createdOn: String!
+    modifiedOn: String
+}
+
+type Track {
+    id: ID!
+    name: String!
+    distance: Int
+    lapRecord: Int
+    website: String
+    latitude: Float
+    longitude: Float
+}
+
