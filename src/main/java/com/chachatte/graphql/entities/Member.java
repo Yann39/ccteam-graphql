@@ -2,6 +2,7 @@ package com.chachatte.graphql.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -47,6 +48,10 @@ public class Member {
     @Column(nullable = false)
     private boolean admin = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Role role;
+
     @Column(nullable = false)
     private LocalDateTime registrationDate;
 
@@ -55,5 +60,16 @@ public class Member {
 
     @Column
     private LocalDateTime modifiedOn;
+
+    public enum Role implements GrantedAuthority {
+        ROLE_USER,
+        ROLE_MEMBER,
+        ROLE_ADMIN;
+
+        @Override
+        public String getAuthority() {
+            return this.name();
+        }
+    }
 
 }

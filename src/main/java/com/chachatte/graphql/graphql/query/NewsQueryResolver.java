@@ -1,14 +1,16 @@
-package com.chachatte.graphql.resolver.query;
+package com.chachatte.graphql.graphql.query;
 
 import com.chachatte.graphql.dto.MemberDto;
 import com.chachatte.graphql.dto.NewsDto;
 import com.chachatte.graphql.entities.Member;
 import com.chachatte.graphql.entities.News;
+import com.chachatte.graphql.graphql.exception.CustomGraphQLException;
 import com.chachatte.graphql.repository.MemberRepository;
 import com.chachatte.graphql.repository.NewsRepository;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -38,10 +40,12 @@ public class NewsQueryResolver implements GraphQLQueryResolver {
      *
      * @return A list of DTO objects representing the news
      */
-    public Iterable<NewsDto> getAllNews() {
+    @Secured("ROLE_MEMBER")
+    public Iterable<NewsDto> getAllNews() throws CustomGraphQLException {
         log.info("Received call to getAllNews");
         final List<News> result = new ArrayList<>();
         newsRepository.findAll().forEach(result::add);
+        //throw new CustomGraphQLException("Un utilisateur ayant la même adresse e-mail existe déjà");
         return result.stream().map(this::convertToNewsDto).collect(Collectors.toList());
     }
 
@@ -51,6 +55,7 @@ public class NewsQueryResolver implements GraphQLQueryResolver {
      * @param title The news title
      * @return A list of DTO objects representing the news
      */
+    @Secured("ROLE_MEMBER")
     public Iterable<NewsDto> getNewsByTitle(String title) {
         log.info("Received call to getEventsByTitle with parameter title = " + title);
         return newsRepository.findByTitle(title).stream().map(this::convertToNewsDto).collect(Collectors.toList());

@@ -1,4 +1,4 @@
-package com.chachatte.graphql.resolver.scalar;
+package com.chachatte.graphql.graphql.scalar;
 
 import graphql.language.StringValue;
 import graphql.schema.*;

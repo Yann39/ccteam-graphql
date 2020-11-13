@@ -1,4 +1,4 @@
-package com.chachatte.graphql.resolver.query;
+package com.chachatte.graphql.graphql.query;
 
 import com.chachatte.graphql.dto.MemberDto;
 import com.chachatte.graphql.entities.Member;
@@ -6,6 +6,7 @@ import com.chachatte.graphql.repository.MemberRepository;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class MemberQueryResolver implements GraphQLQueryResolver {
      *
      * @return A list of DTO objects representing the members
      */
+    @Secured("ROLE_MEMBER")
     public Iterable<MemberDto> getAllMembers() {
         log.info("Received call to getAllMembers");
         final List<Member> result = new ArrayList<>();
@@ -46,6 +48,7 @@ public class MemberQueryResolver implements GraphQLQueryResolver {
      * @param newsId The news ID
      * @return A list of DTO objects representing the members
      */
+    @Secured("ROLE_MEMBER")
     public Iterable<MemberDto> getMembersLikedNews(long newsId) {
         log.info("Received call to getAllMembers");
         return memberRepository.findByNewsId(newsId).stream().map(this::convertToDto).collect(Collectors.toList());
@@ -58,6 +61,7 @@ public class MemberQueryResolver implements GraphQLQueryResolver {
      * @param text The text filter
      * @return A list of DTO objects representing the members
      */
+    @Secured("ROLE_MEMBER")
     public Iterable<MemberDto> getMembersFiltered(String text) {
         log.info("Received call to getMembersFiltered with parameter text = " + text);
         if (text != null && text.length() > 0) {

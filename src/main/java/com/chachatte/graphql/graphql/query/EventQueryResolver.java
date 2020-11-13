@@ -1,4 +1,4 @@
-package com.chachatte.graphql.resolver.query;
+package com.chachatte.graphql.graphql.query;
 
 import com.chachatte.graphql.dto.EventDto;
 import com.chachatte.graphql.entities.Event;
@@ -6,6 +6,7 @@ import com.chachatte.graphql.repository.EventRepository;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class EventQueryResolver implements GraphQLQueryResolver {
      *
      * @return A list of DTO objects representing the events
      */
+    @Secured("ROLE_MEMBER")
     public Iterable<EventDto> getAllEvents() {
         log.info("Received call to getAllEvents");
         final List<Event> result = new ArrayList<>();
@@ -46,6 +48,7 @@ public class EventQueryResolver implements GraphQLQueryResolver {
      * @param title The event title
      * @return A list of DTO objects representing the events
      */
+    @Secured("ROLE_MEMBER")
     public Iterable<EventDto> getEventsByTitle(String title) {
         log.info("Received call to getEventsByTitle with parameter title = " + title);
         return eventRepository.findByTitle(title).stream().map(this::convertToDto).collect(Collectors.toList());

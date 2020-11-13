@@ -1,10 +1,11 @@
-package com.chachatte.graphql.resolver.mutation;
+package com.chachatte.graphql.graphql.mutation;
 
 import com.chachatte.graphql.dto.EventDto;
 import com.chachatte.graphql.entities.Event;
 import com.chachatte.graphql.repository.EventRepository;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,7 @@ public class EventMutationResolver implements GraphQLMutationResolver {
      * @param description The event description
      * @return A DTO object representing the event just created
      */
+    @Secured("ROLE_ADMIN")
     public EventDto newEvent(String title, String description) {
         final Event event = new Event();
         event.setTitle(title);
