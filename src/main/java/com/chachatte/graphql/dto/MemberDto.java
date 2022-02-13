@@ -40,6 +40,7 @@ public class MemberDto {
     private String phone;
     private String avatarUrl;
     private String bike;
+    private String otp;
     private boolean active = false;
     private boolean admin = false;
     private LocalDateTime registrationDate;

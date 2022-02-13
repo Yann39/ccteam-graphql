@@ -23,6 +23,7 @@ import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +40,11 @@ public class CustomGraphQLException extends RuntimeException implements GraphQLE
 
     private static final long serialVersionUID = 1240866421447805573L;
 
-    public CustomGraphQLException(String message) {
+    private final String code;
+
+    public CustomGraphQLException(String code, String message) {
         super(message);
+        this.code = code;
     }
 
     @Override
@@ -55,7 +59,10 @@ public class CustomGraphQLException extends RuntimeException implements GraphQLE
 
     @Override
     public Map<String, Object> getExtensions() {
-        return null;
+        Map<String, Object> customAttributes = new HashMap<>();
+        customAttributes.put("errorCode", this.code);
+        customAttributes.put("errorMessage", this.getMessage());
+        return customAttributes;
     }
 
     @Override

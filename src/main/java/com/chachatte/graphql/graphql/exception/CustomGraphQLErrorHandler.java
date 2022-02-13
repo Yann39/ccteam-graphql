@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * handled by GraphQL.
  * <p>
  * It catches all the exceptions and transfers them to the appropriate {@link GraphQLError}
- * implementation to be be passed to the client-side for handling.
+ * implementation to be passed to the client-side for handling.
  *
  * @author ybailly
  * @since sept 2020

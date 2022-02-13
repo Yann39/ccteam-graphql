@@ -53,6 +53,14 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    /**
+     * Authenticate the user according to the the specified email and password.
+     *
+     * @param userRequest The request data containing the user's e-mail address and password
+     * @return 403 Forbidden if wrong credentials have been specified<br/>
+     * 500 Internal Server Error if any error have occurred during authentication<br/>
+     * 200 Ok if authentication succeeded, with the issued JWT token in the response body
+     */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> authenticate(@RequestBody JWTRequest userRequest) {
 

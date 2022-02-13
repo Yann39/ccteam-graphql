@@ -27,15 +27,25 @@ scalar LocalDateTime
 
 type Query {
     allNews: [News]
+    newsById(id: Int!): News
+
     allEvents: [Event]
-    allMembers: [Member]
-    newsByTitle(title: String!): [News]
+    eventById(id: Int!): Event
     eventsByTitle(title: String!): [Event]
-    membersFiltered(text: String!): [Member]
+
+    allMembers: [Member]
+    memberById(id: Int!): Member
+    memberByEmail(email: String!): Member
+    membersFiltered(text: String): [Member]
 }
 
 type Mutation {
+    newNews(title: String!, catchLine: String!, content: String!, newsDate: String!): News
+    likeNews(newsId: Int!, memberId: Int!): News
+    unlikeNews(newsId: Int!, memberId: Int!): News
+
     newEvent(title: String!, description: String!): Event
+
     newMember(firstName: String!, lastName: String!, email: String!, password: String!): Member
 }
 
@@ -43,14 +53,15 @@ type Event {
     id: ID!
     title: String!
     description: String
-    startDate: String!
-    endDate: String!
+    startDate: LocalDateTime!
+    endDate: LocalDateTime!
     track: Track
     organizer: String
     price: Float
-    createdOn: String!
+    members: [Member]
+    createdOn: LocalDateTime!
     createdBy: Member!
-    modifiedOn: String
+    modifiedOn: LocalDateTime
     modifiedBy: Member
 }
 
@@ -58,15 +69,15 @@ type EventMember {
     id: ID!
     member: Member!
     event: Event!
-    createdOn: String!
+    createdOn: LocalDateTime!
 }
 
 type Gallery {
     id: ID!
     title: String!
     description: String
-    createdOn: String!
-    modifiedOn: String
+    createdOn: LocalDateTime!
+    modifiedOn: LocalDateTime
 }
 
 type LapRecord {
@@ -74,18 +85,18 @@ type LapRecord {
     track: Track!
     member: Member
     lapTime: Int!
-    recordDate: String!
+    recordDate: LocalDateTime!
     conditions: String!
     comments: String
-    createdOn: String!
-    modifiedOn: String
+    createdOn: LocalDateTime!
+    modifiedOn: LocalDateTime
 }
 
 type LikedNews {
     id: ID!
     member: Member
     news: News!
-    createdOn: String!
+    createdOn: LocalDateTime!
 }
 
 type Member {
@@ -99,9 +110,9 @@ type Member {
     bike: String
     active: Boolean!
     admin: Boolean!
-    registrationDate: String!
-    createdOn: String!
-    modifiedOn: String
+    registrationDate: LocalDateTime!
+    createdOn: LocalDateTime!
+    modifiedOn: LocalDateTime
 }
 
 type News {
@@ -123,8 +134,8 @@ type Photo {
     description: String
     link: String!
     gallery: Gallery!
-    createdOn: String!
-    modifiedOn: String
+    createdOn: LocalDateTime!
+    modifiedOn: LocalDateTime
 }
 
 type Track {

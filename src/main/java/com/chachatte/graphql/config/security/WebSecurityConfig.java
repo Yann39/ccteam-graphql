@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,6 +34,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.FilterInvocation;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
 /**
  * Enable Spring HTTP Security, by extending {@link WebSecurityConfigurerAdapter} to provide a
@@ -40,7 +45,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @since oct 2020
  */
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -49,6 +54,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     protected AuthenticationManager getAuthenticationManager() throws Exception {
         return authenticationManager();
+    }
+
+    @Bean
+    public RoleHierarchyImpl roleHierarchy() {
+        final RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MEMBER > ROLE_USER");
+        return roleHierarchy;
+    }
+
+    @Bean
+    public SecurityExpressionHandler<FilterInvocation> webExpressionHandler() {
+        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
+        return expressionHandler;
     }
 
     @Bean
@@ -63,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Needed to prevent the {@link JWTAuthorizationFilter} filter from being called twice.<br/>
-     * Indeed Spring Boot automatically registers any bean that is a Filter with the servlet container.<br/>
+     * Indeed, Spring Boot automatically registers any bean that is a Filter with the servlet container.<br/>
      * We still need the filter to be a bean/component to be able to autowire dependencies in it,
      * this is why we use this registration bean, to tell Spring Boot not to register the filter again.
      * <p>
@@ -86,6 +105,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 // allow access restriction using request matcher
                 .authorizeRequests()
+                // apply our custom web expression handler because we added role hierarchy to it
+                .expressionHandler(webExpressionHandler())
                 // authenticate requests to GraphQL endpoint
                 .antMatchers("/graphql").authenticated()
                 // allow all other requests

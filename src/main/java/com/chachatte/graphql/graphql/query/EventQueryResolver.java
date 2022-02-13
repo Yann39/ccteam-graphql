@@ -20,8 +20,11 @@
 package com.chachatte.graphql.graphql.query;
 
 import com.chachatte.graphql.dto.EventDto;
+import com.chachatte.graphql.dto.MemberDto;
 import com.chachatte.graphql.entities.Event;
+import com.chachatte.graphql.entities.Member;
 import com.chachatte.graphql.repository.EventRepository;
+import com.chachatte.graphql.repository.MemberRepository;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -29,7 +32,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,10 +46,12 @@ import java.util.stream.Collectors;
 public class EventQueryResolver implements GraphQLQueryResolver {
 
     private final EventRepository eventRepository;
+    private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    public EventQueryResolver(EventRepository eventRepository, ModelMapper modelMapper) {
+    public EventQueryResolver(EventRepository eventRepository, MemberRepository memberRepository, ModelMapper modelMapper) {
         this.eventRepository = eventRepository;
+        this.memberRepository = memberRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -62,6 +69,19 @@ public class EventQueryResolver implements GraphQLQueryResolver {
     }
 
     /**
+     * Get an event given the specified {@code id}.
+     *
+     * @param id The event ID
+     * @return A list of DTO objects representing the events
+     */
+    @Secured("ROLE_MEMBER")
+    public EventDto getEventById(Long id) {
+        log.info("Received call to getEventById with parameter ID = " + id);
+        final Optional<Event> event = eventRepository.findById(id);
+        return event.map(this::convertToDto).orElse(null);
+    }
+
+    /**
      * Get all events with the specified {@code title}.
      *
      * @param title The event title
@@ -74,13 +94,26 @@ public class EventQueryResolver implements GraphQLQueryResolver {
     }
 
     /**
-     * Convert the specified {@link Event} object to an {@link EventDto} object.
+     * Convert the specified {@link Event} entity object to an {@link EventDto} DTO object.
      *
      * @param event The event to convert
      * @return The {@link EventDto} object created
      */
     private EventDto convertToDto(Event event) {
-        return modelMapper.map(event, EventDto.class);
+        final EventDto eventDto = modelMapper.map(event, EventDto.class);
+        final List<MemberDto> memberDtos = memberRepository.findByEventId(eventDto.getId()).stream().map(this::convertToMemberDto).collect(Collectors.toList());
+        eventDto.setMembers(new HashSet<>(memberDtos));
+        return eventDto;
+    }
+
+    /**
+     * Convert the specified {@link Member} entity object to a {@link MemberDto} DTO object.
+     *
+     * @param member The member to convert
+     * @return The {@link MemberDto} object created
+     */
+    private MemberDto convertToMemberDto(Member member) {
+        return modelMapper.map(member, MemberDto.class);
     }
 
 }

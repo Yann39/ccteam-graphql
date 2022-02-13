@@ -55,7 +55,7 @@ public class JWTTokenUtils {
     public String generateToken(Object id, Object role) {
         log.info("Calling JWTTokenUtils generateToken");
         final LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Zurich"));
-        final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000 + 3600).atZone(ZoneId.of("Europe/Zurich")).toInstant();
+        final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of("Europe/Zurich")).toInstant();
 
         log.info("Building JWT... it will expire on " + instant.atZone(ZoneId.of("Europe/Zurich")).toString());
 

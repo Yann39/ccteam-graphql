@@ -47,16 +47,29 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
         log.info("Calling JWTAuthenticationEntryPoint commence");
         res.setContentType("application/json;charset=UTF-8");
         final String expired = (String) req.getAttribute("token_expired");
+        final String wrongTokenFormat = (String) req.getAttribute("wrong_token_format");
+        final String noToken = (String) req.getAttribute("no_token");
         final String badCredentials = (String) req.getAttribute("bad_credentials");
         if (expired != null) {
-            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customMessage\":\"" + expired + "\"}");
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"token_expired\"}");
+            log.info("return token_expired");
+        } else if (wrongTokenFormat != null) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"wrong_token_format\"}");
+            log.info("return wrong_token_format");
+        } else if (noToken != null) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"no_token\"}");
+            log.info("return no_token");
         } else if (badCredentials != null) {
             res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customMessage\":\"" + badCredentials + "\"}");
+            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"bad_credentials\"}");
+            log.info("return bad_credentials");
         } else {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customMessage\":\"\"}");
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"internal_error\"}");
+            log.info("return internal_error");
         }
     }
 }

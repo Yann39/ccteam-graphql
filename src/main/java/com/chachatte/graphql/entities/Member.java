@@ -49,7 +49,7 @@ public class Member {
     @Column(length = 128, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(length = 13)
@@ -65,13 +65,22 @@ public class Member {
     private boolean active = false;
 
     @Column(nullable = false)
+    private boolean verified = false;
+
+    @Column(nullable = false)
     private boolean admin = false;
+
+    @Column
+    private String otp ;
+
+    @Column
+    private LocalDateTime otpDate ;
 
     @Enumerated(EnumType.STRING)
     @Column
     private Role role;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime registrationDate;
 
     @Column(nullable = false)

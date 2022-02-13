@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * and the representation of the user details needed by Spring Security.
  * <p>
  * It implements the {@link UserDetails} interface which basically holds principals, credentials, authorities
- * and other information that is regarding a particular user.
+ * and other information regarding a particular user.
  *
  * @author yann39
  * @since oct 2020
@@ -57,7 +57,7 @@ public class CustomUserDetails implements UserDetails {
         this.username = user.getEmail();
         this.password = user.getPassword();
         this.active = user.isActive();
-        this.authorities = Arrays.stream(new String[]{"ROLE_MEMBER"}).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        this.authorities = Arrays.stream(new String[]{user.getRole().getAuthority()}).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
     @Override

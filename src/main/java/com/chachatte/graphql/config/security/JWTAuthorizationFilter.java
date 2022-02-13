@@ -91,18 +91,20 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 req.setAttribute("token_expired", e.getMessage());
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } catch (BadCredentialsException e) {
-                log.info("Bad credentials : " + e.getMessage());
+                log.info("Bad credentials in token : " + e.getMessage());
                 req.setAttribute("bad_credentials", e.getMessage());
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } catch (JWTDecodeException e) {
-                e.printStackTrace();
                 log.info("Problem when decoding token : " + e.getMessage());
+                req.setAttribute("wrong_token_format", e.getMessage());
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
         // no token specified
         else {
             log.info("Request does not contain authorization header with Bearer");
+            req.setAttribute("no_token", "Request does not contain authorization header with Bearer");
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
         // pass request down the chain, except for OPTIONS requests

@@ -9,6 +9,11 @@
 
 ## Documentation
 
+User roles :
+- NORMAL : default user role, not member of the team
+- MEMBER : members that have been accepted in the team
+- ADMIN : administrator users
+
 Application uses only a few starters and libraries :
 - **Spring data JPA** starter as ORM
 - **GraphQL** starter to expose data via GraphQL

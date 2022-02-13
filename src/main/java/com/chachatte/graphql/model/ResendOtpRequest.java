@@ -17,35 +17,25 @@
  * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.chachatte.graphql.dto;
+package com.chachatte.graphql.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Set;
-
 /**
+ * Represent a user registration request.
+ *
  * @author yann39
- * @since sept 2020
+ * @since jan 2021
  */
 @Getter
 @Setter
-public class EventDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ResendOtpRequest {
 
-    private Long id;
-    private String title;
-    private String description;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private TrackDto track;
-    private String organizer;
-    private BigDecimal price;
-    private Set<MemberDto> members;
-    private LocalDateTime createdOn = LocalDateTime.now();
-    private MemberDto createdBy;
-    private LocalDateTime modifiedOn;
-    private MemberDto modifiedBy;
+    private String email;
 
 }

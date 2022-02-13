@@ -17,35 +17,41 @@
  * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.chachatte.graphql.dto;
+package com.chachatte.graphql.entities;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * @author yann39
- * @since sept 2020
+ * @since dec 2020
  */
 @Getter
 @Setter
-public class EventDto {
+@Entity
+@Table(name = "otp")
+public class Otp {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private String description;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private TrackDto track;
-    private String organizer;
-    private BigDecimal price;
-    private Set<MemberDto> members;
+
+    @Column(length = 128, nullable = false)
+    private String email;
+
+    @Column
+    private String otp;
+
+    @Column
+    private LocalDateTime otpDate;
+
+    @Column
+    private int attempts;
+
+    @Column(nullable = false)
     private LocalDateTime createdOn = LocalDateTime.now();
-    private MemberDto createdBy;
-    private LocalDateTime modifiedOn;
-    private MemberDto modifiedBy;
 
 }

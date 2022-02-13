@@ -29,11 +29,12 @@ import com.chachatte.graphql.repository.NewsRepository;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -59,29 +60,28 @@ public class NewsQueryResolver implements GraphQLQueryResolver {
      *
      * @return A list of DTO objects representing the news
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     public Iterable<NewsDto> getAllNews() throws CustomGraphQLException {
         log.info("Received call to getAllNews");
-        final List<News> result = new ArrayList<>();
-        newsRepository.findAll().forEach(result::add);
-        //throw new CustomGraphQLException("Un utilisateur ayant la même adresse e-mail existe déjà");
+        final List<News> result = new ArrayList<>(newsRepository.findAll());
         return result.stream().map(this::convertToNewsDto).collect(Collectors.toList());
     }
 
     /**
-     * Get all news with the specified {@code title}.
+     * Get a news given its {@code id}.
      *
-     * @param title The news title
+     * @param id The news ID
      * @return A list of DTO objects representing the news
      */
-    @Secured("ROLE_MEMBER")
-    public Iterable<NewsDto> getNewsByTitle(String title) {
-        log.info("Received call to getEventsByTitle with parameter title = " + title);
-        return newsRepository.findByTitle(title).stream().map(this::convertToNewsDto).collect(Collectors.toList());
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    public NewsDto getNewsById(Long id) {
+        log.info("Received call to getNewsById with parameter id = " + id);
+        final Optional<News> news = newsRepository.findById(id);
+        return news.map(this::convertToNewsDto).orElse(null);
     }
 
     /**
-     * Convert the specified {@link News} object to an {@link NewsDto} object.
+     * Convert the specified {@link News} entity object to a {@link NewsDto} DTO object.
      *
      * @param news The news to convert
      * @return The {@link NewsDto} object created
@@ -94,7 +94,7 @@ public class NewsQueryResolver implements GraphQLQueryResolver {
     }
 
     /**
-     * Convert the specified {@link Member} object to an {@link MemberDto} object.
+     * Convert the specified {@link Member} entity object to a {@link MemberDto} DTO object.
      *
      * @param member The member to convert
      * @return The {@link MemberDto} object created

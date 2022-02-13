@@ -55,6 +55,9 @@ public class MemberMutationResolver implements GraphQLMutationResolver {
      * @return A DTO object representing the member just created
      */
     public MemberDto newMember(String firstName, String lastName, String email, String password) throws CustomGraphQLException {
+        if (memberRepository.existsMemberByEmail(email)) {
+            throw new CustomGraphQLException("user_already_exist", "Un utilisateur ayant la même adresse e-mail existe déjà");
+        }
         final Member member = new Member();
         member.setFirstName(firstName);
         member.setLastName(lastName);
