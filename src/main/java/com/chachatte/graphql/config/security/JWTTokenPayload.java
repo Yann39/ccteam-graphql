@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2020 by Yann39.
+ * Copyright (c) 2022 by Yann39
  *
- * This file is part of Chachatte Team application.
+ * This file is part of Chachatte Team GraphQL application.
  *
- * Chachatte Team is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Chachatte Team GraphQL is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Chachatte Team is distributed in the hope that it will be useful,
+ * Chachatte Team GraphQL is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with Chachatte Team GraphQL. If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package com.chachatte.graphql.config.security;
@@ -22,13 +23,12 @@ package com.chachatte.graphql.config.security;
 import com.chachatte.graphql.entities.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- *  Represent JWT token payload data.
+ * Represent JWT token payload data.
  *
  * @author yann39
- * @since oct 2020
+ * @since 1.0.0
  */
 @AllArgsConstructor
 @Getter
@@ -39,6 +39,6 @@ public class JWTTokenPayload {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("email", email).append("role", role).toString();
+        return "email=" + email + ",role=" + role;
     }
 }

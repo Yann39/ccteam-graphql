@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2020 by Yann39.
+ * Copyright (c) 2022 by Yann39
  *
- * This file is part of Chachatte Team application.
+ * This file is part of Chachatte Team GraphQL application.
  *
- * Chachatte Team is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Chachatte Team GraphQL is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Chachatte Team is distributed in the hope that it will be useful,
+ * Chachatte Team GraphQL is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with Chachatte Team GraphQL. If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package com.chachatte.graphql.config.security;
@@ -29,14 +30,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Custom authentication entry point used to customize the response on authentication exception before sending the
- * response back to the client.
+ * Custom authentication entry point used to customize the response when an authentication exception is raised
+ * before sending the response back to the client.
  * <p>
- * If the user requests a secure resource without being authenticated, an {@link AuthenticationException} is thrown.<br/>
+ * If the user requests a secure resource without being authenticated, an {@link AuthenticationException} is thrown.
  * Then {@link AuthenticationEntryPoint} is called, and the {@code commence()} method is triggered.
+ * <p>
+ * We use this to customize the server response when a problem occurs while verifying the JWT token in our {@link JWTAuthorizationFilter}.
  *
  * @author yann39
- * @since aug 2020
+ * @since 1.0.0
  */
 @Component
 @Slf4j

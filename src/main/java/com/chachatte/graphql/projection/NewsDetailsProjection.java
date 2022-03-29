@@ -18,29 +18,24 @@
  *
  */
 
-package com.chachatte.graphql.config.security;
+package com.chachatte.graphql.projection;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * Represent a JWT authentication response.
- *
  * @author yann39
  * @since 1.0.0
  */
-@Getter
-@Setter
-@AllArgsConstructor
-public class JWTResponse implements Serializable {
+public interface NewsDetailsProjection {
 
-    @Serial
-    private static final long serialVersionUID = -8091879091924046844L;
+    Long getId();
 
-    private String jwtToken;
+    String getTitle();
+
+    String getContent();
+
+    LocalDateTime getNewsDate();
+
+    String getCreatedBy();
 
 }

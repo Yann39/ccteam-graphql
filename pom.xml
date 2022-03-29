@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.0</version>
+        <version>2.7.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
     <groupId>com.chachatte</groupId>
@@ -15,19 +15,24 @@
     <description>Spring Boot application to expose GraphQL endpoint for Chachatte team mobile application</description>
 
     <properties>
-        <java.version>11</java.version>
-        <mariadb-client.version>2.7.0</mariadb-client.version>
-        <graphql-starters.version>5.0.2</graphql-starters.version>
-        <graphql-java-tools.version>5.2.4</graphql-java-tools.version>
-        <modelmapper.version>2.3.9</modelmapper.version>
-        <java-jwt.version>3.10.3</java-jwt.version>
+        <java.version>17</java.version>
+        <mariadb-client.version>3.0.4</mariadb-client.version>
+        <java-jwt.version>3.19.0</java-jwt.version>
     </properties>
 
     <dependencies>
         <!-- Spring Boot starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -42,32 +47,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-        </dependency>
-
-        <!-- GraphQL starters -->
-        <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphql-spring-boot-starter</artifactId>
-            <version>${graphql-starters.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphiql-spring-boot-starter</artifactId>
-            <version>${graphql-starters.version}</version>
-        </dependency>
-
-        <!-- Model mapper -->
-        <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>${modelmapper.version}</version>
-        </dependency>
-
-        <!-- GraphQL -->
-        <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphql-java-tools</artifactId>
-            <version>${graphql-java-tools.version}</version>
         </dependency>
 
         <!-- MariaDB java client -->
@@ -91,8 +70,47 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.4</version>
             </plugin>
         </plugins>
     </build>
+
+    <!-- This may be removed while Spring Boot 2.7.0 is released -->
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

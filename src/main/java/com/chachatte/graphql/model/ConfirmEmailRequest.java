@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Yann39
+ * Copyright (c) 2022 by Yann39
  *
  * This file is part of Chachatte Team GraphQL application.
  *
@@ -28,7 +28,7 @@ import lombok.Setter;
  * Represent an OTP confirmation request.
  *
  * @author yann39
- * @since nov 2020
+ * @since 1.0.0
  */
 @Getter
 @Setter

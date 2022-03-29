@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2020 by Yann39.
+ * Copyright (c) 2022 by Yann39
  *
- * This file is part of Chachatte Team application.
+ * This file is part of Chachatte Team GraphQL application.
  *
- * Chachatte Team is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Chachatte Team GraphQL is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Chachatte Team is distributed in the hope that it will be useful,
+ * Chachatte Team GraphQL is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with Chachatte Team GraphQL. If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package com.chachatte.graphql.config.security;
@@ -39,15 +40,15 @@ import java.util.Collections;
 /**
  * Custom security filter to be added to the filter chain to process JWT authentication.
  * <p>
- * It extends {@link BasicAuthenticationFilter} which normally processes an HTTP request's BASIC authentication,
- * but here we override the internal filter to get authentication information from the JWT token instead,
- * and then putting the result into the {@link SecurityContextHolder}.
+ * It extends {@link BasicAuthenticationFilter} which normally processes an HTTP request's basic authentication,
+ * but here we override the internal filter to get authentication information from the <i>Authorization</i> header
+ * instead, which contain the JWT token, and then put the result into the {@link SecurityContextHolder}.
  *
  * @author yann39
- * @since oct 2020
+ * @since 1.0.0
  */
-@Component
 @Slf4j
+@Component
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final JWTTokenUtils jwtTokenUtils;

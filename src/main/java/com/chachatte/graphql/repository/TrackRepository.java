@@ -18,29 +18,29 @@
  *
  */
 
-package com.chachatte.graphql.config.security;
+package com.chachatte.graphql.repository;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.chachatte.graphql.entities.Track;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Represent a JWT authentication response.
+ * {@link Track} repository.
  *
  * @author yann39
  * @since 1.0.0
  */
-@Getter
-@Setter
-@AllArgsConstructor
-public class JWTResponse implements Serializable {
+@Repository
+public interface TrackRepository extends JpaRepository<Track, Long> {
 
-    @Serial
-    private static final long serialVersionUID = -8091879091924046844L;
+    @Query("select t from Track t")
+    List<Track> findAllCustom();
 
-    private String jwtToken;
+    @Query("select t from Track t where t.id = :id")
+    Optional<Track> findByIdCustom(long id);
 
 }

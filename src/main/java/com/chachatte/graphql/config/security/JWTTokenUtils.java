@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2020 by Yann39.
+ * Copyright (c) 2022 by Yann39
  *
- * This file is part of Chachatte Team application.
+ * This file is part of Chachatte Team GraphQL application.
  *
- * Chachatte Team is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Chachatte Team GraphQL is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Chachatte Team is distributed in the hope that it will be useful,
+ * Chachatte Team GraphQL is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with Chachatte Team GraphQL. If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package com.chachatte.graphql.config.security;
@@ -25,7 +26,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.chachatte.graphql.entities.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -37,7 +37,7 @@ import java.util.Date;
  * JWT token utilities.
  *
  * @author yann39
- * @since oct 2020
+ * @since 1.0.0
  */
 @Component
 @Slf4j
@@ -46,13 +46,26 @@ public class JWTTokenUtils {
     @Autowired
     private JWTTokenProperties jwtTokenProperties;
 
+    /**
+     * Decode the JWT token from the specified authorization header content.
+     *
+     * @param authorizationHeader The authorization header value as {@link String}
+     * @return The {@link JWTTokenPayload} object containing the decoded JWT information
+     */
     public JWTTokenPayload decodeToken(String authorizationHeader) {
         log.info("Calling JWTTokenUtils decodeToken");
         final DecodedJWT decodedToken = JWT.require(Algorithm.HMAC512(jwtTokenProperties.getSecret().getBytes())).build().verify(authorizationHeader.replace("Bearer ", ""));
         return new JWTTokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role").as(Member.Role.class));
     }
 
-    public String generateToken(Object id, Object role) {
+    /**
+     * Generate a new JWT token from the specified subject and role.
+     *
+     * @param subject The subject claim of the JWT payload data
+     * @param role    The role to be set as claim value in the JWT
+     * @return The new created JWT token as {@link String}
+     */
+    public String generateToken(Object subject, Object role) {
         log.info("Calling JWTTokenUtils generateToken");
         final LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Zurich"));
         final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of("Europe/Zurich")).toInstant();
@@ -60,20 +73,10 @@ public class JWTTokenUtils {
         log.info("Building JWT... it will expire on " + instant.atZone(ZoneId.of("Europe/Zurich")).toString());
 
         return JWT.create()
-                .withSubject(id.toString())
+                .withSubject(subject.toString())
                 .withClaim("role", role.toString())
                 .withExpiresAt(Date.from(instant))
                 .sign(Algorithm.HMAC512(jwtTokenProperties.getSecret().getBytes()));
-    }
-
-    public String extractUsername(String token) {
-        return decodeToken(token).getEmail();
-    }
-
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        log.info("Calling JWTTokenUtils validateToken");
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()));
     }
 
 }

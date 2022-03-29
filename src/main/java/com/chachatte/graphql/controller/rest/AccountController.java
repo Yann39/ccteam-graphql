@@ -1,26 +1,26 @@
 /*
- * Copyright (c) 2020 by Yann39.
+ * Copyright (c) 2022 by Yann39
  *
- * This file is part of Chachatte Team application.
+ * This file is part of Chachatte Team GraphQL application.
  *
- * Chachatte Team is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Chachatte Team GraphQL is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Chachatte Team is distributed in the hope that it will be useful,
+ * Chachatte Team GraphQL is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Chachatte Team. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with Chachatte Team GraphQL. If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package com.chachatte.graphql.controller;
+package com.chachatte.graphql.controller.rest;
 
 import com.chachatte.graphql.entities.Member;
-import com.chachatte.graphql.entities.News;
 import com.chachatte.graphql.model.*;
 import com.chachatte.graphql.repository.MemberRepository;
 import com.chachatte.graphql.service.MailService;
@@ -33,18 +33,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * REST registration controller.
+ * REST account controller.
  *
  * @author yann39
- * @since Nov 2020
+ * @since 1.0.0
  */
 @RestController
 @CrossOrigin
@@ -65,17 +63,21 @@ public class AccountController {
     private PasswordEncoder passwordEncoder;
 
     /**
-     * Check the account associated to the specified e-mail address.<br/>
+     * Check the account associated to the specified e-mail address.
+     * <p>
      * It returns a specific status code according to the account current status,
      * so that the client knows what to do with that account.
      *
      * @param checkAccountRequest The request data containing the account e-mail address
-     * @return 400 Bad request if e-mail address is missing from the request<br/>
-     * 404 Not Found if no account has been found for the specified e-mail address<br/>
-     * 302 Found if account exists, OTP has been sent and is still valid<br/>
-     * 417 Expectation Failed if account exists, OTP has been sent but is not valid anymore
-     * 403 Forbidden if account exists but is not verified<br/>
-     * 200 Ok if account has been found and is verified
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     * <li>400 Bad request if e-mail address is missing from the request</li>
+     * <li>404 Not Found if no account has been found for the specified e-mail address</li>
+     * <li>302 Found if account exists, OTP has been sent and is still valid</li>
+     * <li>417 Expectation Failed if account exists, OTP has been sent but is not valid anymore</li>
+     * <li>403 Forbidden if account exists but is not verified</li>
+     * <li>200 Ok if account has been found and is verified</li>
+     * </ul>
      */
     @RequestMapping(value = "/checkAccount", method = RequestMethod.POST)
     public ResponseEntity<?> checkAccount(@RequestBody CheckAccountRequest checkAccountRequest) {
@@ -89,7 +91,7 @@ public class AccountController {
         }
 
         // get any member with the specified e-mail address
-        final Optional<Member> member = memberRepository.findByEmail(checkAccountRequest.getEmail());
+        final Optional<Member> member = memberRepository.findByEmailCustom(checkAccountRequest.getEmail());
 
         // e-mail address does not exist
         if (member.isEmpty()) {
@@ -121,15 +123,19 @@ public class AccountController {
     }
 
     /**
-     * Pre-register a new user given its e-mail address, first name and last name.<br/>
+     * Pre-register a new user given its e-mail address, first name and last name.
+     * <p>
      * It creates the account with minimal information, but the user will still need to
      * confirm its e-mail address and create a passcode to complete the registration process.
      *
      * @param preRegisterRequest The request data containing the user's e-mail address, first name and last name
-     * @return 400 Bad request if e-mail address, first name, or last name is missing from the request<br/>
-     * 409 Conflict if a user already exist with the same e-mail address<br/>
-     * 207 Multi-status if the user is successfully created but the confirmation e-mail failed to be sent
-     * 201 Created if succeeded
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     * <li>400 Bad request if e-mail address, first name, or last name is missing from the request</li>
+     * <li>409 Conflict if a user already exist with the same e-mail address</li>
+     * <li>207 Multi-status if the user is successfully created but the confirmation e-mail failed to be sent</li>
+     * <li>201 Created if succeeded</li>
+     * </ul>
      */
     @RequestMapping(value = "/preRegister", method = RequestMethod.POST)
     public ResponseEntity<?> preRegister(@RequestBody PreRegisterRequest preRegisterRequest) {
@@ -166,7 +172,7 @@ public class AccountController {
         member.setLastName(preRegisterRequest.getLastName());
         member.setEmail(preRegisterRequest.getEmail());
         member.setCreatedOn(LocalDateTime.now(ZoneId.of("Europe/Paris")));
-        member.setOtp(ThreadLocalRandom.current().nextInt(1000, 10000) + "");
+        member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
         member.setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
         memberRepository.save(member);
 
@@ -176,7 +182,6 @@ public class AccountController {
             log.info("Registration e-mail sent to " + member.getEmail());
         } catch (Exception ex) {
             log.error("Error while sending registration email to " + member.getEmail() + " : " + ex);
-            ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();
         }
 
@@ -186,14 +191,18 @@ public class AccountController {
     }
 
     /**
-     * Send a new one-time password to the specified e-mail address.<br/>
-     * It is used in case user has not entered the OTP in the given time, or if he manually ask a new OTP.
+     * Send a new one-time password to the specified e-mail address.
+     * <p>
+     * It is used in case user has not entered the OTP in the given time, or if he manually asks a new OTP.
      *
      * @param resendOtpRequest The request data containing the user's e-mail address
-     * @return 400 Bad request if e-mail address is missing from the request<br/>
-     * 404 Not Found if no account has been found for the specified e-mail address<br/>
-     * 207 Multi-status if the OTP has been successfully updated but the mail failed to be sent
-     * 200 Ok if OTP has been resent successfully
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     * <li>400 Bad request if e-mail address is missing from the request</li>
+     * <li>404 Not Found if no account has been found for the specified e-mail address</li>
+     * <li>207 Multi-status if the OTP has been successfully updated but the mail failed to be sent</li>
+     * <li>200 Ok if OTP has been resent successfully</li>
+     * </ul>
      */
     @RequestMapping(value = "/resendOtp", method = RequestMethod.POST)
     public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
@@ -207,7 +216,7 @@ public class AccountController {
         }
 
         // get the user
-        final Optional<Member> member = memberRepository.findByEmail(resendOtpRequest.getEmail());
+        final Optional<Member> member = memberRepository.findByEmailCustom(resendOtpRequest.getEmail());
 
         // e-mail address does not exist
         if (member.isEmpty()) {
@@ -227,7 +236,6 @@ public class AccountController {
             log.info("Registration e-mail resent to " + member.get().getEmail());
         } catch (Exception ex) {
             log.error("Error while resending registration email to " + member.get().getEmail() + " : " + ex);
-            ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();
         }
 
@@ -239,11 +247,14 @@ public class AccountController {
      * Confirm the specified e-mail address by checking the specified one-time password which was sent on registration.
      *
      * @param confirmEmailRequest The request data containing the user's e-mail address and the OTP to be confirmed
-     * @return 400 Bad request if e-mail address or OTP is missing from the request<br/>
-     * 404 Not found if the specified user's e-mail address has not been found in the database<br/>
-     * 406 Not acceptable if the specified OTP has expired<br/>
-     * 401 Unauthorized if the specified OTP does not match the one from the database<br/>
-     * 202 Accepted if e-mail has been verified successfully
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     * <li>400 Bad request if e-mail address or OTP is missing from the request</li>
+     * <li>404 Not found if the specified user's e-mail address has not been found in the database</li>
+     * <li>406 Not acceptable if the specified OTP has expired</li>
+     * <li>401 Unauthorized if the specified OTP does not match the one from the database</li>
+     * <li>202 Accepted if e-mail has been verified successfully</li>
+     * </ul>
      */
     @RequestMapping(value = "/confirmEmail", method = RequestMethod.POST)
     public ResponseEntity<?> confirmEmail(@RequestBody ConfirmEmailRequest confirmEmailRequest) {
@@ -263,7 +274,7 @@ public class AccountController {
         }
 
         // get member from the database given the specified e-mail address
-        final Optional<Member> optMember = memberRepository.findByEmail(confirmEmailRequest.getEmail());
+        final Optional<Member> optMember = memberRepository.findByEmailCustom(confirmEmailRequest.getEmail());
 
         // member not found in the database
         if (optMember.isEmpty()) {
@@ -300,9 +311,12 @@ public class AccountController {
      * Complete the registration for the specified account, especially by setting the specified password.
      *
      * @param completeRegistrationRequest The request data containing the user's e-mail address and the password to be defined
-     * @return 400 Bad request if e-mail address or password is missing<br/>
-     * 404 Not found if the specified user's e-mail address is not found in the database<br/>
-     * 200 Ok if succeeded
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     * <li>400 Bad request if e-mail address or password is missing</li>
+     * <li>404 Not found if the specified user's e-mail address is not found in the database</li>
+     * <li>200 Ok if succeeded</li>
+     * </ul>
      */
     @RequestMapping(value = "/completeRegistration", method = RequestMethod.POST)
     public ResponseEntity<?> completeRegistration(@RequestBody CompleteRegistrationRequest completeRegistrationRequest) {
@@ -320,7 +334,7 @@ public class AccountController {
         }
 
         // get member from the database given the specified e-mail address
-        final Optional<Member> optMember = memberRepository.findByEmail(completeRegistrationRequest.getEmail());
+        final Optional<Member> optMember = memberRepository.findByEmailCustom(completeRegistrationRequest.getEmail());
 
         // member not found in the database
         if (optMember.isEmpty()) {
@@ -343,40 +357,39 @@ public class AccountController {
     }
 
     /**
-     * Forgot password.
+     * Send a link to the specified user's e-mail address, so he can request a new password.
      *
-     * @param preRegisterRequest The request data containing the user's e-mail address
-     * @return 400 Bad request if e-mail address is missing<br/>
-     * 404 Not found if the specified user's e-mail address is not found in the database<br/>
-     * 200 Ok if succeeded
+     * @param forgotPasswordRequest The request data containing the user's e-mail address
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     * <li>400 Bad request if e-mail address is missing</li>
+     * <li>404 Not found if the specified user's e-mail address is not found in the database</li>
+     * <li>207 Multi-status if the user has been found but the confirmation e-mail failed to be sent</li>
+     * <li>200 Ok if succeeded</li>
+     * </ul>
      */
     @RequestMapping(value = "/forgotPassword", method = RequestMethod.POST)
-    public ResponseEntity<?> forgotPassword(@RequestBody PreRegisterRequest preRegisterRequest) {
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
 
         // e-mail address has not been specified
-        if (preRegisterRequest.getEmail() == null || preRegisterRequest.getEmail().length() < 1) {
+        if (forgotPasswordRequest.getEmail() == null || forgotPasswordRequest.getEmail().length() < 1) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // get member from the database given the specified e-mail address
-        final Optional<Member> optMember = memberRepository.findByEmail(preRegisterRequest.getEmail());
+        final Optional<Member> optMember = memberRepository.findByEmailCustom(forgotPasswordRequest.getEmail());
 
         // member not found in the database
         if (optMember.isEmpty()) {
-            log.info("No member found in the database with address " + preRegisterRequest.getEmail());
+            log.info("No member found in the database with address " + forgotPasswordRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         final Member member = optMember.get();
 
-        // generate a random string for OTP
-        final byte[] array = new byte[8];
-        new Random().nextBytes(array);
-        final String otp = new String(array, StandardCharsets.UTF_8);
-
         // set new OTP
-        member.setOtp(otp);
+        member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
         member.setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
         memberRepository.save(member);
 
@@ -386,22 +399,11 @@ public class AccountController {
             log.info("Forgot password e-mail sent to " + member.getEmail());
         } catch (Exception ex) {
             log.error("Error while sending forgot password email to " + member.getEmail() + " : " + ex);
-            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();
         }
 
         return ResponseEntity.status(HttpStatus.OK).build();
 
-    }
-
-    @RequestMapping(value = "/news", method = RequestMethod.POST)
-    public ResponseEntity<?> listNews(@RequestBody PreRegisterRequest preRegisterRequest) {
-        log.info("OK in news");
-
-        for (News news : newsService.getNewsFilteredPaginated(preRegisterRequest.getEmail(), 0, 10, "title", "asc")) {
-            log.info(news.getTitle());
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
