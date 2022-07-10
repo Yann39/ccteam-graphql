@@ -20,7 +20,6 @@
 
 package com.chachatte.graphql.controller.rest;
 
-import com.chachatte.graphql.config.security.CustomDbAuthenticationManager;
 import com.chachatte.graphql.config.security.JWTRequest;
 import com.chachatte.graphql.config.security.JWTResponse;
 import com.chachatte.graphql.config.security.JWTTokenUtils;
@@ -29,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -52,7 +53,7 @@ public class AuthController {
     private JWTTokenUtils jwtTokenUtils;
 
     @Autowired
-    private CustomDbAuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     /**
      * Authenticate the user according to the specified email and password.
@@ -71,7 +72,12 @@ public class AuthController {
         log.info("Call to authenticate REST endpoint");
 
         // try to authenticate user using specified credentials
-        final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword()));
+        final Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword()));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         // if authentication succeeded and is not anonymous
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated()) {

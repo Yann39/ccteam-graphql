@@ -20,6 +20,9 @@
 
 package com.chachatte.graphql.config.security;
 
+import com.chachatte.graphql.config.graphql.CustomGraphQLException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -36,7 +39,8 @@ import java.io.IOException;
  * If the user requests a secure resource without being authenticated, an {@link AuthenticationException} is thrown.
  * Then {@link AuthenticationEntryPoint} is called, and the {@code commence()} method is triggered.
  * <p>
- * We use this to customize the server response when a problem occurs while verifying the JWT token in our {@link JWTAuthorizationFilter}.
+ * We use this to customize the server response when a problem occurs while verifying the JWT token in our {@link JWTAuthorizationFilter},
+ * so that we can return a response in a GraphQL standard response format needed on Flutter side.
  *
  * @author yann39
  * @since 1.0.0
@@ -48,31 +52,43 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException authException) throws IOException {
         log.info("Calling JWTAuthenticationEntryPoint commence");
+
         res.setContentType("application/json;charset=UTF-8");
         final String expired = (String) req.getAttribute("token_expired");
         final String wrongTokenFormat = (String) req.getAttribute("wrong_token_format");
         final String noToken = (String) req.getAttribute("no_token");
         final String badCredentials = (String) req.getAttribute("bad_credentials");
+
+        // use custom GraphQL exception to set the error, so that it is in a standard GraphQL response format
+        CustomGraphQLException customGraphQLException;
+
         if (expired != null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"token_expired\"}");
+            customGraphQLException = new CustomGraphQLException("token_expired", authException.getMessage());
             log.info("return token_expired");
         } else if (wrongTokenFormat != null) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"wrong_token_format\"}");
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            customGraphQLException = new CustomGraphQLException("wrong_token_format", authException.getMessage());
             log.info("return wrong_token_format");
         } else if (noToken != null) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"no_token\"}");
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            customGraphQLException = new CustomGraphQLException("no_token", authException.getMessage());
             log.info("return no_token");
         } else if (badCredentials != null) {
             res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"bad_credentials\"}");
+            customGraphQLException = new CustomGraphQLException("bad_credentials", authException.getMessage());
             log.info("return bad_credentials");
         } else {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            res.getWriter().write("{\"originalMessage\":\"" + authException.getMessage() + "\", \"customCode\":\"internal_error\"}");
+            customGraphQLException = new CustomGraphQLException("internal_error", authException.getMessage());
             log.info("return internal_error");
         }
+
+        // serialize GraphQL exception as JSON
+        final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        final String json = ow.writeValueAsString(customGraphQLException);
+
+        // write JSON to response and wrap it with "errors" so that the response is in a standard GraphQL response format
+        res.getWriter().write("{ \"errors\": [ " + json + "], \"data\" : null }");
     }
 }

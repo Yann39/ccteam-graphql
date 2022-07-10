@@ -70,7 +70,7 @@ public class JWTTokenUtils {
         final LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Zurich"));
         final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of("Europe/Zurich")).toInstant();
 
-        log.info("Building JWT... it will expire on " + instant.atZone(ZoneId.of("Europe/Zurich")).toString());
+        log.info("Building JWT... it will expire on " + instant.atZone(ZoneId.of("Europe/Zurich")));
 
         return JWT.create()
                 .withSubject(subject.toString())

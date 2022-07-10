@@ -24,12 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
@@ -59,6 +62,16 @@ public class WebSecurityConfig {
         final RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MEMBER > ROLE_USER");
         return roleHierarchy;
+    }
+
+    /**
+     * Define a password encoder that uses the BCrypt strong hashing function.
+     *
+     * @return A {@link PasswordEncoder} object representing the {@link BCryptPasswordEncoder} implementation
+     */
+    @Bean
+    protected PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     /**
@@ -93,6 +106,18 @@ public class WebSecurityConfig {
     }
 
     /**
+     * Define the authentication manager for the current authentication request, according to the current authentication configuration.
+     *
+     * @param authenticationConfiguration The {@link AuthenticationConfiguration} that exports the current authentication configuration.
+     * @return The {@link AuthenticationManager} for the current authentication request
+     * @throws Exception An exception occurred while getting authentication manager from authentication configuration
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    /**
      * HTTP security configuration for authenticated content.
      *
      * @param http The {@link HttpSecurity}
@@ -100,7 +125,6 @@ public class WebSecurityConfig {
      * @throws Exception An exception occurred while configuring the HTTP security
      */
     @Bean
-    @Order(1)
     public SecurityFilterChain filterChainAuthenticated(HttpSecurity http) throws Exception {
         http
                 // disable CSRF as we do not serve browser clients
@@ -108,7 +132,7 @@ public class WebSecurityConfig {
                 // match GraphQL endpoint
                 .antMatcher("/graphql")
                 // add JWT authorization filter
-                .addFilter(new JWTAuthorizationFilter(new CustomDbAuthenticationManager(), jwtTokenUtils))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), jwtTokenUtils))
                 // allow access restriction using request matcher
                 .authorizeRequests()
                 // apply our custom web expression handler because we added role hierarchy to it
@@ -119,29 +143,6 @@ public class WebSecurityConfig {
                 .anyRequest().permitAll().and()
                 // custom exception handling
                 .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
-                // make sure we use stateless session, session will not be used to store user's state
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        return http.build();
-    }
-
-    /**
-     * HTTP security configuration for non-authenticated content.
-     * <p>
-     * We use that second configuration because we need to apply the custom authentication filter only
-     * for non-authenticated content.
-     *
-     * @param http The {@link HttpSecurity}
-     * @return A {@link SecurityFilterChain} object representing the new configured filter chain
-     * @throws Exception An exception occurred while configuring the HTTP security
-     */
-    @Bean
-    @Order(2)
-    public SecurityFilterChain filterChainNotAuthenticated(HttpSecurity http) throws Exception {
-        http
-                // disable CSRF as we do not serve browser clients
-                .csrf().disable()
-                // custom exception handling
-                .exceptionHandling().authenticationEntryPoint(new CustomDbAuthenticationEntryPoint()).and()
                 // make sure we use stateless session, session will not be used to store user's state
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();
