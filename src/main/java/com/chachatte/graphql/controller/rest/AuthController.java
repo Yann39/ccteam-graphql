@@ -20,6 +20,7 @@
 
 package com.chachatte.graphql.controller.rest;
 
+import com.chachatte.graphql.config.security.CustomUserDetails;
 import com.chachatte.graphql.config.security.JWTRequest;
 import com.chachatte.graphql.config.security.JWTResponse;
 import com.chachatte.graphql.config.security.JWTTokenUtils;
@@ -32,7 +33,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -66,7 +66,7 @@ public class AuthController {
      * <li>200 Ok if authentication succeeded, with the issued JWT token in the response body</li>
      * </ul>
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> authenticate(@RequestBody JWTRequest userRequest) {
 
         log.info("Call to authenticate REST endpoint");
@@ -85,11 +85,16 @@ public class AuthController {
             // set authentication in security context holder
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // get authorities, we should have only one role per member so simply get the first one
-            final GrantedAuthority grantedAuthority = authentication.getAuthorities().iterator().next();
+            // get username from Principal
+            final String username = ((CustomUserDetails) authentication.getPrincipal()).getUsername();
+
+            // get role from authorities, we should have only one role per member so simply get the first one
+            final String role = authentication.getAuthorities().iterator().next().toString();
+
+            log.info("User {} authenticated with role {}", username, role);
 
             // generate new JWT token
-            final String jwtToken = jwtTokenUtils.generateToken(authentication.getPrincipal(), grantedAuthority);
+            final String jwtToken = jwtTokenUtils.generateToken(username, role);
 
             // return response containing the JWT token
             return ResponseEntity.ok(new JWTResponse(jwtToken));

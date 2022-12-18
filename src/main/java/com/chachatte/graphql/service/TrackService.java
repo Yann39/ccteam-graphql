@@ -91,4 +91,50 @@ public class TrackService {
         return trackRepository.save(track);
     }
 
+    /**
+     * Update the track represented by the given track ID with the specified data.
+     *
+     * @param name      The official name of the track
+     * @param distance  The track distance (in meters)
+     * @param lapRecord The lap record (in milliseconds)
+     * @param website   The official website of the track
+     * @param latitude  The track latitude coordinate
+     * @param longitude The track longitude coordinate
+     * @return A {@link Track} object representing the track just updated
+     */
+    public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website, BigDecimal latitude, BigDecimal longitude) throws CustomGraphQLException {
+        final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
+        if (trackOptional.isEmpty()) {
+            log.error("Track with id " + trackId + " not found in the database");
+            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+        }
+
+        final Track track = trackOptional.get();
+        track.setName(name);
+        track.setDistance(distance);
+        track.setLapRecord(lapRecord);
+        track.setWebsite(website);
+        track.setLatitude(latitude);
+        track.setLongitude(longitude);
+        return trackRepository.save(track);
+    }
+
+    /**
+     * Delete the track represented by the given track ID.
+     *
+     * @param trackId The ID of the {@link Track} to delete
+     * @return A {@link Track} object representing the track just deleted
+     */
+    public Track deleteTrack(long trackId) throws CustomGraphQLException {
+        final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
+        if (trackOptional.isEmpty()) {
+            log.error("Track with id " + trackId + " not found in the database");
+            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+        }
+
+        final Track track = trackOptional.get();
+        trackRepository.delete(track);
+        return track;
+    }
+
 }

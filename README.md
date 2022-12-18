@@ -4,8 +4,8 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg?style=for-the-badge)
 
-![Version](https://img.shields.io/badge/JDK-17-red.svg)
-![Version](https://img.shields.io/badge/Spring%20Boot-2.7.0-green.svg)
+![Version](https://img.shields.io/badge/JDK-19-red.svg)
+![Version](https://img.shields.io/badge/Spring%20Boot-3.0.0-green.svg)
 
 ## Documentation
 

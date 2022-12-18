@@ -106,7 +106,7 @@ public class NewsService {
                 .withIgnorePaths("catchLine", "content", "newsDate", "createdOn", "createdBy", "modifiedOn", "modifiedBy")
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
-        final Page<News> newsPage = newsRepository.findAll(Example.of(news, matcher), PageRequest.of(pageNumber, pageSize, sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()));
+        final Page<News> newsPage = newsRepository.findFilteredCustom(Example.of(news, matcher), PageRequest.of(pageNumber, pageSize, sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()));
 
         if (newsPage.isEmpty()) {
             return new ArrayList<>();
@@ -141,20 +141,95 @@ public class NewsService {
      * @return A {@link News} object representing the news just created
      */
     public News createNews(String title, String catchLine, String content, String newsDate, long memberId) throws CustomGraphQLException {
-        final Optional<Member> member = memberRepository.findByIdCustom(memberId);
-        if (member.isEmpty()) {
+
+        // check if specified member exists
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
             log.error("Member with id " + memberId + " not found in the database");
             throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
         }
 
+        // create news with specified data
         final News news = new News();
         news.setTitle(title);
         news.setCatchLine(catchLine);
         news.setContent(content);
         news.setNewsDate(LocalDateTime.parse(newsDate));
-        news.setCreatedBy(member.get());
+        news.setCreatedBy(memberOptional.get());
         news.setCreatedOn(LocalDateTime.now());
-        return newsRepository.save(news);
+
+        // save to database
+        final News savedNews = newsRepository.save(news);
+
+        // fetch again from database using our custom query so that lazy data is loaded
+        return newsRepository.findByIdCustom(savedNews.getId()).orElseThrow();
+    }
+
+    /**
+     * Update the news represented by the given news ID with the specified data.
+     *
+     * @param newsId    The ID of the {@link News} to update
+     * @param title     The news title
+     * @param catchLine The news catch line
+     * @param content   The news content
+     * @param newsDate  The news date
+     * @param memberId  The ID of the {@link Member} creating the news
+     * @return A {@link News} object representing the news just updated
+     */
+    public News updateNews(long newsId, String title, String catchLine, String content, String newsDate, long memberId) throws CustomGraphQLException {
+
+        // check if specified news exists
+        final Optional<News> newsOptional = newsRepository.findByIdCustom(newsId);
+        if (newsOptional.isEmpty()) {
+            log.error("News with id " + newsId + " not found in the database");
+            throw new CustomGraphQLException("news_not_found", "Specified news ID has not been found in the database");
+        }
+
+        // check if specified member exists
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with id " + memberId + " not found in the database");
+            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+        }
+
+        // update news with specified data
+        final News news = newsOptional.get();
+        news.setTitle(title);
+        news.setCatchLine(catchLine);
+        news.setContent(content);
+        news.setNewsDate(LocalDateTime.parse(newsDate));
+        news.setModifiedBy(memberOptional.get());
+        news.setModifiedOn(LocalDateTime.now());
+
+        // save to database
+        final News savedNews = newsRepository.save(news);
+
+        // fetch again from database using our custom query so that lazy data is loaded
+        return newsRepository.findByIdCustom(savedNews.getId()).orElseThrow();
+    }
+
+    /**
+     * Delete the news represented by the given news ID.
+     *
+     * @param newsId The ID of the {@link News} to delete
+     * @return A {@link News} object representing the news just deleted
+     */
+    public News deleteNews(long newsId) throws CustomGraphQLException {
+
+        // check if specified news exists
+        final Optional<News> newsOptional = newsRepository.findByIdCustom(newsId);
+        if (newsOptional.isEmpty()) {
+            log.error("News with id " + newsId + " not found in the database");
+            throw new CustomGraphQLException("news_not_found", "Specified news ID has not been found in the database");
+        }
+
+        final News news = newsOptional.get();
+
+        // delete from database
+        newsRepository.delete(news);
+
+        // return the original news
+        return news;
     }
 
     /**

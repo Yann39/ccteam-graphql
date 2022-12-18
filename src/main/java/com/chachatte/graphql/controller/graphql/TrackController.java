@@ -26,12 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -86,13 +84,47 @@ public class TrackController {
      * @param longitude The track longitude coordinate
      * @return A {@link Track} object representing the track just created
      */
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Track createTrack(@Argument String name, @Argument int distance, @Argument int lapRecord,
                              @Argument String website, @Argument BigDecimal latitude, @Argument BigDecimal longitude) {
         log.info("Received call to createTrack with parameters name = " + name + ", distance = " + distance +
                 ", lapRecord = " + lapRecord + ", website = " + website + ", latitude = " + latitude + ", longitude = " + longitude);
         return trackService.createTrack(name, distance, lapRecord, website, latitude, longitude);
+    }
+
+    /**
+     * Update the track represented by the given track ID with the specified data.
+     *
+     * @param trackId   The ID of the {@link Track} to update
+     * @param name      The official name of the track
+     * @param distance  The track distance (in meters)
+     * @param lapRecord The lap record (in milliseconds)
+     * @param website   The official website of the track
+     * @param latitude  The track latitude coordinate
+     * @param longitude The track longitude coordinate
+     * @return A {@link Track} object representing the track just updated
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Track updateTrack(@Argument long trackId, @Argument String name, @Argument int distance, @Argument int lapRecord,
+                             @Argument String website, @Argument BigDecimal latitude, @Argument BigDecimal longitude) {
+        log.info("Received call to createTrack with parameters trackId = " + trackId + ", name = " + name + ", distance = " + distance +
+                ", lapRecord = " + lapRecord + ", website = " + website + ", latitude = " + latitude + ", longitude = " + longitude);
+        return trackService.updateTrack(trackId, name, distance, lapRecord, website, latitude, longitude);
+    }
+
+    /**
+     * Delete the track represented by the given track ID.
+     *
+     * @param trackId The ID of the {@link Track} to delete
+     * @return A {@link Track} object representing the track just deleted
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Track deleteTrack(@Argument long trackId) {
+        log.info("Received call to deleteTrack with parameter trackId = " + trackId);
+        return trackService.deleteTrack(trackId);
     }
 
 }

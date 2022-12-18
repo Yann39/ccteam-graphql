@@ -23,7 +23,6 @@ package com.chachatte.graphql.service;
 import com.chachatte.graphql.config.graphql.CustomGraphQLException;
 import com.chachatte.graphql.entities.Event;
 import com.chachatte.graphql.entities.Member;
-import com.chachatte.graphql.entities.News;
 import com.chachatte.graphql.entities.Track;
 import com.chachatte.graphql.repository.EventRepository;
 import com.chachatte.graphql.repository.MemberRepository;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link News} service.
+ * {@link Event} service.
  *
  * @author yann39
  * @since 1.0.0
@@ -107,14 +106,14 @@ public class EventService {
     public Event createEvent(@Argument String title, @Argument String description, @Argument String startDate,
                              @Argument String endDate, @Argument long trackId, @Argument String organizer,
                              @Argument BigDecimal price, @Argument long memberId) {
-        final Optional<Track> track = trackRepository.findByIdCustom(trackId);
-        if (track.isEmpty()) {
+        final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
+        if (trackOptional.isEmpty()) {
             log.error("Track with id " + trackId + " not found in the database");
             throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
         }
 
-        final Optional<Member> member = memberRepository.findByIdCustom(memberId);
-        if (member.isEmpty()) {
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
             log.error("Member with id " + memberId + " not found in the database");
             throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
         }
@@ -124,12 +123,78 @@ public class EventService {
         event.setDescription(description);
         event.setStartDate(LocalDateTime.parse(startDate));
         event.setEndDate(LocalDateTime.parse(endDate));
-        event.setTrack(track.get());
+        event.setTrack(trackOptional.get());
         event.setOrganizer(organizer);
         event.setPrice(price);
-        event.setCreatedBy(member.get());
+        event.setCreatedBy(memberOptional.get());
         event.setCreatedOn(LocalDateTime.now());
         return eventRepository.save(event);
+    }
+
+    /**
+     * Update the event represented by the given event ID with the specified data.
+     *
+     * @param eventId     The ID of the {@link Event} to update
+     * @param title       The event title
+     * @param description The event description
+     * @param startDate   The start date of the event as ISO {@link String}
+     * @param endDate     The end date of the event as ISO {@link String}
+     * @param trackId     The ID of the {@link Track} where the event takes place
+     * @param organizer   The organizer of the event
+     * @param price       The event price
+     * @param memberId    The ID of the {@link Member} who created that event
+     * @return An {@link Event} object representing the event just updated
+     */
+    public Event updateEvent(@Argument long eventId, @Argument String title, @Argument String description,
+                             @Argument String startDate, @Argument String endDate, @Argument long trackId,
+                             @Argument String organizer, @Argument BigDecimal price, @Argument long memberId) {
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id " + eventId + " not found in the database");
+            throw new CustomGraphQLException("event_not_found", "Specified event ID has not been found in the database");
+        }
+
+        final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
+        if (trackOptional.isEmpty()) {
+            log.error("Track with id " + trackId + " not found in the database");
+            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+        }
+
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with id " + memberId + " not found in the database");
+            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+        event.setTitle(title);
+        event.setDescription(description);
+        event.setStartDate(LocalDateTime.parse(startDate));
+        event.setEndDate(LocalDateTime.parse(endDate));
+        event.setTrack(trackOptional.get());
+        event.setOrganizer(organizer);
+        event.setPrice(price);
+        event.setModifiedBy(memberOptional.get());
+        event.setModifiedOn(LocalDateTime.now());
+        return eventRepository.save(event);
+    }
+
+    /**
+     * Delete the event represented by the given event ID.
+     *
+     * @param eventId The ID of the {@link Event} to delete
+     * @return A {@link Event} object representing the event just deleted
+     */
+    public Event deleteEvent(long eventId) throws CustomGraphQLException {
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id " + eventId + " not found in the database");
+            throw new CustomGraphQLException("event_not_found", "Specified event ID has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+        eventRepository.delete(event);
+        return event;
     }
 
 }

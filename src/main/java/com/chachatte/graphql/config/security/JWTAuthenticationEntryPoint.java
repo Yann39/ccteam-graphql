@@ -23,13 +23,13 @@ package com.chachatte.graphql.config.security;
 import com.chachatte.graphql.config.graphql.CustomGraphQLException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -79,6 +79,7 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
             customGraphQLException = new CustomGraphQLException("bad_credentials", authException.getMessage());
             log.info("return bad_credentials");
         } else {
+            log.info(authException.getMessage());
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             customGraphQLException = new CustomGraphQLException("internal_error", authException.getMessage());
             log.info("return internal_error");

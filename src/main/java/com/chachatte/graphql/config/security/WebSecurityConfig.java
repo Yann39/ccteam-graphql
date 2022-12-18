@@ -20,22 +20,21 @@
 
 package com.chachatte.graphql.config.security;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
 /**
  * Web security configuration.
@@ -46,7 +45,7 @@ import org.springframework.security.web.access.expression.DefaultWebSecurityExpr
  * @since 1.0.0
  */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfig {
 
     @Autowired
@@ -65,6 +64,19 @@ public class WebSecurityConfig {
     }
 
     /**
+     * Define a new method security expression handler with the new defined role hierarchy, to be used instead
+     * of the default one.
+     *
+     * @return A {@link DefaultMethodSecurityExpressionHandler} object representing the new configured expression handler
+     */
+    @Bean
+    public DefaultMethodSecurityExpressionHandler expressionHandler() {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
+        return expressionHandler;
+    }
+
+    /**
      * Define a password encoder that uses the BCrypt strong hashing function.
      *
      * @return A {@link PasswordEncoder} object representing the {@link BCryptPasswordEncoder} implementation
@@ -75,22 +87,9 @@ public class WebSecurityConfig {
     }
 
     /**
-     * Define a new security expression handler with the new defined role hierarchy, to be used instead
-     * of the default {@link DefaultWebSecurityExpressionHandler} so we can use our custom role hierarchy.
-     *
-     * @return A {@link RoleHierarchyImpl} object representing the new role hierarchy implementation
-     */
-    @Bean
-    public SecurityExpressionHandler<FilterInvocation> webExpressionHandler() {
-        final DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy());
-        return expressionHandler;
-    }
-
-    /**
      * Needed to prevent the {@link JWTAuthorizationFilter} filter from being called twice.<br/>
      * Indeed, Spring Boot automatically registers any bean that is a Filter with the servlet container.<br/>
-     * In our case we still need the filter to be a bean/component to be able to autowire dependencies in it,
+     * In our case we still need the filter to be a bean/component to be able to auto-wire dependencies in it,
      * this is why we use this registration bean, to tell Spring Boot not to register the filter again.
      * <p>
      *
@@ -118,34 +117,36 @@ public class WebSecurityConfig {
     }
 
     /**
-     * HTTP security configuration for authenticated content.
+     * HTTP security configuration.
      *
      * @param http The {@link HttpSecurity}
      * @return A {@link SecurityFilterChain} object representing the new configured filter chain
      * @throws Exception An exception occurred while configuring the HTTP security
      */
     @Bean
-    public SecurityFilterChain filterChainAuthenticated(HttpSecurity http) throws Exception {
-        http
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        return http
                 // disable CSRF as we do not serve browser clients
                 .csrf().disable()
-                // match GraphQL endpoint
-                .antMatcher("/graphql")
                 // add JWT authorization filter
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), jwtTokenUtils))
-                // allow access restriction using request matcher
-                .authorizeRequests()
-                // apply our custom web expression handler because we added role hierarchy to it
-                .expressionHandler(webExpressionHandler())
+                // allow restricting access to certain URL based on the HTTP servlet request
+                .authorizeHttpRequests()
+                // by default, the AuthorizationFilter applies to all dispatcher types, so grant all access only on requests with dispatcher type ASYNC or FORWARD
+                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD).permitAll()
                 // authenticate requests to GraphQL endpoint
-                .antMatchers("/graphql").authenticated()
-                // allow any other requests
-                .anyRequest().permitAll().and()
+                .requestMatchers("/graphql").authenticated()
+                // allow any request to REST endpoint
+                .requestMatchers("/rest/**").permitAll()
+                // deny any other requests
+                .anyRequest().denyAll().and()
                 // custom exception handling
                 .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
                 // make sure we use stateless session, session will not be used to store user's state
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        return http.build();
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .build();
+
     }
 
 }

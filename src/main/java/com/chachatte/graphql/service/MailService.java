@@ -21,12 +21,11 @@
 package com.chachatte.graphql.service;
 
 import com.chachatte.graphql.entities.Member;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
-import javax.mail.internet.MimeMessage;
 
 /**
  * Mail utilities.

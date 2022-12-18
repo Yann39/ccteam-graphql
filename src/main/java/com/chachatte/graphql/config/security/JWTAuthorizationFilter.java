@@ -22,6 +22,10 @@ package com.chachatte.graphql.config.security;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,10 +34,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -74,14 +74,19 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 // decode JWT token
                 final JWTTokenPayload jwtTokenPayload = jwtTokenUtils.decodeToken(authorizationHeader);
 
-                // if user e-mail has been retrieved correctly from the token and if user is not already authenticated
-                if (jwtTokenPayload.getEmail() != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // if user e-mail has been retrieved correctly from the token
+                if (jwtTokenPayload.getEmail() != null) {
 
-                    // authenticate user
-                    final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jwtTokenPayload.getEmail(), null, Collections.singletonList(jwtTokenPayload.getRole()));
+                    // if user is not already authenticated
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                        // authenticate user
+                        final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jwtTokenPayload.getEmail(), null, Collections.singletonList(jwtTokenPayload.getRole()));
 
-                    // set authentication in security context holder
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                        // set authentication in security context holder
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    } else {
+                        log.debug("User is already authenticated");
+                    }
 
                 } else {
                     log.error("Valid token contains no user info");

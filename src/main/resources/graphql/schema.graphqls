@@ -48,11 +48,20 @@ type Query {
 
 type Mutation {
     createNews(title: String!, catchLine: String!, content: String!, newsDate: String!, memberId: Long!): News
+    updateNews(newsId: Long!, title: String!, catchLine: String!, content: String!, newsDate: String!, memberId: Long!): News
+    deleteNews(newsId: Long!): News
     likeNews(newsId: Long!, memberId: Long!): News
     unlikeNews(newsId: Long!, memberId: Long!): News
+
     createMember(firstName: String!, lastName: String!, email: String!, password: String!): Member
+
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
+    updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
+    deleteEvent(eventId: Long!): Event
+
     createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
+    updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
+    deleteTrack(trackId: Long!): Track
 }
 
 type NewsListProjection {

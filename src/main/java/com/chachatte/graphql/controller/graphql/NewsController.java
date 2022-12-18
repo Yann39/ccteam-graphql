@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
@@ -73,7 +72,7 @@ public class NewsController {
      * @param sortDirection The sort direction ({@code asc} or {@code desc})
      * @return A list of {@link News} object representing the news
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @QueryMapping
     public List<News> getAllNewsFilteredPaginated(@Argument String text, @Argument int pageNumber, @Argument int pageSize, @Argument String sortBy, @Argument String sortDirection) {
         log.info("Received call to getAllNewsFilteredPaginated with parameter text = " + text + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", sortBy=" + sortBy + ", sortDirection=" + sortDirection);
@@ -128,11 +127,42 @@ public class NewsController {
      * @param memberId  The ID of the {@link Member} creating the news
      * @return A {@link News} object representing the news just created
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public News createNews(@Argument String title, @Argument String catchLine, @Argument String content, @Argument String newsDate, @Argument long memberId) {
         log.info("Received call to createNews with parameters title = " + title + ", catchLine = " + catchLine + ", content = " + content + ", newsDate = " + newsDate + ", memberId = " + memberId);
         return newsService.createNews(title, catchLine, content, newsDate, memberId);
+    }
+
+    /**
+     * Update the news represented by the given news ID with the specified data.
+     *
+     * @param newsId    The ID of the {@link News} to update
+     * @param title     The news title
+     * @param catchLine The news catch line
+     * @param content   The news content
+     * @param newsDate  The news date
+     * @param memberId  The ID of the {@link Member} creating the news
+     * @return A {@link News} object representing the news just created
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public News updateNews(@Argument long newsId, @Argument String title, @Argument String catchLine, @Argument String content, @Argument String newsDate, @Argument long memberId) {
+        log.info("Received call to updateNews with parameters newsId = " + newsId + ", title = " + title + ", catchLine = " + catchLine + ", content = " + content + ", newsDate = " + newsDate + ", memberId = " + memberId);
+        return newsService.updateNews(newsId, title, catchLine, content, newsDate, memberId);
+    }
+
+    /**
+     * Delete the news represented by the given news ID.
+     *
+     * @param newsId The ID of the {@link News} to delete
+     * @return A {@link News} object representing the news just deleted
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public News deleteNews(@Argument long newsId) {
+        log.info("Received call to deleteNews with parameter newsId = " + newsId);
+        return newsService.deleteNews(newsId);
     }
 
     /**
@@ -142,7 +172,7 @@ public class NewsController {
      * @param memberId The member ID
      * @return A DTO object representing the news just liked
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public News likeNews(@Argument long newsId, @Argument long memberId) {
         log.info("Received call to likeNews with parameters newsId = " + newsId + ", memberId = " + memberId);
@@ -156,7 +186,7 @@ public class NewsController {
      * @param memberId The member ID
      * @return {@code true} if the unlike succeeded, {@code false} if not
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public News unlikeNews(@Argument long newsId, @Argument long memberId) {
         log.info("Received call to unlikeNews with parameters newsId = " + newsId + ", memberId = " + memberId);

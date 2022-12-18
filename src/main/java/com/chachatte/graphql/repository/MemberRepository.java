@@ -21,8 +21,8 @@
 package com.chachatte.graphql.repository;
 
 import com.chachatte.graphql.entities.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -36,7 +36,7 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Repository
-public interface MemberRepository extends PagingAndSortingRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select distinct m from Member m " +
             "left join fetch m.likedNews ln " +

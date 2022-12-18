@@ -25,7 +25,7 @@ import com.chachatte.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class MemberController {
      *
      * @return A list of {@link Member} objects representing the members
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<Member> getAllMembers() {
         log.info("Received call to getAllMembers");
@@ -64,7 +64,7 @@ public class MemberController {
      * @param id The ID of the member to retrieve
      * @return A {@link Member} object representing the member
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public Member getMemberById(@Argument Long id) {
         log.info("Received call to getMemberById with parameter ID = " + id);
@@ -77,7 +77,7 @@ public class MemberController {
      * @param email The member's e-mail address
      * @return A {@link Member} object representing the member
      */
-    @Secured("ROLE_USER")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @QueryMapping
     public Member getMemberByEmail(@Argument String email) {
         log.info("Received call to getMemberByEmail with parameter email = " + email);
@@ -92,7 +92,7 @@ public class MemberController {
      * @param text The text filter string
      * @return A list of {@link Member} objects representing the members
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<Member> getMembersFiltered(@Argument String text) {
         log.info("Received call to getMembersFiltered with parameter text = " + text);

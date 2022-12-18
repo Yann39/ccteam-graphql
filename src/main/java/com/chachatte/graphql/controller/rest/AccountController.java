@@ -79,7 +79,7 @@ public class AccountController {
      * <li>200 Ok if account has been found and is verified</li>
      * </ul>
      */
-    @RequestMapping(value = "/checkAccount", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/checkAccount", method = RequestMethod.POST)
     public ResponseEntity<?> checkAccount(@RequestBody CheckAccountRequest checkAccountRequest) {
 
         log.info("Call to checkAccount REST endpoint");
@@ -137,7 +137,7 @@ public class AccountController {
      * <li>201 Created if succeeded</li>
      * </ul>
      */
-    @RequestMapping(value = "/preRegister", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/preRegister", method = RequestMethod.POST)
     public ResponseEntity<?> preRegister(@RequestBody PreRegisterRequest preRegisterRequest) {
 
         log.info("Call to preRegister REST endpoint");
@@ -204,7 +204,7 @@ public class AccountController {
      * <li>200 Ok if OTP has been resent successfully</li>
      * </ul>
      */
-    @RequestMapping(value = "/resendOtp", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/resendOtp", method = RequestMethod.POST)
     public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
 
         log.info("Call to resendOtp REST endpoint");
@@ -256,7 +256,7 @@ public class AccountController {
      * <li>202 Accepted if e-mail has been verified successfully</li>
      * </ul>
      */
-    @RequestMapping(value = "/confirmEmail", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/confirmEmail", method = RequestMethod.POST)
     public ResponseEntity<?> confirmEmail(@RequestBody ConfirmEmailRequest confirmEmailRequest) {
 
         log.info("Call to confirmEmail REST endpoint");
@@ -318,7 +318,7 @@ public class AccountController {
      * <li>200 Ok if succeeded</li>
      * </ul>
      */
-    @RequestMapping(value = "/completeRegistration", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/completeRegistration", method = RequestMethod.POST)
     public ResponseEntity<?> completeRegistration(@RequestBody CompleteRegistrationRequest completeRegistrationRequest) {
 
         // e-mail address has not been specified
@@ -368,7 +368,7 @@ public class AccountController {
      * <li>200 Ok if succeeded</li>
      * </ul>
      */
-    @RequestMapping(value = "/forgotPassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/forgotPassword", method = RequestMethod.POST)
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
 
         // e-mail address has not been specified

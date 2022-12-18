@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
@@ -55,7 +55,7 @@ public class EventController {
      *
      * @return A list of {@link Event} objects representing the events
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<Event> getAllEvents() {
         log.info("Received call to getAllEvents");
@@ -68,7 +68,7 @@ public class EventController {
      * @param id The ID of the event to retrieve
      * @return An {@link Event} object representing the event
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public Event getEventById(@Argument Long id) {
         log.info("Received call to getEventById with parameter ID = " + id);
@@ -81,7 +81,7 @@ public class EventController {
      * @param title The event title
      * @return A list of {@link Event} objects representing the events
      */
-    @Secured("ROLE_MEMBER")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<Event> getEventsByTitle(@Argument String title) {
         log.info("Received call to getEventsByTitle with parameter title = " + title);
@@ -101,7 +101,7 @@ public class EventController {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
      */
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Event createEvent(@Argument String title, @Argument String description, @Argument String startDate,
                              @Argument String endDate, @Argument long trackId, @Argument String organizer,
@@ -110,6 +110,44 @@ public class EventController {
                 ", startDate = " + startDate + ", endDate = " + endDate + ", trackId = " + trackId + ", organizer = " + organizer +
                 ", price = " + price + ", memberId = " + memberId);
         return eventService.createEvent(title, description, startDate, endDate, trackId, organizer, price, memberId);
+    }
+
+    /**
+     * Update the event represented by the given event ID with the specified data.
+     *
+     * @param eventId     The ID of the {@link Event} to update
+     * @param title       The event title
+     * @param description The event description
+     * @param startDate   The start date of the event as ISO {@link String}
+     * @param endDate     The end date of the event as ISO {@link String}
+     * @param trackId     The ID of the {@link Track} where the event takes place
+     * @param organizer   The organizer of the event
+     * @param price       The event price
+     * @param memberId    The ID of the {@link Member} who created that event
+     * @return An {@link Event} object representing the event just updated
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Event updateEvent(@Argument long eventId, @Argument String title, @Argument String description,
+                             @Argument String startDate, @Argument String endDate, @Argument long trackId,
+                             @Argument String organizer, @Argument BigDecimal price, @Argument long memberId) {
+        log.info("Received call to updateEvent with parameters eventId = " + eventId + ", title = " + title + ", description = " + description +
+                ", startDate = " + startDate + ", endDate = " + endDate + ", trackId = " + trackId + ", organizer = " + organizer +
+                ", price = " + price + ", memberId = " + memberId);
+        return eventService.updateEvent(eventId, title, description, startDate, endDate, trackId, organizer, price, memberId);
+    }
+
+    /**
+     * Delete the event represented by the given event ID.
+     *
+     * @param eventId The ID of the {@link Event} to delete
+     * @return A {@link Event} object representing the event just deleted
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Event deleteEvent(@Argument long eventId) {
+        log.info("Received call to deleteNews with parameter eventId = " + eventId);
+        return eventService.deleteEvent(eventId);
     }
 
 }

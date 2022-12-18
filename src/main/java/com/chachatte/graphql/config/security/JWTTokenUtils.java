@@ -65,7 +65,7 @@ public class JWTTokenUtils {
      * @param role    The role to be set as claim value in the JWT
      * @return The new created JWT token as {@link String}
      */
-    public String generateToken(Object subject, Object role) {
+    public String generateToken(String subject, String role) {
         log.info("Calling JWTTokenUtils generateToken");
         final LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Zurich"));
         final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of("Europe/Zurich")).toInstant();
@@ -73,8 +73,8 @@ public class JWTTokenUtils {
         log.info("Building JWT... it will expire on " + instant.atZone(ZoneId.of("Europe/Zurich")));
 
         return JWT.create()
-                .withSubject(subject.toString())
-                .withClaim("role", role.toString())
+                .withSubject(subject)
+                .withClaim("role", role)
                 .withExpiresAt(Date.from(instant))
                 .sign(Algorithm.HMAC512(jwtTokenProperties.getSecret().getBytes()));
     }

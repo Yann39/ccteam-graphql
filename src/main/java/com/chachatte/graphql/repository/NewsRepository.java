@@ -23,6 +23,10 @@ package com.chachatte.graphql.repository;
 import com.chachatte.graphql.entities.News;
 import com.chachatte.graphql.projection.NewsDetailsProjection;
 import com.chachatte.graphql.projection.NewsListProjection;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -46,6 +50,10 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             "left join fetch ln.member")
     List<News> findAllCustom();
 
+    @EntityGraph(attributePaths = {"likedNews", "createdBy", "modifiedBy", "likedNews.member"})
+    @Query("select distinct n from News n")
+    Page<News> findFilteredCustom(Example<News> example, Pageable pageable);
+
     @Query("select n from News n " +
             "left join fetch n.likedNews ln " +
             "left join fetch n.createdBy " +
@@ -58,7 +66,8 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             "from news n", nativeQuery = true)
     List<NewsListProjection> findAllCustomForHomeList();
 
-    @Query(value = "select n.id, n.title, n.content, n.news_date as newsDate, concat(m.first_name, ' ', m.last_name) as createdBy from news n " +
+    @Query(value = "select n.id, n.title, n.content, n.news_date as newsDate, concat(m.first_name, ' ', m.last_name) as createdBy " +
+            "from news n " +
             "inner join member m on m.id = n.created_by " +
             "where n.id = :id", nativeQuery = true)
     Optional<NewsDetailsProjection> findOneCustomForDetailsView(long id);
