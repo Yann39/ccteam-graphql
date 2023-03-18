@@ -21,6 +21,7 @@
 package com.chachatte.graphql.service;
 
 import com.chachatte.graphql.config.graphql.CustomGraphQLException;
+import com.chachatte.graphql.entities.LikedNews;
 import com.chachatte.graphql.entities.Member;
 import com.chachatte.graphql.entities.News;
 import com.chachatte.graphql.projection.NewsDetailsProjection;
@@ -265,7 +266,11 @@ public class NewsService {
         }
 
         // set news to be liked by member
-        news.addLikedNews(member);
+        final LikedNews lNews = new LikedNews();
+        lNews.setNews(news);
+        lNews.setMember(member);
+        lNews.setCreatedOn(LocalDateTime.now());
+        news.getLikedNews().add(lNews);
 
         // save to database
         return newsRepository.save(news);
@@ -287,14 +292,12 @@ public class NewsService {
         }
 
         // check that member exists
-        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
-        if (memberOptional.isEmpty()) {
+        if (!memberRepository.existsById(memberId)) {
             log.error("Member with id " + memberId + " not found in the database");
             throw new CustomGraphQLException("member_not_found", "Specified member has not been found in the database");
         }
 
         final News news = newsOptional.get();
-        final Member member = memberOptional.get();
 
         // check that the news is indeed liked by the member
         if (news.getLikedNews().stream().noneMatch(ln -> ln.getNews().getId().equals(newsId) && ln.getMember().getId().equals(memberId))) {
@@ -303,7 +306,7 @@ public class NewsService {
         }
 
         // remove the liked news for the member
-        news.removeLikedNews(member);
+        news.getLikedNews().removeIf(ln -> ln.getMember().getId().equals(memberId));
 
         // save to database
         return newsRepository.save(news);

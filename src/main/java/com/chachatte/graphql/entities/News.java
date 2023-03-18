@@ -26,7 +26,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -71,38 +70,5 @@ public class News {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modified_by")
     private Member modifiedBy;
-
-    /**
-     * Set the current news to be liked by the specified {@code member}.
-     *
-     * @param member The {@link Member} to be defined as having liked the news
-     */
-    public void addLikedNews(Member member) {
-        final LikedNews lNews = new LikedNews();
-        lNews.setNews(this);
-        lNews.setMember(member);
-        lNews.setCreatedOn(LocalDateTime.now());
-        likedNews.add(lNews);
-        member.getLikedNews().add(lNews);
-    }
-
-    /**
-     * Set the current news to be not liked by the specified {@code member}.
-     *
-     * @param member The {@link Member} to be removed from having liked the news
-     */
-    public void removeLikedNews(Member member) {
-        for (Iterator<LikedNews> iterator = likedNews.iterator();
-             iterator.hasNext(); ) {
-            final LikedNews lNews = iterator.next();
-            if (lNews.getNews().equals(this) &&
-                    lNews.getMember().equals(member)) {
-                iterator.remove();
-                lNews.getMember().getLikedNews().remove(lNews);
-                lNews.setNews(null);
-                lNews.setMember(null);
-            }
-        }
-    }
 
 }

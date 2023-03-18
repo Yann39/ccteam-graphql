@@ -20,3 +20,8 @@ Application uses only a few starters and libraries :
 - **Lombok** library to avoid boilerplate code
 - **MariaDB** client to connect to the database
 
+Create the database :
+
+```sql
+CREATE DATABASE chachatte_team CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```

@@ -58,6 +58,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             "left join fetch n.likedNews ln " +
             "left join fetch n.createdBy " +
             "left join fetch n.modifiedBy " +
+            "left join fetch ln.news " +
             "left join fetch ln.member " +
             "where n.id = :id")
     Optional<News> findByIdCustom(long id);

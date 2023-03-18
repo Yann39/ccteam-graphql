@@ -14,10 +14,9 @@
     <description>Spring Boot application to expose GraphQL endpoint for Chachatte team mobile application</description>
 
     <properties>
-        <java.version>19</java.version>
+        <java.version>17</java.version>
         <mariadb-client.version>3.0.6</mariadb-client.version>
         <java-jwt.version>4.2.1</java-jwt.version>
-        <spring-boot-maven-plugin.version>3.0.0</spring-boot-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -70,7 +69,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
