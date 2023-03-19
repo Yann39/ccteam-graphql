@@ -23,14 +23,17 @@ package com.chachatte.graphql.repository;
 import com.chachatte.graphql.entities.News;
 import com.chachatte.graphql.projection.NewsDetailsProjection;
 import com.chachatte.graphql.projection.NewsListProjection;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,5 +75,15 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             "inner join member m on m.id = n.created_by " +
             "where n.id = :id", nativeQuery = true)
     Optional<NewsDetailsProjection> findOneCustomForDetailsView(long id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "insert into liked_news(member_id, news_id, created_on) values (:memberId, :newsId, :createdOn)", nativeQuery = true)
+    int likeNews(long memberId, long newsId, LocalDateTime createdOn);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from liked_news where member_id = :memberId and news_id = :newsId", nativeQuery = true)
+    int unlikeNews(long memberId, long newsId);
 
 }
