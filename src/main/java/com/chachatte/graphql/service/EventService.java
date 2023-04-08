@@ -29,7 +29,6 @@ import com.chachatte.graphql.repository.MemberRepository;
 import com.chachatte.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -66,6 +65,39 @@ public class EventService {
     }
 
     /**
+     * Get all events in the specified year, based on event start date.
+     *
+     * @param year The year of the events to retrieve
+     * @return A list of {@link Event} objects representing the events
+     */
+    public List<Event> getEventsByYear(int year) {
+        return eventRepository.findByYearCustom(year);
+    }
+
+    /**
+     * Get all events in the specified month and year, based on event start date.
+     *
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
+     * @param year  The year of the events to retrieve
+     * @return A list of {@link Event} objects representing the events
+     */
+    public List<Event> getEventsByMonthAndYear(int month, int year) {
+        return eventRepository.findByMonthAndYearCustom(month, year);
+    }
+
+    /**
+     * Get all events in the specified day, month and year, based on event start date.
+     *
+     * @param day   The day of the events to retrieve
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
+     * @param year  The year of the events to retrieve
+     * @return A list of {@link Event} objects representing the events
+     */
+    public List<Event> getEventsByDayAndMonthAndYear(int day, int month, int year) {
+        return eventRepository.findByDayAndMonthAndYearCustom(day, month, year);
+    }
+
+    /**
      * Get an event given its {@code id}.
      *
      * @param id The ID of the event to retrieve
@@ -74,7 +106,7 @@ public class EventService {
     public Event getEventById(Long id) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(id);
         if (eventOptional.isEmpty()) {
-            log.error("Event with id " + id + " not found in the database");
+            log.error("Event with id {} not found in the database", id);
             throw new CustomGraphQLException("event_not_found", "Specified member has not been found in the database");
         }
         return eventOptional.get();
@@ -103,18 +135,16 @@ public class EventService {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
      */
-    public Event createEvent(@Argument String title, @Argument String description, @Argument String startDate,
-                             @Argument String endDate, @Argument long trackId, @Argument String organizer,
-                             @Argument BigDecimal price, @Argument long memberId) {
+    public Event createEvent(String title, String description, String startDate, String endDate, long trackId, String organizer, BigDecimal price, long memberId) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
-            log.error("Track with id " + trackId + " not found in the database");
+            log.error("Track with id {} not found in the database", trackId);
             throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
         }
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
-            log.error("Member with id " + memberId + " not found in the database");
+            log.error("Member with id {} not found in the database", memberId);
             throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
         }
 
@@ -145,24 +175,22 @@ public class EventService {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just updated
      */
-    public Event updateEvent(@Argument long eventId, @Argument String title, @Argument String description,
-                             @Argument String startDate, @Argument String endDate, @Argument long trackId,
-                             @Argument String organizer, @Argument BigDecimal price, @Argument long memberId) {
+    public Event updateEvent(long eventId, String title, String description, String startDate, String endDate, long trackId, String organizer, BigDecimal price, long memberId) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
-            log.error("Event with id " + eventId + " not found in the database");
+            log.error("Event with id {} not found in the database", eventId);
             throw new CustomGraphQLException("event_not_found", "Specified event ID has not been found in the database");
         }
 
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
-            log.error("Track with id " + trackId + " not found in the database");
+            log.error("Track with id {} not found in the database", trackId);
             throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
         }
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
-            log.error("Member with id " + memberId + " not found in the database");
+            log.error("Member with id {} not found in the database", memberId);
             throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
         }
 
@@ -185,10 +213,10 @@ public class EventService {
      * @param eventId The ID of the {@link Event} to delete
      * @return A {@link Event} object representing the event just deleted
      */
-    public Event deleteEvent(long eventId) throws CustomGraphQLException {
+    public Event deleteEvent(long eventId) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
-            log.error("Event with id " + eventId + " not found in the database");
+            log.error("Event with id {} not found in the database", eventId);
             throw new CustomGraphQLException("event_not_found", "Specified event ID has not been found in the database");
         }
 

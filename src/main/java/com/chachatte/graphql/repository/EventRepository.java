@@ -39,12 +39,46 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("select e from Event e " +
             "left join fetch e.track t " +
+            "left join fetch e.participants p " +
+            "left join fetch p.member " +
             "left join fetch e.createdBy " +
             "left join fetch e.modifiedBy")
     List<Event> findAllCustom();
 
     @Query("select e from Event e " +
             "left join fetch e.track t " +
+            "left join fetch e.participants p " +
+            "left join fetch p.member " +
+            "left join fetch e.createdBy " +
+            "left join fetch e.modifiedBy " +
+            "where year(e.startDate) = :year")
+    List<Event> findByYearCustom(int year);
+
+    @Query("select e from Event e " +
+            "left join fetch e.track t " +
+            "left join fetch e.participants p " +
+            "left join fetch p.member " +
+            "left join fetch e.createdBy " +
+            "left join fetch e.modifiedBy " +
+            "where month(e.startDate) = :month " +
+            "and year(e.startDate) = :year")
+    List<Event> findByMonthAndYearCustom(int month, int year);
+
+    @Query("select e from Event e " +
+            "left join fetch e.track t " +
+            "left join fetch e.participants p " +
+            "left join fetch p.member " +
+            "left join fetch e.createdBy " +
+            "left join fetch e.modifiedBy " +
+            "where day(e.startDate) = :day " +
+            "and month(e.startDate) = :month " +
+            "and year(e.startDate) = :year")
+    List<Event> findByDayAndMonthAndYearCustom(int day, int month, int year);
+
+    @Query("select e from Event e " +
+            "left join fetch e.track t " +
+            "left join fetch e.participants p " +
+            "left join fetch p.member " +
             "left join fetch e.createdBy " +
             "left join fetch e.modifiedBy " +
             "where e.id = :id")
@@ -52,6 +86,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("select e from Event e " +
             "left join fetch e.track t " +
+            "left join fetch e.participants p " +
+            "left join fetch p.member " +
             "left join fetch e.createdBy " +
             "left join fetch e.modifiedBy " +
             "where :title is null or e.title like %:title%")

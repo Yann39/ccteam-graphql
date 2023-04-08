@@ -69,7 +69,7 @@ public class TrackController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public Track getTrackById(@Argument Long id) {
-        log.info("Received call to getTrackById with parameter ID = " + id);
+        log.info("Received call to getTrackById with parameter ID = {}", id);
         return trackService.getTrackById(id);
     }
 
@@ -86,10 +86,14 @@ public class TrackController {
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
-    public Track createTrack(@Argument String name, @Argument int distance, @Argument int lapRecord,
-                             @Argument String website, @Argument BigDecimal latitude, @Argument BigDecimal longitude) {
-        log.info("Received call to createTrack with parameters name = " + name + ", distance = " + distance +
-                ", lapRecord = " + lapRecord + ", website = " + website + ", latitude = " + latitude + ", longitude = " + longitude);
+    public Track createTrack(@Argument String name,
+                             @Argument int distance,
+                             @Argument int lapRecord,
+                             @Argument String website,
+                             @Argument BigDecimal latitude,
+                             @Argument BigDecimal longitude) {
+        log.info("Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
+                name, distance, lapRecord, website, latitude, longitude);
         return trackService.createTrack(name, distance, lapRecord, website, latitude, longitude);
     }
 
@@ -107,10 +111,15 @@ public class TrackController {
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
-    public Track updateTrack(@Argument long trackId, @Argument String name, @Argument int distance, @Argument int lapRecord,
-                             @Argument String website, @Argument BigDecimal latitude, @Argument BigDecimal longitude) {
-        log.info("Received call to createTrack with parameters trackId = " + trackId + ", name = " + name + ", distance = " + distance +
-                ", lapRecord = " + lapRecord + ", website = " + website + ", latitude = " + latitude + ", longitude = " + longitude);
+    public Track updateTrack(@Argument long trackId,
+                             @Argument String name,
+                             @Argument int distance,
+                             @Argument int lapRecord,
+                             @Argument String website,
+                             @Argument BigDecimal latitude,
+                             @Argument BigDecimal longitude) {
+        log.info("Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
+                trackId, name, distance, lapRecord, website, latitude, longitude);
         return trackService.updateTrack(trackId, name, distance, lapRecord, website, latitude, longitude);
     }
 
@@ -123,7 +132,7 @@ public class TrackController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Track deleteTrack(@Argument long trackId) {
-        log.info("Received call to deleteTrack with parameter trackId = " + trackId);
+        log.info("Received call to deleteTrack with parameter trackId = {}", trackId);
         return trackService.deleteTrack(trackId);
     }
 

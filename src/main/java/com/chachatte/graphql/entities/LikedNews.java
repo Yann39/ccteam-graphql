@@ -33,7 +33,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "liked_news")
+@Table(name = "liked_news",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "news_id"})})
 public class LikedNews {
 
     @Id

@@ -23,8 +23,6 @@ package com.chachatte.graphql.service;
 import com.chachatte.graphql.config.graphql.CustomGraphQLException;
 import com.chachatte.graphql.entities.Member;
 import com.chachatte.graphql.entities.News;
-import com.chachatte.graphql.projection.NewsDetailsProjection;
-import com.chachatte.graphql.projection.NewsListProjection;
 import com.chachatte.graphql.repository.MemberRepository;
 import com.chachatte.graphql.repository.NewsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -63,24 +61,15 @@ public class NewsService {
     }
 
     /**
-     * Get all news, with only minimum properties to be used in home list view.
-     *
-     * @return A list of {@link NewsListProjection} objects representing the news list
-     */
-    public List<NewsListProjection> getAllNewsForHomeList() {
-        return newsRepository.findAllCustomForHomeList();
-    }
-
-    /**
      * Get a specific news given its {@code id}.
      *
      * @param id The ID of the news to retrieve
      * @return A {@link News} object representing the news
      */
-    public News getNewsById(Long id) throws CustomGraphQLException {
+    public News getNewsById(Long id) {
         final Optional<News> newsOptional = newsRepository.findByIdCustom(id);
         if (newsOptional.isEmpty()) {
-            log.error("News with id " + id + " not found in the database");
+            log.error("News with id {} not found in the database", id);
             throw new CustomGraphQLException("news_not_found", "Specified news has not been found in the database");
         }
         return newsOptional.get();
@@ -115,37 +104,29 @@ public class NewsService {
     }
 
     /**
-     * Get a news given its {@code id}, with only minimum properties to be used in news detail view.
-     *
-     * @param id The ID of the news to retrieve
-     * @return A {@link NewsDetailsProjection} object representing the news
-     */
-    public NewsDetailsProjection getNewsByIdForDetailsView(Long id) throws CustomGraphQLException {
-        final Optional<NewsDetailsProjection> newsOptional = newsRepository.findOneCustomForDetailsView(id);
-        if (newsOptional.isEmpty()) {
-            log.error("News with id " + id + " not found in the database");
-            throw new CustomGraphQLException("news_not_found", "Specified news has not been found in the database");
-        }
-        return newsOptional.get();
-    }
-
-    /**
      * Create a new news.
      *
      * @param title     The news title
      * @param catchLine The news catch line
      * @param content   The news content
      * @param newsDate  The news date
-     * @param memberId  The ID of the {@link Member} creating the news
+     * @param memberId  The ID of the {@link Member} to set as creator of the news
      * @return A {@link News} object representing the news just created
      */
     public News createNews(String title, String catchLine, String content, String newsDate, long memberId) throws CustomGraphQLException {
 
+        // get the current logged user
+        /*final Object loggedUserPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(loggedUserPrincipal instanceof String loggedUserMail) || loggedUserMail.isEmpty()) {
+            log.error("Cannot get user principal from security context");
+            throw new CustomGraphQLException("user_not_logged", "Cannot get user principal from security context");
+        }*/
+
         // check if specified member exists
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
-            log.error("Member with id " + memberId + " not found in the database");
-            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+            log.error("Member with ID {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found", "Logged member has not been found in the database");
         }
 
         // create news with specified data
@@ -172,23 +153,30 @@ public class NewsService {
      * @param catchLine The news catch line
      * @param content   The news content
      * @param newsDate  The news date
-     * @param memberId  The ID of the {@link Member} creating the news
+     * @param memberId  The ID of the {@link Member} to set as last modifier of the news
      * @return A {@link News} object representing the news just updated
      */
-    public News updateNews(long newsId, String title, String catchLine, String content, String newsDate, long memberId) throws CustomGraphQLException {
+    public News updateNews(long newsId, String title, String catchLine, String content, String newsDate, long memberId) {
 
         // check if specified news exists
         final Optional<News> newsOptional = newsRepository.findByIdCustom(newsId);
         if (newsOptional.isEmpty()) {
-            log.error("News with id " + newsId + " not found in the database");
+            log.error("News with id {} not found in the database", newsId);
             throw new CustomGraphQLException("news_not_found", "Specified news ID has not been found in the database");
         }
+
+        // get the current logged user
+        /*final Object loggedUserPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(loggedUserPrincipal instanceof String loggedUserMail) || loggedUserMail.isEmpty()) {
+            log.error("Cannot get user principal from security context");
+            throw new CustomGraphQLException("user_not_logged", "Cannot get user principal from security context");
+        }*/
 
         // check if specified member exists
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
-            log.error("Member with id " + memberId + " not found in the database");
-            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+            log.error("Member with ID {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found", "Logged member has not been found in the database");
         }
 
         // update news with specified data
@@ -205,6 +193,7 @@ public class NewsService {
 
         // fetch again from database using our custom query so that lazy data is loaded
         return newsRepository.findByIdCustom(savedNews.getId()).orElseThrow();
+
     }
 
     /**
@@ -218,7 +207,7 @@ public class NewsService {
         // check if specified news exists
         final Optional<News> newsOptional = newsRepository.findByIdCustom(newsId);
         if (newsOptional.isEmpty()) {
-            log.error("News with id " + newsId + " not found in the database");
+            log.error("News with id {} not found in the database", newsId);
             throw new CustomGraphQLException("news_not_found", "Specified news ID has not been found in the database");
         }
 
@@ -243,13 +232,13 @@ public class NewsService {
         // check that the news exists
         final Optional<News> newsOptional = newsRepository.findByIdCustom(newsId);
         if (newsOptional.isEmpty()) {
-            log.error("News with id " + newsId + " not found in the database");
+            log.error("News with id {} not found in the database", newsId);
             throw new CustomGraphQLException("news_not_found", "Specified news has not been found in the database");
         }
 
         // check that the member exists
         if (!memberRepository.existsById(memberId)) {
-            log.error("Member with id " + memberId + " not found in the database");
+            log.error("Member with id {} not found in the database", memberId);
             throw new CustomGraphQLException("member_not_found", "Specified member has not been found in the database");
         }
 
@@ -257,7 +246,7 @@ public class NewsService {
 
         // check that the news is not already liked by the member
         if (news.getLikedNews().stream().anyMatch(ln -> ln.getNews().getId().equals(newsId) && ln.getMember().getId().equals(memberId))) {
-            log.error("News with id " + newsId + " already liked by member id " + memberId);
+            log.error("News with id {} already liked by member id {}", newsId, memberId);
             throw new CustomGraphQLException("news_already_liked_by_member", "Specified news is already liked by specified member");
         }
 
@@ -270,7 +259,7 @@ public class NewsService {
         // fetch the up-to-date news from the database
         final Optional<News> latestNewsOptional = newsRepository.findByIdCustom(newsId);
         if (latestNewsOptional.isEmpty()) {
-            log.error("News with id " + newsId + " not found in the database after processing");
+            log.error("News with id {} not found in the database after processing", newsId);
             throw new CustomGraphQLException("news_not_found", "News has not been found in the database after processing");
         }
 
@@ -289,13 +278,13 @@ public class NewsService {
         // check that news exists
         final Optional<News> newsOptional = newsRepository.findByIdCustom(newsId);
         if (newsOptional.isEmpty()) {
-            log.error("News with id " + newsId + " not found in the database");
+            log.error("News with id {} not found in the database", newsId);
             throw new CustomGraphQLException("news_not_found", "Specified news has not been found in the database");
         }
 
         // check that member exists
         if (!memberRepository.existsById(memberId)) {
-            log.error("Member with id " + memberId + " not found in the database");
+            log.error("Member with id {} not found in the database", memberId);
             throw new CustomGraphQLException("member_not_found", "Specified member has not been found in the database");
         }
 
@@ -303,7 +292,7 @@ public class NewsService {
 
         // check that the news is indeed liked by the member
         if (news.getLikedNews().stream().noneMatch(ln -> ln.getNews().getId().equals(newsId) && ln.getMember().getId().equals(memberId))) {
-            log.error("News with id " + newsId + " is not liked by member id " + memberId + ", cannot unlike");
+            log.error("News with id {} is not liked by member id {}, cannot unlike", newsId, memberId);
             throw new CustomGraphQLException("news_not_liked_by_member", "Specified news is not liked by specified member");
         }
 
@@ -316,7 +305,7 @@ public class NewsService {
         // fetch the up-to-date news from the database
         final Optional<News> latestNewsOptional = newsRepository.findByIdCustom(newsId);
         if (latestNewsOptional.isEmpty()) {
-            log.error("News with id " + newsId + " not found in the database after processing");
+            log.error("News with id {} not found in the database after processing", newsId);
             throw new CustomGraphQLException("news_not_found", "News has not been found in the database after processing");
         }
 

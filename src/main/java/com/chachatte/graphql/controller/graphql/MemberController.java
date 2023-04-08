@@ -20,10 +20,12 @@
 
 package com.chachatte.graphql.controller.graphql;
 
+import com.chachatte.graphql.entities.Event;
 import com.chachatte.graphql.entities.Member;
 import com.chachatte.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -67,7 +69,7 @@ public class MemberController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public Member getMemberById(@Argument Long id) {
-        log.info("Received call to getMemberById with parameter ID = " + id);
+        log.info("Received call to getMemberById with parameters ID = {}", id);
         return memberService.getMemberById(id);
     }
 
@@ -80,7 +82,7 @@ public class MemberController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @QueryMapping
     public Member getMemberByEmail(@Argument String email) {
-        log.info("Received call to getMemberByEmail with parameter email = " + email);
+        log.info("Received call to getMemberByEmail with parameters email = {}", email);
         return memberService.getMemberByEmail(email);
     }
 
@@ -95,8 +97,80 @@ public class MemberController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<Member> getMembersFiltered(@Argument String text) {
-        log.info("Received call to getMembersFiltered with parameter text = " + text);
+        log.info("Received call to getMembersFiltered with parameters text = {}", text);
         return memberService.getMembersFiltered(text);
+    }
+
+
+    /**
+     * Create a new member.
+     *
+     * @param firstName The member first name
+     * @param lastName  The member last name
+     * @param email     The member e-mail address
+     * @param phone     The member phone number
+     * @param avatarUrl The member avatar URL
+     * @param bike      The member bike model
+     * @param active    A boolean indicating if the member is active
+     * @param admin     A boolean indicating if the member is admin
+     * @return A {@link Member} object representing the member just created
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Member createMember(@Argument String firstName,
+                               @Argument String lastName,
+                               @Argument String email,
+                               @Argument String phone,
+                               @Argument String avatarUrl,
+                               @Argument String bike,
+                               @Argument boolean active,
+                               @Argument boolean admin) {
+        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, avatarUrl = {}, bike = {}, active = {}, admin = {}",
+                firstName, lastName, email, phone, avatarUrl, bike, active, admin);
+        return memberService.createMember(firstName, lastName, email, phone, avatarUrl, bike, active, admin);
+    }
+
+    /**
+     * Update the member represented by the given member ID with the specified data.
+     *
+     * @param memberId  The ID of the {@link Member} to update
+     * @param firstName The member first name
+     * @param lastName  The member last name
+     * @param email     The member e-mail address
+     * @param phone     The member phone number
+     * @param avatarUrl The member avatar URL
+     * @param bike      The member bike model
+     * @param active    A boolean indicating if the member is active
+     * @param admin     A boolean indicating if the member is admin
+     * @return An {@link Event} object representing the event just updated
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Member updateMember(@Argument long memberId,
+                               @Argument String firstName,
+                               @Argument String lastName,
+                               @Argument String email,
+                               @Argument String phone,
+                               @Argument String avatarUrl,
+                               @Argument String bike,
+                               @Argument boolean active,
+                               @Argument boolean admin) {
+        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, avatarUrl = {}, bike = {}, active = {}, admin = {}",
+                memberId, firstName, lastName, email, phone, avatarUrl, bike, active, admin);
+        return memberService.updateMember(memberId, firstName, lastName, email, phone, avatarUrl, bike, active, admin);
+    }
+
+    /**
+     * Delete the member represented by the given event ID.
+     *
+     * @param memberId The ID of the {@link Event} to delete
+     * @return A {@link Event} object representing the member just deleted
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public Member deleteMember(@Argument long memberId) {
+        log.info("Received call to deleteMember with parameters memberId = {}", memberId);
+        return memberService.deleteMember(memberId);
     }
 
 }

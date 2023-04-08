@@ -95,29 +95,29 @@ public class AccountController {
 
         // e-mail address does not exist
         if (member.isEmpty()) {
-            log.info("E-mail address " + checkAccountRequest.getEmail() + " has not been found");
+            log.info("E-mail address {} has not been found", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // account exist, OTP has been sent and is still valid
         if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isBefore(LocalDateTime.now(ZoneId.of("Europe/Paris")).plusMinutes(10))) {
-            log.info("Account with e-mail address " + checkAccountRequest.getEmail() + " exist, OTP has been sent and is still valid");
+            log.info("Account with e-mail address {} exist, OTP has been sent and is still valid", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.FOUND).build();
         }
 
         // account exist, OTP has been sent but is not valid anymore
         if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isAfter(LocalDateTime.now(ZoneId.of("Europe/Paris")).plusMinutes(10))) {
-            log.info("Account with e-mail address " + checkAccountRequest.getEmail() + " exist, OTP has been sent but is not valid anymore");
+            log.info("Account with e-mail address {} exist, OTP has been sent but is not valid anymore", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
 
         // account exist, OTP has been verified, but password has not been created
         if (member.get().isVerified() && member.get().getPassword() == null) {
-            log.info("Account with e-mail address " + checkAccountRequest.getEmail() + " exist but is not verified");
+            log.info("Account with e-mail address {} exist but is not verified", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        log.info("Account with e-mail address " + checkAccountRequest.getEmail() + " exist and has a password");
+        log.info("Account with e-mail address {} exist and has a password", checkAccountRequest.getEmail());
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
@@ -156,13 +156,13 @@ public class AccountController {
 
         // last name has not been specified
         if (preRegisterRequest.getLastName() == null || preRegisterRequest.getLastName().length() < 1) {
-            log.info("No last name address specified");
+            log.info("No last name specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // e-mail address already exists
         if (memberRepository.existsMemberByEmail(preRegisterRequest.getEmail())) {
-            log.info("A member already exist with the e-mail address " + preRegisterRequest.getEmail());
+            log.info("A member already exist with the e-mail address {}", preRegisterRequest.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
@@ -179,13 +179,13 @@ public class AccountController {
         // send registration e-mail
         try {
             mailService.sendRegistrationEmail(member);
-            log.info("Registration e-mail sent to " + member.getEmail());
-        } catch (Exception ex) {
-            log.error("Error while sending registration email to " + member.getEmail() + " : " + ex);
+            log.info("Registration e-mail sent to {}", member.getEmail());
+        } catch (Exception e) {
+            log.error("Error while sending registration e-mail to {}", member.getEmail(), e);
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();
         }
 
-        log.info("Pre-registration done for user " + member.getEmail());
+        log.info("Pre-registration done for user {}", member.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
@@ -220,7 +220,7 @@ public class AccountController {
 
         // e-mail address does not exist
         if (member.isEmpty()) {
-            log.info("E-mail address " + resendOtpRequest.getEmail() + " has not been found");
+            log.info("E-mail address {} has not been found", resendOtpRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -228,14 +228,14 @@ public class AccountController {
         member.get().setOtp(ThreadLocalRandom.current().nextInt(1000, 10000) + "");
         member.get().setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
         memberRepository.save(member.get());
-        log.info("New OTP has been generated and saved for e-mail address " + resendOtpRequest.getEmail());
+        log.info("New OTP has been generated and saved for e-mail address {}", resendOtpRequest.getEmail());
 
         // send registration e-mail
         try {
             mailService.sendRegistrationEmail(member.get());
-            log.info("Registration e-mail resent to " + member.get().getEmail());
-        } catch (Exception ex) {
-            log.error("Error while resending registration email to " + member.get().getEmail() + " : " + ex);
+            log.info("Registration e-mail resent to {}", member.get().getEmail());
+        } catch (Exception e) {
+            log.error("Error while resending registration e-mail to {}", member.get().getEmail(), e);
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();
         }
 
@@ -278,7 +278,7 @@ public class AccountController {
 
         // member not found in the database
         if (optMember.isEmpty()) {
-            log.info("No member found in the database with address " + confirmEmailRequest.getEmail());
+            log.info("No member found in the database with e-mail address {}", confirmEmailRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -292,7 +292,7 @@ public class AccountController {
 
         // specified OTP does not match the one from the database
         if (!member.getOtp().equalsIgnoreCase(confirmEmailRequest.getOtp())) {
-            log.info("Specified OTP " + confirmEmailRequest.getOtp() + " does not match the one from the database");
+            log.info("Specified OTP {} does not match the one from the database", confirmEmailRequest.getOtp());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -302,7 +302,7 @@ public class AccountController {
         member.setVerified(true);
         memberRepository.save(member);
 
-        log.info("E-mail address confirmed for user " + member.getEmail());
+        log.info("E-mail address confirmed for user {}", member.getEmail());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
     }
@@ -338,7 +338,7 @@ public class AccountController {
 
         // member not found in the database
         if (optMember.isEmpty()) {
-            log.info("No member found in the database with address " + completeRegistrationRequest.getEmail());
+            log.info("No member found in the database with e-mail address {}", completeRegistrationRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -351,7 +351,7 @@ public class AccountController {
         member.setRegistrationDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
         memberRepository.save(member);
 
-        log.info("Registration completed for member " + member.getEmail());
+        log.info("Registration completed for member {}", member.getEmail());
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
@@ -382,7 +382,7 @@ public class AccountController {
 
         // member not found in the database
         if (optMember.isEmpty()) {
-            log.info("No member found in the database with address " + forgotPasswordRequest.getEmail());
+            log.info("No member found in the database with e-mail address {}", forgotPasswordRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -397,8 +397,8 @@ public class AccountController {
         try {
             mailService.sendForgotPasswordEmail(member.getEmail());
             log.info("Forgot password e-mail sent to " + member.getEmail());
-        } catch (Exception ex) {
-            log.error("Error while sending forgot password email to " + member.getEmail() + " : " + ex);
+        } catch (Exception e) {
+            log.error("Error while sending forgot password e-mail to {}", member.getEmail(), e);
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();
         }
 

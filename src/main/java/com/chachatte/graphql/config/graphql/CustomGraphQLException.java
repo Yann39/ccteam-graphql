@@ -62,7 +62,7 @@ public class CustomGraphQLException extends RuntimeException implements GraphQLE
 
     @Override
     public Map<String, Object> getExtensions() {
-        Map<String, Object> customAttributes = new HashMap<>();
+        final Map<String, Object> customAttributes = new HashMap<>();
         customAttributes.put("errorCode", this.code);
         return customAttributes;
     }

@@ -26,7 +26,6 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -49,7 +48,7 @@ public class Member {
     @Column(length = 64, nullable = false)
     private String lastName;
 
-    @Column(length = 128, nullable = false)
+    @Column(length = 128, nullable = false, unique = true)
     private String email;
 
     @Column
@@ -74,10 +73,10 @@ public class Member {
     private boolean admin = false;
 
     @Column
-    private String otp ;
+    private String otp;
 
     @Column
-    private LocalDateTime otpDate ;
+    private LocalDateTime otpDate;
 
     @Enumerated(EnumType.STRING)
     @Column
@@ -87,7 +86,10 @@ public class Member {
     private LocalDateTime registrationDate;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LikedNews> likedNews = new HashSet<>();
+    private Set<LikedNews> likedNews;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<EventMember> eventMembers;
 
     @Column(nullable = false)
     private LocalDateTime createdOn = LocalDateTime.now();

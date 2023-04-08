@@ -39,12 +39,12 @@ import org.springframework.stereotype.Component;
 public class CustomDataFetchingExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
     @Override
-    public GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
-        if (ex instanceof CustomGraphQLException) {
-            return GraphqlErrorBuilder.newError(env)
-                    .message(ex.getMessage())
-                    .extensions(((CustomGraphQLException) ex).getExtensions())
-                    .errorType(((CustomGraphQLException) ex).getErrorType())
+    public GraphQLError resolveToSingleError(Throwable throwable, DataFetchingEnvironment dataFetchingEnvironment) {
+        if (throwable instanceof CustomGraphQLException) {
+            return GraphqlErrorBuilder.newError(dataFetchingEnvironment)
+                    .message(throwable.getMessage())
+                    .extensions(((CustomGraphQLException) throwable).getExtensions())
+                    .errorType(((CustomGraphQLException) throwable).getErrorType())
                     .build();
         }
         return null;

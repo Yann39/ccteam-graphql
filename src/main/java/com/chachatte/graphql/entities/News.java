@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -55,7 +54,7 @@ public class News {
     private LocalDateTime newsDate;
 
     @OneToMany(mappedBy = "news", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LikedNews> likedNews = new HashSet<>();
+    private Set<LikedNews> likedNews;
 
     @Column(nullable = false)
     private LocalDateTime createdOn = LocalDateTime.now();

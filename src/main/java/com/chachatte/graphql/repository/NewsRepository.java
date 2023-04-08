@@ -21,8 +21,6 @@
 package com.chachatte.graphql.repository;
 
 import com.chachatte.graphql.entities.News;
-import com.chachatte.graphql.projection.NewsDetailsProjection;
-import com.chachatte.graphql.projection.NewsListProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -65,16 +63,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             "left join fetch ln.member " +
             "where n.id = :id")
     Optional<News> findByIdCustom(long id);
-
-    @Query(value = "select n.id, n.title, n.catch_line as catchLine, n.news_date as newsDate " +
-            "from news n", nativeQuery = true)
-    List<NewsListProjection> findAllCustomForHomeList();
-
-    @Query(value = "select n.id, n.title, n.content, n.news_date as newsDate, concat(m.first_name, ' ', m.last_name) as createdBy " +
-            "from news n " +
-            "inner join member m on m.id = n.created_by " +
-            "where n.id = :id", nativeQuery = true)
-    Optional<NewsDetailsProjection> findOneCustomForDetailsView(long id);
 
     @Modifying
     @Transactional

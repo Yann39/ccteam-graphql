@@ -63,6 +63,51 @@ public class EventController {
     }
 
     /**
+     * Get all events in the specified year, based on event start date.
+     *
+     * @param year The year of the events to retrieve
+     * @return A list of {@link Event} objects representing the events
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @QueryMapping
+    public List<Event> getEventsByYear(@Argument int year) {
+        log.info("Received call to getEventsByYear with parameter year = {}", year);
+        return eventService.getEventsByYear(year);
+    }
+
+    /**
+     * Get all events in the specified month and year, based on event start date.
+     *
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
+     * @param year  The year of the events to retrieve
+     * @return A list of {@link Event} objects representing the events
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @QueryMapping
+    public List<Event> getEventsByMonthAndYear(@Argument int month,
+                                               @Argument int year) {
+        log.info("Received call to getEventsByMonthAndYear with parameters month = {}, year = {}", month, year);
+        return eventService.getEventsByMonthAndYear(month, year);
+    }
+
+    /**
+     * Get all events in the specified day, month and year, based on event start date.
+     *
+     * @param day   The day of the events to retrieve
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
+     * @param year  The year of the events to retrieve
+     * @return A list of {@link Event} objects representing the events
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @QueryMapping
+    public List<Event> getEventsByDayAndMonthAndYear(@Argument int day,
+                                                     @Argument int month,
+                                                     @Argument int year) {
+        log.info("Received call to getEventsByDayAndMonthAndYear with parameters day = {}, month = {}, year = {}", day, month, year);
+        return eventService.getEventsByDayAndMonthAndYear(day, month, year);
+    }
+
+    /**
      * Get an event given its {@code id}.
      *
      * @param id The ID of the event to retrieve
@@ -71,7 +116,7 @@ public class EventController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public Event getEventById(@Argument Long id) {
-        log.info("Received call to getEventById with parameter ID = " + id);
+        log.info("Received call to getEventById with parameter ID = {}", id);
         return eventService.getEventById(id);
     }
 
@@ -84,7 +129,7 @@ public class EventController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<Event> getEventsByTitle(@Argument String title) {
-        log.info("Received call to getEventsByTitle with parameter title = " + title);
+        log.info("Received call to getEventsByTitle with parameter title = {}", title);
         return eventService.getEventsByTitle(title);
     }
 
@@ -103,12 +148,16 @@ public class EventController {
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
-    public Event createEvent(@Argument String title, @Argument String description, @Argument String startDate,
-                             @Argument String endDate, @Argument long trackId, @Argument String organizer,
-                             @Argument BigDecimal price, @Argument long memberId) {
-        log.info("Received call to createEvent with parameters title = " + title + ", description = " + description +
-                ", startDate = " + startDate + ", endDate = " + endDate + ", trackId = " + trackId + ", organizer = " + organizer +
-                ", price = " + price + ", memberId = " + memberId);
+    public Event createEvent(@Argument String title,
+                             @Argument String description,
+                             @Argument String startDate,
+                             @Argument String endDate,
+                             @Argument long trackId,
+                             @Argument String organizer,
+                             @Argument BigDecimal price,
+                             @Argument long memberId) {
+        log.info("Received call to createEvent with parameters title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizer = {}, price = {}, memberId = {}",
+                title, description, startDate, endDate, trackId, organizer, price, memberId);
         return eventService.createEvent(title, description, startDate, endDate, trackId, organizer, price, memberId);
     }
 
@@ -128,12 +177,17 @@ public class EventController {
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
-    public Event updateEvent(@Argument long eventId, @Argument String title, @Argument String description,
-                             @Argument String startDate, @Argument String endDate, @Argument long trackId,
-                             @Argument String organizer, @Argument BigDecimal price, @Argument long memberId) {
-        log.info("Received call to updateEvent with parameters eventId = " + eventId + ", title = " + title + ", description = " + description +
-                ", startDate = " + startDate + ", endDate = " + endDate + ", trackId = " + trackId + ", organizer = " + organizer +
-                ", price = " + price + ", memberId = " + memberId);
+    public Event updateEvent(@Argument long eventId,
+                             @Argument String title,
+                             @Argument String description,
+                             @Argument String startDate,
+                             @Argument String endDate,
+                             @Argument long trackId,
+                             @Argument String organizer,
+                             @Argument BigDecimal price,
+                             @Argument long memberId) {
+        log.info("Received call to updateEvent with parameters eventId = {}, title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizer = {}, price = {}, memberId = {}",
+                eventId, title, description, startDate, endDate, trackId, organizer, price, memberId);
         return eventService.updateEvent(eventId, title, description, startDate, endDate, trackId, organizer, price, memberId);
     }
 
@@ -146,7 +200,7 @@ public class EventController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Event deleteEvent(@Argument long eventId) {
-        log.info("Received call to deleteNews with parameter eventId = " + eventId);
+        log.info("Received call to deleteEvent with parameter eventId = {}", eventId);
         return eventService.deleteEvent(eventId);
     }
 

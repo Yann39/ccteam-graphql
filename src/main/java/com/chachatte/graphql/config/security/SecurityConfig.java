@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,7 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Web security configuration.
+ * Security configuration.
  * <p>
  * It enables Spring HTTP Security, by providing a default configuration.
  *
@@ -46,7 +47,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableMethodSecurity
-public class WebSecurityConfig {
+public class SecurityConfig {
 
     @Autowired
     private JWTTokenUtils jwtTokenUtils;
@@ -117,15 +118,15 @@ public class WebSecurityConfig {
     }
 
     /**
-     * HTTP security configuration.
+     * HTTP security configuration for JWT protected content.
      *
      * @param http The {@link HttpSecurity}
      * @return A {@link SecurityFilterChain} object representing the new configured filter chain
      * @throws Exception An exception occurred while configuring the HTTP security
      */
     @Bean
+    @Order(1)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         return http
                 // disable CSRF as we do not serve browser clients
                 .csrf().disable()
@@ -134,19 +135,43 @@ public class WebSecurityConfig {
                 // allow restricting access to certain URL based on the HTTP servlet request
                 .authorizeHttpRequests()
                 // by default, the AuthorizationFilter applies to all dispatcher types, so grant all access only on requests with dispatcher type ASYNC or FORWARD
-                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD).permitAll()
+                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                 // authenticate requests to GraphQL endpoint
                 .requestMatchers("/graphql").authenticated()
-                // allow any request to REST endpoint
-                .requestMatchers("/rest/**").permitAll()
-                // deny any other requests
-                .anyRequest().denyAll().and()
+                // allow any other requests (will be restricted later in next security filter)
+                .anyRequest().permitAll().and()
                 // custom exception handling
                 .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
                 // make sure we use stateless session, session will not be used to store user's state
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .build();
+    }
 
+    /**
+     * HTTP security configuration for non-authenticated content.
+     * <p>
+     * We use that second configuration because we need to apply the custom authentication filter only
+     * for authenticated content.
+     *
+     * @param http The {@link HttpSecurity}
+     * @return A {@link SecurityFilterChain} object representing the new configured filter chain
+     * @throws Exception An exception occurred while configuring the HTTP security
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain filterChainNotAuthenticated(HttpSecurity http) throws Exception {
+        return http
+                // disable CSRF as we do not serve browser clients
+                .csrf().disable()
+                // allow restricting access to certain URL based on the HTTP servlet request
+                .authorizeHttpRequests()
+                // allow any request to REST endpoint
+                .requestMatchers("/rest/**").permitAll()
+                // deny any other requests
+                .anyRequest().denyAll().and()
+                // make sure we use stateless session, session will not be used to store user's state
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .build();
     }
 
 }

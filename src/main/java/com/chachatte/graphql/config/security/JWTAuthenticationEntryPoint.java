@@ -60,7 +60,7 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
         final String badCredentials = (String) req.getAttribute("bad_credentials");
 
         // use custom GraphQL exception to set the error, so that it is in a standard GraphQL response format
-        CustomGraphQLException customGraphQLException;
+        final CustomGraphQLException customGraphQLException;
 
         if (expired != null) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

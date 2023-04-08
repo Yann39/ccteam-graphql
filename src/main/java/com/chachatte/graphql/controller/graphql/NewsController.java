@@ -22,8 +22,6 @@ package com.chachatte.graphql.controller.graphql;
 
 import com.chachatte.graphql.entities.Member;
 import com.chachatte.graphql.entities.News;
-import com.chachatte.graphql.projection.NewsDetailsProjection;
-import com.chachatte.graphql.projection.NewsListProjection;
 import com.chachatte.graphql.service.NewsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -74,8 +72,13 @@ public class NewsController {
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @QueryMapping
-    public List<News> getAllNewsFilteredPaginated(@Argument String text, @Argument int pageNumber, @Argument int pageSize, @Argument String sortBy, @Argument String sortDirection) {
-        log.info("Received call to getAllNewsFilteredPaginated with parameter text = " + text + ", pageNumber=" + pageNumber + ", pageSize=" + pageSize + ", sortBy=" + sortBy + ", sortDirection=" + sortDirection);
+    public List<News> getAllNewsFilteredPaginated(@Argument String text,
+                                                  @Argument int pageNumber,
+                                                  @Argument int pageSize,
+                                                  @Argument String sortBy,
+                                                  @Argument String sortDirection) {
+        log.info("Received call to getAllNewsFilteredPaginated with parameter text = {}, pageNumber = {}, pageSize = {}, sortBy = {}, sortDirection = {}",
+                text, pageNumber, pageSize, sortBy, sortDirection);
         return newsService.getNewsFilteredPaginated(text, pageNumber, pageSize, sortBy, sortDirection);
     }
 
@@ -88,33 +91,8 @@ public class NewsController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public News getNewsById(@Argument Long id) {
-        log.info("Received call to getNewsById with parameter ID = " + id);
+        log.info("Received call to getNewsById with parameter ID = {}", id);
         return newsService.getNewsById(id);
-    }
-
-    /**
-     * Get all news, with only minimum properties to be used in home list.
-     *
-     * @return A list of {@link NewsListProjection} objects representing the news list
-     */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
-    @QueryMapping
-    public List<NewsListProjection> getAllNewsForHomeList() {
-        log.info("Received call to getAllNewsForHomeList");
-        return newsService.getAllNewsForHomeList();
-    }
-
-    /**
-     * Get a news given its {@code id}, with only minimum properties to be used in news detail view.
-     *
-     * @param id The ID of the news to retrieve
-     * @return A {@link NewsDetailsProjection} object representing the news
-     */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
-    @QueryMapping
-    public NewsDetailsProjection getNewsByIdForDetailsView(@Argument Long id) {
-        log.info("Received call to getNewsByIdForDetailsView with parameter id = " + id);
-        return newsService.getNewsByIdForDetailsView(id);
     }
 
     /**
@@ -124,13 +102,18 @@ public class NewsController {
      * @param catchLine The news catch line
      * @param content   The news content
      * @param newsDate  The news date
-     * @param memberId  The ID of the {@link Member} creating the news
+     * @param memberId  The ID of the {@link Member} to set as creator of the news
      * @return A {@link News} object representing the news just created
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
-    public News createNews(@Argument String title, @Argument String catchLine, @Argument String content, @Argument String newsDate, @Argument long memberId) {
-        log.info("Received call to createNews with parameters title = " + title + ", catchLine = " + catchLine + ", content = " + content + ", newsDate = " + newsDate + ", memberId = " + memberId);
+    public News createNews(@Argument String title,
+                           @Argument String catchLine,
+                           @Argument String content,
+                           @Argument String newsDate,
+                           @Argument long memberId) {
+        log.info("Received call to createNews with parameters title = {}, catchLine = {}, content = {}, newsDate = {}, memberId = {}",
+                title, catchLine, content, newsDate, memberId);
         return newsService.createNews(title, catchLine, content, newsDate, memberId);
     }
 
@@ -142,13 +125,19 @@ public class NewsController {
      * @param catchLine The news catch line
      * @param content   The news content
      * @param newsDate  The news date
-     * @param memberId  The ID of the {@link Member} creating the news
+     * @param memberId  The ID of the {@link Member} to set as last modifier of the news
      * @return A {@link News} object representing the news just created
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
-    public News updateNews(@Argument long newsId, @Argument String title, @Argument String catchLine, @Argument String content, @Argument String newsDate, @Argument long memberId) {
-        log.info("Received call to updateNews with parameters newsId = " + newsId + ", title = " + title + ", catchLine = " + catchLine + ", content = " + content + ", newsDate = " + newsDate + ", memberId = " + memberId);
+    public News updateNews(@Argument long newsId,
+                           @Argument String title,
+                           @Argument String catchLine,
+                           @Argument String content,
+                           @Argument String newsDate,
+                           @Argument long memberId) {
+        log.info("Received call to updateNews with parameters newsId = {}, title = {}, catchLine = {}, content = {}, newsDate = {}, memberId = {}",
+                newsId, title, catchLine, content, newsDate, memberId);
         return newsService.updateNews(newsId, title, catchLine, content, newsDate, memberId);
     }
 
@@ -161,7 +150,7 @@ public class NewsController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public News deleteNews(@Argument long newsId) {
-        log.info("Received call to deleteNews with parameter newsId = " + newsId);
+        log.info("Received call to deleteNews with parameter newsId = {}", newsId);
         return newsService.deleteNews(newsId);
     }
 
@@ -174,8 +163,9 @@ public class NewsController {
      */
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
-    public News likeNews(@Argument long newsId, @Argument long memberId) {
-        log.info("Received call to likeNews with parameters newsId = " + newsId + ", memberId = " + memberId);
+    public News likeNews(@Argument long newsId,
+                         @Argument long memberId) {
+        log.info("Received call to likeNews with parameters newsId = {}, memberId = {}", newsId, memberId);
         return newsService.likeNews(newsId, memberId);
     }
 
@@ -188,8 +178,9 @@ public class NewsController {
      */
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
-    public News unlikeNews(@Argument long newsId, @Argument long memberId) {
-        log.info("Received call to unlikeNews with parameters newsId = " + newsId + ", memberId = " + memberId);
+    public News unlikeNews(@Argument long newsId,
+                           @Argument long memberId) {
+        log.info("Received call to unlikeNews with parameters newsId = {}, memberId = {}", newsId, memberId);
         return newsService.unlikeNews(newsId, memberId);
     }
 

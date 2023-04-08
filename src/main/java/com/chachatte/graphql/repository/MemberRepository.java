@@ -39,23 +39,31 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select distinct m from Member m " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event " +
             "left join fetch m.likedNews ln " +
             "left join fetch ln.news")
     List<Member> findAllCustom();
 
     @Query("select m from Member m " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event " +
             "left join fetch m.likedNews ln " +
             "left join fetch ln.news " +
             "where m.id = :id")
     Optional<Member> findByIdCustom(long id);
 
     @Query("select m from Member m " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event " +
             "left join fetch m.likedNews ln " +
             "left join fetch ln.news " +
             "where m.email = :email")
     Optional<Member> findByEmailCustom(String email);
 
     @Query("select distinct m from Member m " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event " +
             "left join fetch m.likedNews ln " +
             "left join fetch ln.news " +
             "where :text is null or ( " +
@@ -64,13 +72,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "or m.email like %:text%" +
             ")")
     List<Member> findFilteredCustom(String text);
-
-    List<Member> findByActiveTrueAndFirstNameLikeOrLastNameLikeOrEmailLike(@Param("text") String firstName, @Param("text") String lastName, @Param("text") String email);
-
-    List<Member> findByActiveTrue();
-
-    @Query("select em.member from EventMember em where em.event.id = ?1")
-    List<Member> findByEventId(long eventId);
 
     boolean existsMemberByEmail(String email);
 }

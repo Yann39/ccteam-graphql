@@ -47,41 +47,6 @@ public class LongScalar implements RuntimeWiringConfigurer {
                 .description("Long type")
                 .coercing(new Coercing<Long, Integer>() {
 
-                    /*@Override
-                    public String serialize(final Object dataFetcherResult) {
-                        if (dataFetcherResult instanceof Long) {
-                            return Long.toString((Long) dataFetcherResult);
-                        } else {
-                            throw new CoercingSerializeException("Expected a Long object");
-                        }
-                    }
-
-                    @Override
-                    public Long parseValue(final Object input) {
-                        try {
-                            if (input instanceof String) {
-                                return Long.parseLong((String) input);
-                            } else {
-                                throw new CoercingParseValueException("Expected a String value");
-                            }
-                        } catch (NumberFormatException e) {
-                            throw new CoercingParseValueException(input + " is not a valid long", e);
-                        }
-                    }
-
-                    @Override
-                    public Long parseLiteral(final Object input) {
-                        if (input instanceof StringValue) {
-                            try {
-                                return Long.parseLong(((StringValue) input).getValue());
-                            } catch (DateTimeParseException e) {
-                                throw new CoercingParseLiteralException(e);
-                            }
-                        } else {
-                            throw new CoercingParseLiteralException("Expected a String literal");
-                        }
-                    }*/
-
                     @Override
                     public Integer serialize(final Object dataFetcherResult) {
                         if (dataFetcherResult instanceof Long) {

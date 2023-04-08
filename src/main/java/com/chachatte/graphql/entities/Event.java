@@ -26,6 +26,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * @author yann39
@@ -62,6 +63,9 @@ public class Event {
 
     @Column(precision = 6, scale = 2)
     private BigDecimal price;
+
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<EventMember> participants;
 
     @Column(nullable = false)
     private LocalDateTime createdOn = LocalDateTime.now();

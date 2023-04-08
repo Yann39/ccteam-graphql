@@ -30,8 +30,6 @@ type Query {
     getAllNews: [News]
     getAllNewsFilteredPaginated(text: String, pageNumber: Int, pageSize: Int, sortBy: String, sortDirection: String): [News]
     getNewsById(id: Long!): News
-    getAllNewsForHomeList: [NewsListProjection]
-    getNewsByIdForDetailsView(id: Long!): NewsDetailsProjection
 
     getAllMembers: [Member]
     getMemberById(id: Long!): Member
@@ -39,6 +37,9 @@ type Query {
     getMembersFiltered(text: String): [Member]
 
     getAllEvents: [Event]
+    getEventsByYear(year: Int!): [Event]
+    getEventsByMonthAndYear(month: Int!, year: Int!): [Event]
+    getEventsByDayAndMonthAndYear(day: Int!, month: Int!, year: Int!): [Event]
     getEventById(id: Int!): Event
     getEventsByTitle(title: String!): [Event]
 
@@ -53,7 +54,9 @@ type Mutation {
     likeNews(newsId: Long!, memberId: Long!): News
     unlikeNews(newsId: Long!, memberId: Long!): News
 
-    createMember(firstName: String!, lastName: String!, email: String!, password: String!): Member
+    createMember(firstName: String!, lastName: String!, email: String!, phone: String, avatarUrl: String, bike: String, active: Boolean!, admin: Boolean!): Member
+    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, avatarUrl: String, bike: String, active: Boolean!, admin: Boolean!): Member
+    deleteMember(memberId: Long!): Member
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
@@ -88,7 +91,7 @@ type Event {
     track: Track
     organizer: String
     price: Float
-    members: [Member]
+    participants: [EventMember]
     createdOn: LocalDateTime!
     createdBy: Member!
     modifiedOn: LocalDateTime
@@ -140,6 +143,7 @@ type Member {
     bike: String
     active: Boolean!
     admin: Boolean!
+    eventMembers: [EventMember]
     likedNews: [LikedNews]
     registrationDate: LocalDateTime
     createdOn: LocalDateTime!

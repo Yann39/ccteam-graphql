@@ -33,18 +33,19 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "event_member")
+@Table(name = "event_member",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "event_id"})})
 public class EventMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     Event event;
 
