@@ -7,11 +7,11 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.0</version>
     </parent>
-    <groupId>com.chachatte</groupId>
-    <artifactId>chachatte-graphql</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>chachatte-graphql</name>
-    <description>Spring Boot application to expose GraphQL endpoint for Chachatte team mobile application</description>
+    <groupId>com.ccteam</groupId>
+    <artifactId>ccteam-graphql</artifactId>
+    <version>0.7.0</version>
+    <name>ccteam-graphql</name>
+    <description>Spring Boot application to expose GraphQL endpoint for CCTeam mobile application</description>
 
     <properties>
         <java.version>17</java.version>
@@ -40,6 +40,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Lombok -->
