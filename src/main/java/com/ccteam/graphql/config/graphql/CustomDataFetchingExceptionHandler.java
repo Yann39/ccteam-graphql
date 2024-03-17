@@ -40,11 +40,11 @@ public class CustomDataFetchingExceptionHandler extends DataFetcherExceptionReso
 
     @Override
     public GraphQLError resolveToSingleError(Throwable throwable, DataFetchingEnvironment dataFetchingEnvironment) {
-        if (throwable instanceof CustomGraphQLException) {
+        if (throwable instanceof CustomGraphQLException customGraphQLException) {
             return GraphqlErrorBuilder.newError(dataFetchingEnvironment)
                     .message(throwable.getMessage())
-                    .extensions(((CustomGraphQLException) throwable).getExtensions())
-                    .errorType(((CustomGraphQLException) throwable).getErrorType())
+                    .extensions((customGraphQLException).getExtensions())
+                    .errorType((customGraphQLException).getErrorType())
                     .build();
         }
         return null;

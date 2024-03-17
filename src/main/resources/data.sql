@@ -21,7 +21,7 @@ INSERT INTO `ccteam`.`news` (`id`, `title`, `catch_line`, `content`, `news_date`
 INSERT INTO `ccteam`.`track` (`id`, `name`, `distance`, `lap_record`, `website`, `latitude`, `longitude`) VALUES
 (1, 'Bresse', 3000, 84330, 'https://www.circuitdebresse.com', 46.551431, 5.328642),
 (2, 'Dijon-Prenois', 3800, 79427, 'https://www.circuit-dijon-prenois.com', 47.3643282, 4.8977331),
-(3, 'Magny-Cours', 4410, 96950, 'https://www.circuitmagnycours.com', 46.8615409, 3.1612033),
+(3, 'Magny-Cours', 4411, 96950, 'https://www.circuitmagnycours.com', 46.8615409, 3.1612033),
 (4, 'Bourbonnais', 2300, 66800, 'https://circuitdubourbonnais.com', 46.5364023, 3.4311176),
 (5, 'Vaison', 2000, 58590, 'http://vaisonpiste.com', 46.762535, 4.4403653),
 (6, 'Lédenon', 3150, 81996, 'https://www.ledenon.com', 43.9236779, 4.5043975),

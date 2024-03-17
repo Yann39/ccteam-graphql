@@ -20,13 +20,6 @@
 
 package com.ccteam.graphql.service;
 
-import com.chachatte.graphql.config.graphql.CustomGraphQLException;
-import com.chachatte.graphql.entities.Event;
-import com.chachatte.graphql.entities.Member;
-import com.chachatte.graphql.entities.Track;
-import com.chachatte.graphql.repository.EventRepository;
-import com.chachatte.graphql.repository.MemberRepository;
-import com.chachatte.graphql.repository.TrackRepository;
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.Member;
@@ -114,7 +107,7 @@ public class EventService {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(id);
         if (eventOptional.isEmpty()) {
             log.error("Event with id {} not found in the database", id);
-            throw new CustomGraphQLException("event_not_found", "Specified member has not been found in the database");
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
         }
         return eventOptional.get();
     }

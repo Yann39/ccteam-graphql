@@ -49,8 +49,8 @@ public class LongScalar implements RuntimeWiringConfigurer {
 
                     @Override
                     public Integer serialize(final Object dataFetcherResult) {
-                        if (dataFetcherResult instanceof Long) {
-                            return Math.toIntExact((Long) dataFetcherResult);
+                        if (dataFetcherResult instanceof Long value) {
+                            return Math.toIntExact(value);
                         } else {
                             throw new CoercingSerializeException("Expected a Long object");
                         }
@@ -59,8 +59,8 @@ public class LongScalar implements RuntimeWiringConfigurer {
                     @Override
                     public Long parseValue(final Object input) {
                         try {
-                            if (input instanceof Integer) {
-                                return Long.valueOf((Integer) input);
+                            if (input instanceof Integer value) {
+                                return Long.valueOf(value);
                             } else {
                                 throw new CoercingParseValueException("Expected an Integer value");
                             }
@@ -71,9 +71,9 @@ public class LongScalar implements RuntimeWiringConfigurer {
 
                     @Override
                     public Long parseLiteral(final Object input) {
-                        if (input instanceof IntValue) {
+                        if (input instanceof IntValue value) {
                             try {
-                                return ((IntValue) input).getValue().longValue();
+                                return (value).getValue().longValue();
                             } catch (DateTimeParseException e) {
                                 throw new CoercingParseLiteralException(e);
                             }

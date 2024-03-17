@@ -1,0 +1,38 @@
+query GetEventsByDayAndMonthAndYear ($day: Int!, $month: Int!, $year: Int!) {
+    getEventsByDayAndMonthAndYear(day: $day, month: $month, year: $year) {
+        id
+        title
+        description
+        startDate
+        endDate
+        track {
+            name
+            distance
+            lapRecord
+            website
+            latitude
+            longitude
+        }
+        participants {
+            member {
+                firstName
+                lastName
+                email
+            }
+        }
+        organizer
+        price
+        createdOn
+        createdBy {
+            id
+            firstName
+            lastName
+        }
+        modifiedOn
+        modifiedBy {
+            id
+            firstName
+            lastName
+        }
+    }
+}

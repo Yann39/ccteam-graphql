@@ -52,8 +52,8 @@ public class LocalDateTimeScalar implements RuntimeWiringConfigurer {
 
                     @Override
                     public String serialize(final Object dataFetcherResult) {
-                        if (dataFetcherResult instanceof LocalDateTime) {
-                            return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format((LocalDateTime) dataFetcherResult);
+                        if (dataFetcherResult instanceof LocalDateTime localDateTime) {
+                            return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(localDateTime);
                         } else {
                             throw new CoercingSerializeException("Expected a LocalDateTime object");
                         }
@@ -62,8 +62,8 @@ public class LocalDateTimeScalar implements RuntimeWiringConfigurer {
                     @Override
                     public LocalDateTime parseValue(final Object input) {
                         try {
-                            if (input instanceof String) {
-                                return LocalDateTime.parse((String) input);
+                            if (input instanceof String string) {
+                                return LocalDateTime.parse(string);
                             } else {
                                 throw new CoercingParseValueException("Expected a String value");
                             }
@@ -74,9 +74,9 @@ public class LocalDateTimeScalar implements RuntimeWiringConfigurer {
 
                     @Override
                     public LocalDateTime parseLiteral(final Object input) {
-                        if (input instanceof StringValue) {
+                        if (input instanceof StringValue stringValue) {
                             try {
-                                return LocalDateTime.parse(((StringValue) input).getValue());
+                                return LocalDateTime.parse((stringValue).getValue());
                             } catch (DateTimeParseException e) {
                                 throw new CoercingParseLiteralException(e);
                             }

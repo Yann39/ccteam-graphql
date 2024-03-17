@@ -32,6 +32,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -129,21 +130,28 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 // disable CSRF as we do not serve browser clients
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // add JWT authorization filter
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), jwtTokenUtils))
+                .addFilter(
+                        new JWTAuthorizationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), jwtTokenUtils)
+                )
                 // allow restricting access to certain URL based on the HTTP servlet request
-                .authorizeHttpRequests()
-                // by default, the AuthorizationFilter applies to all dispatcher types, so grant all access only on requests with dispatcher type ASYNC or FORWARD
-                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                // authenticate requests to GraphQL endpoint
-                .requestMatchers("/graphql").authenticated()
-                // allow any other requests (will be restricted later in next security filter)
-                .anyRequest().permitAll().and()
+                .authorizeHttpRequests(a -> a
+                        // by default, the AuthorizationFilter applies to all dispatcher types, so grant all access only on requests with dispatcher type ASYNC or FORWARD
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+                        // authenticate requests to GraphQL endpoint
+                        .requestMatchers("/graphql").authenticated()
+                        // allow any other requests (will be restricted later in next security filter)
+                        .anyRequest().permitAll()
+                )
                 // custom exception handling
-                .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
+                )
                 // make sure we use stateless session, session will not be used to store user's state
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement(s -> s
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .build();
     }
 
@@ -162,17 +170,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChainNotAuthenticated(HttpSecurity http) throws Exception {
         return http
                 // disable CSRF as we do not serve browser clients
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // allow restricting access to certain URL based on the HTTP servlet request
-                .authorizeHttpRequests()
-                // allow any request to REST endpoint
-                .requestMatchers("/rest/**").permitAll()
-                // allow any request to actuator health endpoint
-                .requestMatchers("/actuator/health").permitAll()
-                // deny any other requests
-                .anyRequest().denyAll().and()
+                .authorizeHttpRequests(a -> a
+                        // allow any request to REST endpoint
+                        .requestMatchers("/rest/**").permitAll()
+                        // allow any request to actuator health endpoint
+                        .requestMatchers("/actuator/health").permitAll()
+                        // deny any other requests
+                        .anyRequest().denyAll())
                 // make sure we use stateless session, session will not be used to store user's state
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement(s -> s
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .build();
     }
 

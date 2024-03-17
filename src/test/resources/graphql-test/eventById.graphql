@@ -1,0 +1,38 @@
+query GetEventById ($id: Int!) {
+    getEventById(id: $id) {
+        id
+        title
+        description
+        startDate
+        endDate
+        track {
+            name
+            distance
+            lapRecord
+            website
+            latitude
+            longitude
+        }
+        participants {
+            member {
+                firstName
+                lastName
+                email
+            }
+        }
+        organizer
+        price
+        createdOn
+        createdBy {
+            id
+            firstName
+            lastName
+        }
+        modifiedOn
+        modifiedBy {
+            id
+            firstName
+            lastName
+        }
+    }
+}
