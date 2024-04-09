@@ -60,6 +60,10 @@ public class Member {
     @Column
     private String avatarUrl;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "attachment_id")
+    private Attachment avatar;
+
     @Column(length = 128)
     private String bike;
 

@@ -82,13 +82,21 @@ To run the application locally :
     CREATE DATABASE ccteam CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     ```
 
-2. If you want **JPA** to create the database structure and insert default data, set the following properties (in your _application-local.properties_ file) :
+2. If you want **JPA** to create the database structure, set the following properties (in your _application-local.properties_ file) :
+
+    ```properties
+    spring.jpa.hibernate.ddl-auto=                      update
+    ```
+   
+   And if you want to initialize the database with some default data, set the following properties (in your _application-local.properties_ file) :
 
     ```properties
     spring.sql.init.mode=                               always
-    spring.jpa.hibernate.ddl-auto=                      update
     spring.jpa.defer-datasource-initialization=         true
     ```
+   
+   This will run the _src/main/resources/data.sql_ file to insert the data.
+   The default password for every user is `123456`.
 
 3. Run the application with the right profile :
 
