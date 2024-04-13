@@ -45,6 +45,10 @@ type Query {
 
     getAllTracks: [Track]
     getTrackById(id: Int!): Track
+
+    getAllLapRecords: [LapRecord]
+    getMemberLapRecords(memberId: Long!): [LapRecord]
+    getTrackLapRecords(trackId: Long!): [LapRecord]
 }
 
 type Mutation {
@@ -65,6 +69,10 @@ type Mutation {
     createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
     updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
     deleteTrack(trackId: Long!): Track
+
+    createLapRecord(memberId: Long!, trackId: Long!, recordDate: LocalDateTime!, lapTime: Int!, conditions: String!, comments: String): LapRecord
+    updateLapRecord(lapRecordId: Long!, trackId: Long!, recordDate: LocalDateTime!, lapTime: Int!, conditions: String!, comments: String): LapRecord
+    deleteLapRecord(lapRecordId: Long!): LapRecord
 }
 
 type NewsListProjection {

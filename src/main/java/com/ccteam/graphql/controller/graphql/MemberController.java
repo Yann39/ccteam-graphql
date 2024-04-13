@@ -101,7 +101,6 @@ public class MemberController {
         return memberService.getMembersFiltered(text);
     }
 
-
     /**
      * Create a new member.
      *
