@@ -44,9 +44,9 @@ import java.util.Optional;
 @Slf4j
 public class LapRecordService {
 
-    private LapRecordRepository lapRecordRepository;
-    private MemberRepository memberRepository;
-    private TrackRepository trackRepository;
+    private final LapRecordRepository lapRecordRepository;
+    private final MemberRepository memberRepository;
+    private final TrackRepository trackRepository;
 
     public LapRecordService(LapRecordRepository lapRecordRepository, MemberRepository memberRepository, TrackRepository trackRepository) {
         this.lapRecordRepository = lapRecordRepository;
@@ -88,13 +88,13 @@ public class LapRecordService {
      *
      * @param memberId   The member ID
      * @param trackId    The track ID
-     * @param recordDate The lap record date
-     * @param lapTime    The lap time
+     * @param recordDate The lap record date as ISO 8601 string
+     * @param lapTime    The lap time in milliseconds
      * @param conditions The track conditions
      * @param comments   Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    public LapRecord createLapRecord(long memberId, long trackId, LocalDateTime recordDate, int lapTime, String conditions, String comments) {
+    public LapRecord createLapRecord(long memberId, long trackId, String recordDate, int lapTime, String conditions, String comments) {
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
@@ -111,7 +111,7 @@ public class LapRecordService {
         final LapRecord lapRecord = new LapRecord();
         lapRecord.setMember(memberOptional.get());
         lapRecord.setTrack(trackOptional.get());
-        lapRecord.setRecordDate(recordDate);
+        lapRecord.setRecordDate(LocalDateTime.parse(recordDate));
         lapRecord.setLapTime(lapTime);
         lapRecord.setConditions(conditions);
         lapRecord.setComments(comments);
@@ -125,13 +125,13 @@ public class LapRecordService {
      *
      * @param lapRecordId The lap record ID
      * @param trackId     The track ID
-     * @param recordDate  The lap record date
-     * @param lapTime     The lap time
-     * @param conditions The track conditions
-     * @param comments   Some comment about the lap record
+     * @param recordDate  The lap record date as ISO 8601 string
+     * @param lapTime     The lap time in milliseconds
+     * @param conditions  The track conditions
+     * @param comments    Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    public LapRecord updateLapRecord(long lapRecordId, long trackId, LocalDateTime recordDate, int lapTime, String conditions, String comments) {
+    public LapRecord updateLapRecord(long lapRecordId, long trackId, String recordDate, int lapTime, String conditions, String comments) {
 
         final Optional<LapRecord> lapRecordOptional = lapRecordRepository.findByIdCustom(lapRecordId);
         if (lapRecordOptional.isEmpty()) {
@@ -148,7 +148,7 @@ public class LapRecordService {
         final LapRecord lapRecord = lapRecordOptional.get();
 
         lapRecord.setTrack(trackOptional.get());
-        lapRecord.setRecordDate(recordDate);
+        lapRecord.setRecordDate(LocalDateTime.parse(recordDate));
         lapRecord.setLapTime(lapTime);
         lapRecord.setConditions(conditions);
         lapRecord.setComments(comments);

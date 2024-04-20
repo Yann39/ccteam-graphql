@@ -29,7 +29,6 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -91,8 +90,8 @@ public class LapRecordController {
      *
      * @param memberId   The member ID
      * @param trackId    The track ID
-     * @param recordDate The lap record date
-     * @param lapTime    The lap time
+     * @param recordDate The lap record date as ISO 8601 string
+     * @param lapTime    The lap time in milliseconds
      * @param conditions The track conditions
      * @param comments   Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
@@ -101,7 +100,7 @@ public class LapRecordController {
     @MutationMapping
     public LapRecord createLapRecord(@Argument long memberId,
                                      @Argument long trackId,
-                                     @Argument LocalDateTime recordDate,
+                                     @Argument String recordDate,
                                      @Argument int lapTime,
                                      @Argument String conditions,
                                      @Argument String comments) {
@@ -115,17 +114,17 @@ public class LapRecordController {
      *
      * @param lapRecordId The lap record ID
      * @param trackId     The track ID
-     * @param recordDate  The lap record date
-     * @param lapTime     The lap time
-     * @param conditions The track conditions
-     * @param comments   Some comment about the lap record
+     * @param recordDate  The lap record date as ISO 8601 string
+     * @param lapTime     The lap time in milliseconds
+     * @param conditions  The track conditions
+     * @param comments    Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public LapRecord updateLapRecord(@Argument long lapRecordId,
                                      @Argument long trackId,
-                                     @Argument LocalDateTime recordDate,
+                                     @Argument String recordDate,
                                      @Argument int lapTime,
                                      @Argument String conditions,
                                      @Argument String comments) {
