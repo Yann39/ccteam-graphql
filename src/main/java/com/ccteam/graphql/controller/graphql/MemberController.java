@@ -27,9 +27,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -104,14 +106,15 @@ public class MemberController {
     /**
      * Create a new member.
      *
-     * @param firstName The member first name
-     * @param lastName  The member last name
-     * @param email     The member e-mail address
-     * @param phone     The member phone number
-     * @param avatarUrl The member avatar URL
-     * @param bike      The member bike model
-     * @param active    A boolean indicating if the member is active
-     * @param admin     A boolean indicating if the member is admin
+     * @param firstName      The member first name
+     * @param lastName       The member last name
+     * @param email          The member e-mail address
+     * @param phone          The member phone number
+     * @param avatarFile     The member avatar file as base64 encoded string
+     * @param avatarFileName The member avatar file name
+     * @param bike           The member bike model
+     * @param active         A boolean indicating if the member is active
+     * @param admin          A boolean indicating if the member is admin
      * @return A {@link Member} object representing the member just created
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -120,27 +123,29 @@ public class MemberController {
                                @Argument String lastName,
                                @Argument String email,
                                @Argument String phone,
-                               @Argument String avatarUrl,
+                               @Argument String avatarFile,
+                               @Argument String avatarFileName,
                                @Argument String bike,
                                @Argument boolean active,
                                @Argument boolean admin) {
-        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, avatarUrl = {}, bike = {}, active = {}, admin = {}",
-                firstName, lastName, email, phone, avatarUrl, bike, active, admin);
-        return memberService.createMember(firstName, lastName, email, phone, avatarUrl, bike, active, admin);
+        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, bike = {}, active = {}, admin = {}",
+                firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
+        return memberService.createMember(firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
     }
 
     /**
      * Update the member represented by the given member ID with the specified data.
      *
-     * @param memberId  The ID of the {@link Member} to update
-     * @param firstName The member first name
-     * @param lastName  The member last name
-     * @param email     The member e-mail address
-     * @param phone     The member phone number
-     * @param avatarUrl The member avatar URL
-     * @param bike      The member bike model
-     * @param active    A boolean indicating if the member is active
-     * @param admin     A boolean indicating if the member is admin
+     * @param memberId       The ID of the {@link Member} to update
+     * @param firstName      The member first name
+     * @param lastName       The member last name
+     * @param email          The member e-mail address
+     * @param phone          The member phone number
+     * @param avatarFile     The member avatar file as base64 encoded string
+     * @param avatarFileName The member avatar file name
+     * @param bike           The member bike model
+     * @param active         A boolean indicating if the member is active
+     * @param admin          A boolean indicating if the member is admin
      * @return An {@link Event} object representing the event just updated
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -150,13 +155,14 @@ public class MemberController {
                                @Argument String lastName,
                                @Argument String email,
                                @Argument String phone,
-                               @Argument String avatarUrl,
+                               @Argument String avatarFile,
+                               @Argument String avatarFileName,
                                @Argument String bike,
                                @Argument boolean active,
                                @Argument boolean admin) {
-        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, avatarUrl = {}, bike = {}, active = {}, admin = {}",
-                memberId, firstName, lastName, email, phone, avatarUrl, bike, active, admin);
-        return memberService.updateMember(memberId, firstName, lastName, email, phone, avatarUrl, bike, active, admin);
+        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, bike = {}, active = {}, admin = {}",
+                memberId, firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
+        return memberService.updateMember(memberId, firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
     }
 
     /**
@@ -170,6 +176,16 @@ public class MemberController {
     public Member deleteMember(@Argument long memberId) {
         log.info("Received call to deleteMember with parameters memberId = {}", memberId);
         return memberService.deleteMember(memberId);
+    }
+
+    @SchemaMapping(typeName = "Member", field = "avatarFile")
+    public String getAvatarFile(Member member) {
+        return new String(Base64.getEncoder().encode(member.getAvatar().getFile()));
+    }
+
+    @SchemaMapping(typeName = "Member", field = "avatarFileName")
+    public String getAvatarFileName(Member member) {
+        return member.getAvatar().getFilename();
     }
 
 }

@@ -60,7 +60,7 @@ public class Member {
     @Column
     private String avatarUrl;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "attachment_id")
     private Attachment avatar;
 

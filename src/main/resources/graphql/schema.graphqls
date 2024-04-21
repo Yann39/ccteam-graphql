@@ -58,8 +58,8 @@ type Mutation {
     likeNews(newsId: Long!, memberId: Long!): News
     unlikeNews(newsId: Long!, memberId: Long!): News
 
-    createMember(firstName: String!, lastName: String!, email: String!, phone: String, avatarUrl: String, bike: String, active: Boolean!, admin: Boolean!): Member
-    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, avatarUrl: String, bike: String, active: Boolean!, admin: Boolean!): Member
+    createMember(firstName: String!, lastName: String!, email: String!, phone: String, avatarFile: String, avatarFileName: String, bike: String, active: Boolean!, admin: Boolean!): Member
+    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, avatarFile: String, avatarFileName: String, bike: String, active: Boolean!, admin: Boolean!): Member
     deleteMember(memberId: Long!): Member
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
@@ -148,6 +148,8 @@ type Member {
     password: String!
     phone: String
     avatarUrl: String
+    avatarFile: String
+    avatarFileName: String
     bike: String
     active: Boolean!
     admin: Boolean!

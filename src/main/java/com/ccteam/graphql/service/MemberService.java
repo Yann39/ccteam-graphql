@@ -21,15 +21,17 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
+import com.ccteam.graphql.entities.Attachment;
 import com.ccteam.graphql.entities.Event;
+import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.News;
 import com.ccteam.graphql.repository.MemberRepository;
-import com.ccteam.graphql.entities.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,17 +103,18 @@ public class MemberService {
     /**
      * Create a new member.
      *
-     * @param firstName The member first name
-     * @param lastName  The member last name
-     * @param email     The member e-mail address
-     * @param phone     The member phone number
-     * @param avatarUrl The member avatar URL
-     * @param bike      The member bike model
-     * @param active    A boolean indicating if the member is active
-     * @param admin     A boolean indicating if the member is admin
+     * @param firstName      The member first name
+     * @param lastName       The member last name
+     * @param email          The member e-mail address
+     * @param phone          The member phone number
+     * @param avatarFile     The member avatar file as base64 encoded string
+     * @param avatarFileName The member avatar file name
+     * @param bike           The member bike model
+     * @param active         A boolean indicating if the member is active
+     * @param admin          A boolean indicating if the member is admin
      * @return A {@link Member} object representing the member just created
      */
-    public Member createMember(String firstName, String lastName, String email, String phone, String avatarUrl, String bike, boolean active, boolean admin) {
+    public Member createMember(String firstName, String lastName, String email, String phone, String avatarFile, String avatarFileName, String bike, boolean active, boolean admin) {
 
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
         if (memberOptional.isPresent()) {
@@ -124,30 +127,40 @@ public class MemberService {
         member.setLastName(lastName);
         member.setEmail(email);
         member.setPhone(phone);
-        member.setAvatarUrl(avatarUrl);
         member.setBike(bike);
         member.setActive(active);
         member.setAdmin(admin);
         member.setRegistrationDate(LocalDateTime.now());
         member.setCreatedOn(LocalDateTime.now());
+
+        if (avatarFile != null) {
+            final byte[] decoded = Base64.getDecoder().decode(avatarFile.getBytes());
+            final Attachment attachment = new Attachment();
+            attachment.setFilename(avatarFileName);
+            attachment.setFile(decoded);
+            attachment.setUploadDate(LocalDateTime.now());
+            member.setAvatar(attachment);
+        }
+
         return memberRepository.save(member);
     }
 
     /**
      * Update the member represented by the given member ID with the specified data.
      *
-     * @param memberId  The ID of the {@link Member} to update
-     * @param firstName The member first name
-     * @param lastName  The member last name
-     * @param email     The member e-mail address
-     * @param phone     The member phone number
-     * @param avatarUrl The member avatar URL
-     * @param bike      The member bike model
-     * @param active    A boolean indicating if the member is active
-     * @param admin     A boolean indicating if the member is admin
+     * @param memberId       The ID of the {@link Member} to update
+     * @param firstName      The member first name
+     * @param lastName       The member last name
+     * @param email          The member e-mail address
+     * @param phone          The member phone number
+     * @param avatarFile     The member avatar file as base64 encoded string
+     * @param avatarFileName The member avatar file name
+     * @param bike           The member bike model
+     * @param active         A boolean indicating if the member is active
+     * @param admin          A boolean indicating if the member is admin
      * @return An {@link Event} object representing the event just updated
      */
-    public Member updateMember(long memberId, String firstName, String lastName, String email, String phone, String avatarUrl, String bike, boolean active, boolean admin) {
+    public Member updateMember(long memberId, String firstName, String lastName, String email, String phone, String avatarFile, String avatarFileName, String bike, boolean active, boolean admin) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
@@ -159,11 +172,26 @@ public class MemberService {
         member.setLastName(lastName);
         member.setEmail(email);
         member.setPhone(phone);
-        member.setAvatarUrl(avatarUrl);
         member.setBike(bike);
         member.setActive(active);
         member.setAdmin(admin);
         member.setModifiedOn(LocalDateTime.now());
+
+        if (avatarFile != null) {
+            final byte[] decoded = Base64.getDecoder().decode(avatarFile.getBytes());
+            if (member.getAvatar() != null) {
+                member.getAvatar().setFilename(avatarFileName);
+                member.getAvatar().setFile(decoded);
+                member.getAvatar().setUploadDate(LocalDateTime.now());
+            } else {
+                final Attachment attachment = new Attachment();
+                attachment.setFilename(avatarFileName);
+                attachment.setFile(decoded);
+                attachment.setUploadDate(LocalDateTime.now());
+                member.setAvatar(attachment);
+            }
+        }
+
         return memberRepository.save(member);
     }
 
