@@ -180,12 +180,12 @@ public class MemberController {
 
     @SchemaMapping(typeName = "Member", field = "avatarFile")
     public String getAvatarFile(Member member) {
-        return new String(Base64.getEncoder().encode(member.getAvatar().getFile()));
+        return member.getAvatar() != null ? new String(Base64.getEncoder().encode(member.getAvatar().getFile())) : null;
     }
 
     @SchemaMapping(typeName = "Member", field = "avatarFileName")
     public String getAvatarFileName(Member member) {
-        return member.getAvatar().getFilename();
+        return member.getAvatar() != null ? member.getAvatar().getFilename() : null;
     }
 
 }

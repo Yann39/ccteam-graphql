@@ -147,7 +147,6 @@ type Member {
     email: String!
     password: String!
     phone: String
-    avatarUrl: String
     avatarFile: String
     avatarFileName: String
     bike: String

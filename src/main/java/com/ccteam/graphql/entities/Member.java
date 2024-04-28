@@ -57,9 +57,6 @@ public class Member {
     @Column(length = 13)
     private String phone;
 
-    @Column
-    private String avatarUrl;
-
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "attachment_id")
     private Attachment avatar;
