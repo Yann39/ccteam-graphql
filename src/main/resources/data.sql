@@ -1,14 +1,14 @@
-INSERT INTO `ccteam`.`member` (`id`, `first_name`, `last_name`, `email`, `password`, `phone`, `avatar_url`, `bike`, `active`, `verified`, `admin`, `otp`, `otp_date`, `registration_date`, `role`, `created_on`, `modified_on`) VALUES
-(1, 'Bob', 'Admin', 'bob.admin@example.com', '$2y$10$MuLwPiQkTlcKEbGX6ztzAOxGlqK7ddglgDXcYBRBFDwkM.AQy63EK', '+33 123456789', null, 'Honda CBR 600 RR 2007', 1, 1, 1, null, null, '2016-07-11 00:00:00', 'ROLE_ADMIN', '2019-06-10 13:44:26', '2018-07-01 07:30:54'),
-(2, 'Stéphane', 'Verger', 'steph.verger@example.fr', null, '+72 777992834', null, 'Kawasaki ZX6R 636 2015', 0, 0, 0, null, null, '2016-06-30 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:11:24', NULL),
-(3, 'Coralie', 'Archambault', 'coralie.ar@example.fr', null, '+56 856755465', null, 'Suzuki GSXR 750 2007', 0, 0, 0, null, null, '2019-01-11 21:44:00', 'ROLE_MEMBER',, '2019-02-11 21:07:37', NULL),
-(4, 'Etienne', 'Moquin', 'etienne.moquin@example.com', null, '+34 583683774', null, 'Yamaha R1 2016', 0, 0, 0, null, null, '2019-01-31 23:27:00', 'ROLE_MEMBER',, '2019-02-11 21:06:59', NULL),
-(5, 'Dylan', 'Gabriaux', 'dylangabriaux@example.net', null, '+03 381647281', null, 'BMW S1000RR', 0, 0, 0, null, null, '2017-05-16 00:00:00', 'ROLE_MEMBER',, '2019-02-11 21:08:00', NULL),
-(6, 'André', 'De La Vergne', 'Andre.vergne@example.fr', null, '+77 373737377', null, 'Aprilia RSV4 2010', 0, 0, 0, null, null, '2019-02-11 22:12:00', 'ROLE_MEMBER',, '2019-02-11 21:12:34', NULL),
-(7, 'Gilles', 'Arpin', 'gillearpin@example.ch', null, '+02 883773736', null, 'Honda 1000 CBR 2012', 0, 0, 0, null, null, '2019-02-11 22:13:00', 'ROLE_MEMBER',, '2019-02-11 21:13:47', NULL),
-(8, 'Frédéric', 'Dupond', 'Fred.dupond@example.fr', null, '+03 383747278', null, 'Ducati 848 2012', 0, 0, 0, null, null, '2019-02-11 22:15:00', 'ROLE_MEMBER',, '2019-02-11 21:15:59', NULL),
-(9, 'John', 'Doe', 'john.doe@example.fr', null, '+33608080808', null, 'Honda CBR 600 RR 2010', 0, 0, 0, null, null, '2018-01-30 00:00:00', 'ROLE_MEMBER',, '2018-07-01 09:30:54', NULL),
-(10, 'Jenna', 'Jonhnson', 'jenna.jonhnson@example.com', null, NULL, null, 'Kawasaki ZX6R 636 2013', 0, 0, 0, null, null, '2018-02-19 13:56:42', 'ROLE_MEMBER',, '2018-07-01 09:37:12', NULL);
+INSERT INTO `ccteam`.`member` (`id`, `first_name`, `last_name`, `email`, `password`, `phone`, `bike`, `active`, `verified`, `admin`, `otp`, `otp_date`, `registration_date`, `role`, `created_on`, `modified_on`) VALUES
+(1, 'Bob', 'Admin', 'bob.admin@example.com', '$2y$10$MuLwPiQkTlcKEbGX6ztzAOxGlqK7ddglgDXcYBRBFDwkM.AQy63EK', '+33 123456789', 'Honda CBR 600 RR 2007', 1, 1, 1, null, null, '2016-07-11 00:00:00', 'ROLE_ADMIN', '2019-06-10 13:44:26', '2018-07-01 07:30:54'),
+(2, 'Stéphane', 'Verger', 'steph.verger@example.fr', null, '+72 777992834', 'Kawasaki ZX6R 636 2015', 0, 0, 0, null, null, '2016-06-30 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:11:24', NULL),
+(3, 'Coralie', 'Archambault', 'coralie.ar@example.fr', null, '+56 856755465', 'Suzuki GSXR 750 2007', 0, 0, 0, null, null, '2019-01-11 21:44:00', 'ROLE_MEMBER', '2019-02-11 21:07:37', NULL),
+(4, 'Etienne', 'Moquin', 'etienne.moquin@example.com', null, '+34 583683774', 'Yamaha R1 2016', 0, 0, 0, null, null, '2019-01-31 23:27:00', 'ROLE_MEMBER', '2019-02-11 21:06:59', NULL),
+(5, 'Dylan', 'Gabriaux', 'dylangabriaux@example.net', null, '+03 381647281', 'BMW S1000RR', 0, 0, 0, null, null, '2017-05-16 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:08:00', NULL),
+(6, 'André', 'De La Vergne', 'Andre.vergne@example.fr', null, '+77 373737377', 'Aprilia RSV4 2010', 0, 0, 0, null, null, '2019-02-11 22:12:00', 'ROLE_MEMBER', '2019-02-11 21:12:34', NULL),
+(7, 'Gilles', 'Arpin', 'gillearpin@example.ch', null, '+02 883773736', 'Honda 1000 CBR 2012', 0, 0, 0, null, null, '2019-02-11 22:13:00', 'ROLE_MEMBER', '2019-02-11 21:13:47', NULL),
+(8, 'Frédéric', 'Dupond', 'Fred.dupond@example.fr', null, '+03 383747278', 'Ducati 848 2012', 0, 0, 0, null, null, '2019-02-11 22:15:00', 'ROLE_MEMBER', '2019-02-11 21:15:59', NULL),
+(9, 'John', 'Doe', 'john.doe@example.fr', null, '+33608080808', 'Honda CBR 600 RR 2010', 0, 0, 0, null, null, '2018-01-30 00:00:00', 'ROLE_MEMBER', '2018-07-01 09:30:54', NULL),
+(10, 'Jenna', 'Jonhnson', 'jenna.jonhnson@example.com', null, NULL, 'Kawasaki ZX6R 636 2013', 0, 0, 0, null, null, '2018-02-19 13:56:42', 'ROLE_MEMBER', '2018-07-01 09:37:12', NULL);
 
 INSERT INTO `ccteam`.`news` (`id`, `title`, `catch_line`, `content`, `news_date`, `created_on`, `created_by`, `modified_on`, `modified_by`) VALUES
 (1, 'Repas du club', 'Repas de club avec tartiflettre géante', 'Repas de club avec tartiflettre géante', '2018-05-30 23:17:12', '2018-06-01 11:50:41', 1, NULL, NULL),
