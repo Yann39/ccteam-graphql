@@ -61,7 +61,7 @@ public class AuthController {
      * @param userRequest The request data containing the user's e-mail address and password
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>403 Forbidden if wrong credentials have been specified</li>
+     * <li>401 Unauthorized if wrong credentials have been specified</li>
      * <li>500 Internal Server Error if any error have occurred during authentication</li>
      * <li>200 Ok if authentication succeeded, with the issued JWT token in the response body</li>
      * </ul>

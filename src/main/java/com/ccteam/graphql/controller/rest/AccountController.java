@@ -85,7 +85,7 @@ public class AccountController {
         log.info("Call to checkAccount REST endpoint");
 
         // e-mail address has not been specified
-        if (checkAccountRequest.getEmail() == null || checkAccountRequest.getEmail().length() < 1) {
+        if (checkAccountRequest.getEmail() == null || checkAccountRequest.getEmail().isEmpty()) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -143,19 +143,19 @@ public class AccountController {
         log.info("Call to preRegister REST endpoint");
 
         // e-mail address has not been specified
-        if (preRegisterRequest.getEmail() == null || preRegisterRequest.getEmail().length() < 1) {
+        if (preRegisterRequest.getEmail() == null || preRegisterRequest.getEmail().isEmpty()) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // first name has not been specified
-        if (preRegisterRequest.getFirstName() == null || preRegisterRequest.getFirstName().length() < 1) {
+        if (preRegisterRequest.getFirstName() == null || preRegisterRequest.getFirstName().isEmpty()) {
             log.info("No first name specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // last name has not been specified
-        if (preRegisterRequest.getLastName() == null || preRegisterRequest.getLastName().length() < 1) {
+        if (preRegisterRequest.getLastName() == null || preRegisterRequest.getLastName().isEmpty()) {
             log.info("No last name specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -174,6 +174,7 @@ public class AccountController {
         member.setCreatedOn(LocalDateTime.now(ZoneId.of("Europe/Paris")));
         member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
         member.setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
+        member.setRole(Member.Role.ROLE_USER);
         memberRepository.save(member);
 
         // send registration e-mail
@@ -210,7 +211,7 @@ public class AccountController {
         log.info("Call to resendOtp REST endpoint");
 
         // e-mail address has not been specified
-        if (resendOtpRequest.getEmail() == null || resendOtpRequest.getEmail().length() < 1) {
+        if (resendOtpRequest.getEmail() == null || resendOtpRequest.getEmail().isEmpty()) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -262,13 +263,13 @@ public class AccountController {
         log.info("Call to confirmEmail REST endpoint");
 
         // e-mail address has not been specified
-        if (confirmEmailRequest.getEmail() == null || confirmEmailRequest.getEmail().length() < 1) {
+        if (confirmEmailRequest.getEmail() == null || confirmEmailRequest.getEmail().isEmpty()) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // OTP code has not been specified
-        if (confirmEmailRequest.getOtp() == null || confirmEmailRequest.getOtp().length() < 1) {
+        if (confirmEmailRequest.getOtp() == null || confirmEmailRequest.getOtp().isEmpty()) {
             log.info("No OTP code specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -322,13 +323,13 @@ public class AccountController {
     public ResponseEntity<?> completeRegistration(@RequestBody CompleteRegistrationRequest completeRegistrationRequest) {
 
         // e-mail address has not been specified
-        if (completeRegistrationRequest.getEmail() == null || completeRegistrationRequest.getEmail().length() < 1) {
+        if (completeRegistrationRequest.getEmail() == null || completeRegistrationRequest.getEmail().isEmpty()) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // password has not been specified
-        if (completeRegistrationRequest.getPassword() == null || completeRegistrationRequest.getPassword().length() < 1) {
+        if (completeRegistrationRequest.getPassword() == null || completeRegistrationRequest.getPassword().isEmpty()) {
             log.info("No password specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -372,7 +373,7 @@ public class AccountController {
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
 
         // e-mail address has not been specified
-        if (forgotPasswordRequest.getEmail() == null || forgotPasswordRequest.getEmail().length() < 1) {
+        if (forgotPasswordRequest.getEmail() == null || forgotPasswordRequest.getEmail().isEmpty()) {
             log.info("No e-mail address specified");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -396,7 +397,7 @@ public class AccountController {
         // send forgot password e-mail
         try {
             mailService.sendForgotPasswordEmail(member.getEmail());
-            log.info("Forgot password e-mail sent to " + member.getEmail());
+            log.info("Forgot password e-mail sent to {}", member.getEmail());
         } catch (Exception e) {
             log.error("Error while sending forgot password e-mail to {}", member.getEmail(), e);
             return ResponseEntity.status(HttpStatus.MULTI_STATUS).build();

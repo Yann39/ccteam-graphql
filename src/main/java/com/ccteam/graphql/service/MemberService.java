@@ -132,6 +132,7 @@ public class MemberService {
         member.setAdmin(admin);
         member.setRegistrationDate(LocalDateTime.now());
         member.setCreatedOn(LocalDateTime.now());
+        member.setRole(Member.Role.ROLE_USER);
 
         if (avatarFile != null) {
             final byte[] decoded = Base64.getDecoder().decode(avatarFile.getBytes());

@@ -80,7 +80,7 @@ public class Member {
     private LocalDateTime otpDate;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private Role role;
 
     @Column
