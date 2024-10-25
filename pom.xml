@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ccteam</groupId>
     <artifactId>ccteam-graphql</artifactId>
-    <version>0.8.1</version>
+    <version>0.9.0</version>
     <name>ccteam-graphql</name>
     <description>Spring Boot application to expose GraphQL endpoint for CCTeam mobile application</description>
 
@@ -27,6 +27,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

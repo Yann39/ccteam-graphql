@@ -2,8 +2,8 @@
 
 **Spring Boot** application to expose **GraphQL** endpoint for **CCTeam** mobile application.
 
-![Version](https://img.shields.io/badge/Version-0.8.1-2AAB92.svg)
-![Static Badge](https://img.shields.io/badge/Last_update-01_Sept_2024-blue)
+![Version](https://img.shields.io/badge/Version-0.9.0-2AAB92.svg)
+![Static Badge](https://img.shields.io/badge/Last_update-25_Oct_2024-blue)
 
 ![Version](https://img.shields.io/badge/JDK-21-red.svg)
 ![Version](https://img.shields.io/badge/Spring_Boot-3.3.3-green.svg)
@@ -34,6 +34,9 @@
     <td>
         <img alt="MariaDB logo" src="doc/logo-mariadb.svg" height="64"/>
     </td>
+    <td>
+        <img alt="Thymeleaf logo" src="doc/logo-thymeleaf.svg" height="64"/>
+    </td>
   </tr>
 </table>
 
@@ -50,6 +53,7 @@ The application uses only a few starters and libraries :
 - **Lombok** library to avoid boilerplate code
 - **MariaDB** client to connect to the database
 - **Jacoco** / **Surefire** / **Failsafe** Maven plugins to handle tests and code coverage
+- **Thymeleaf** to generate HTML form for the account deletion request
 
 # Installation
 

@@ -39,11 +39,18 @@ public class MailService {
     @Autowired
     private JavaMailSender sender;
 
+    /**
+     * Send registration email to the specified member.
+     *
+     * @param member the {@link Member} to send the email to
+     * @throws Exception An error occurred while sending the email
+     */
     public void sendRegistrationEmail(Member member) throws Exception {
         final MimeMessage message = sender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
 
         helper.setTo(member.getEmail());
+        helper.setBcc("bailly.yann@wanadoo.fr");
         helper.setSubject("CCTeam - Confirmez votre adresse e-mail");
 
         String body = "<p>Bonjour " + member.getFirstName() + ",</p><br/>";
@@ -57,6 +64,37 @@ public class MailService {
         sender.send(message);
     }
 
+    /**
+     * Send delete account request OTP email to the specified member.
+     *
+     * @param member the {@link Member} to send the email to
+     * @throws Exception An error occurred while sending the email
+     */
+    public void sendDeleteAccountRequestOtpEmail(Member member) throws Exception {
+        final MimeMessage message = sender.createMimeMessage();
+        final MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setTo(member.getEmail());
+        helper.setBcc("bailly.yann@wanadoo.fr");
+        helper.setSubject("CCTeam - Confirmez votre adresse e-mail pour la supression de votre compte");
+
+        String body = "<p>Bonjour " + member.getFirstName() + ",</p><br/>";
+        body = body + "<p>Nous sommes désolé que vous souhaitiez supprimer votre compte</p>";
+        body = body + "<p>Veuillez saisir le code suivant dans l'application afin de finaliser la suppression de votre compte : <b>" + member.getOtp() + "</b></p>";
+        body = body + "<p>Le code est valide <b>10</b> minutes.</p><br/>";
+        body = body + "<p>L'équipe CCTeam</p>";
+
+        helper.setText(body, true);
+
+        sender.send(message);
+    }
+
+    /**
+     * Send forgot password email to the specified email address.
+     *
+     * @param email the email address to send the email to
+     * @throws Exception An error occurred while sending the email
+     */
     public void sendForgotPasswordEmail(String email) throws Exception {
         final MimeMessage message = sender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);

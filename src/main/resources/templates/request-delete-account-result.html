@@ -1,0 +1,48 @@
+<!--
+  ~ Copyright (c) 2024 by Yann39
+  ~
+  ~ This file is part of CCTeam GraphQL application.
+  ~
+  ~ CCTeam GraphQL is free software: you can redistribute it
+  ~ and/or modify it under the terms of the GNU General Public License
+  ~ as published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ CCTeam GraphQL is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with CCTeam GraphQL. If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org" lang="fr">
+<head>
+    <title>CCTeam - Demande de suppression de compte</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #bb86fc;
+        }
+    </style>
+</head>
+<body>
+<img th:src="@{images/ccteam6.png}" height="111" alt="CCTeam logo">
+<h1>Demande de suppression de compte</h1>
+<div th:switch="${result}">
+    <p th:case="'success'">Votre demande de suppression de compte a bien été prise en compte. Vous pouvez fermer cette page</p>
+    <p th:case="'invalid_otp'">Le code OTP indiqué n'est pas valide, veuillez soumettre à nouveau votre demande.</p>
+    <p th:case="'member_not_found'">Aucun compte n'a été trouvé avec cette adresse e-mail.</p>
+    <p th:case="'missing_email'">Vous devez indiquer votre adresse e-mail</p>
+</div>
+</body>
+</html>

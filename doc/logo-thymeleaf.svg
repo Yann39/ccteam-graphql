@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="183.79144"
+   height="184.1012"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="thymeleaf.svg"
+   inkscape:export-filename="C:\Users\dfernandez\Desktop\thymeleaf_new.png"
+   inkscape:export-xdpi="283.16165"
+   inkscape:export-ydpi="283.16165">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.1688298"
+     inkscape:cx="120.67533"
+     inkscape:cy="136.83291"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     showguides="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-69.922722,-29.528288)">
+    <circle
+       style="fill:#ffffff;fill-opacity:1"
+       id="path4191"
+       cy="854.56702"
+       cx="130.58324"
+       r="0" />
+    <rect
+       inkscape:export-ydpi="39.758492"
+       inkscape:export-xdpi="39.758492"
+       inkscape:export-filename="C:\Users\dfernandez\Desktop\thymeleaf_new.png"
+       style="fill:#005f0f;fill-opacity:1;stroke:none;stroke-width:1.29999995;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4303"
+       width="183.79144"
+       height="184.1012"
+       x="69.922722"
+       y="29.528288"
+       ry="13.09364" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.97172701;stroke-opacity:1"
+       d="m 226.56658,54.630647 c -22.63485,27.736623 -50.27828,50.967743 -79.75769,71.106363 -9.58344,6.86004 -20.16309,12.96567 -27.5309,22.35978 -2.814,4.94394 -3.4931,11.90606 1.31809,15.9177 8.01243,7.55084 20.49274,9.19337 30.53044,4.96619 14.05309,-5.35253 23.75883,-17.53675 31.9175,-29.61444 18.20588,-26.22879 29.24663,-56.397444 43.52256,-84.735593 z"
+       id="path4307"
+       inkscape:connector-curvature="0" />
+    <path
+       id="path4309"
+       d="m 213.58452,64.221988 c -28.18179,22.329093 -50.72373,34.39671 -79.545,44.777302 -8.69848,3.72204 -18.02075,8.44556 -22.06177,17.57876 -4.16058,8.64076 -2.79696,20.69049 1.97588,28.69121 -0.35707,-3.36811 1.44228,-8.80963 4.11923,-11.36422 8.88287,-9.89225 20.4528,-16.37371 30.62983,-23.88501 l 0.0243,-0.0207 0.0244,-0.0164 c 23.55269,-16.17524 45.63382,-34.658829 64.8331,-55.761485 z"
+       style="fill:#aea99f;fill-opacity:1;stroke:none;stroke-width:0.97172701;stroke-opacity:1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccc" />
+  </g>
+</svg>

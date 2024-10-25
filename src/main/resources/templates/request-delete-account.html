@@ -1,0 +1,119 @@
+<!--
+  ~ Copyright (c) 2024 by Yann39
+  ~
+  ~ This file is part of CCTeam GraphQL application.
+  ~
+  ~ CCTeam GraphQL is free software: you can redistribute it
+  ~ and/or modify it under the terms of the GNU General Public License
+  ~ as published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ CCTeam GraphQL is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with CCTeam GraphQL. If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org" lang="fr">
+<head>
+    <title>CCTeam - Demande de suppression de compte</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #bb86fc;
+        }
+        form {
+            border: 1px solid #bb86fc;
+            padding: 10px;
+            background-color: #1e1e1e;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 300px;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border: 1px solid #bb86fc;
+        }
+        input[type="submit"], input[type="reset"] {
+            background-color: #bb86fc;
+            color: #121212;
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<img th:src="@{images/ccteam6.png}" height="111" alt="CCTeam logo">
+<h1>Demande de suppression de compte</h1>
+<p>
+    Veuillez remplir le formulaire ci-dessous pour demander la suppression de votre compte.<br>
+    Indiquez votre adresse e-mail et cliquez sur le bouton "Envoyer le code" pour recevoir un code OTP.<br>
+    Saisissez le code OTP reçu dans le champ correspondant et soumettez le formulaire.
+</p>
+<form action="#" th:action="@{/requestDeleteAccount}" th:object="${deleteAccountRequest}" method="post">
+    <p>
+        <label for="email">Adresse e-mail :</label>
+        <input id="email" type="text" th:field="*{email}"/>
+        <button type="button" onclick="sendOtp()">Envoyer le code</button>
+    </p>
+    <p>
+        <label for="otp">Code OTP :</label>
+        <input id="otp" type="number" th:field="*{otp}"/>
+    </p>
+    <p>
+        <label for="reason">Motif de la demande (facultatif) :</label>
+        <textarea id="reason" th:field="*{reason}"></textarea>
+    </p>
+    <p><input type="submit" value="Soumettre"/> <input type="reset" value="Annuler"/></p>
+</form>
+<script>
+    function sendOtp() {
+        const email = document.getElementById('email').value;
+        if (!email) {
+            alert('Veuillez entrer une adresse e-mail.');
+            return;
+        }
+        fetch('/ccteam-gql/requestDeleteAccountOtp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => {
+            if (response.status === 400) {
+                alert('Bad request: e-mail address is missing.');
+            } else if (response.status === 404) {
+                alert('No account found for the specified e-mail address.');
+            } else if (response.status === 207) {
+                alert('The mail failed to be sent.');
+            } else if (response.status === 200) {
+                alert('OTP sent to your email address.');
+            } else {
+                alert('Une erreur est survenue lors de l\'envoi du code OTP');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de l\'envoi du code OTP');
+        });
+    }
+</script>
+</body>
+</html>

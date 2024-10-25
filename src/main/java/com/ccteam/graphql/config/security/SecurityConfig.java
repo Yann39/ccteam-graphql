@@ -174,6 +174,7 @@ public class SecurityConfig {
                 // allow restricting access to certain URL based on the HTTP servlet request
                 .authorizeHttpRequests(a -> a
                         // allow any request to REST endpoint
+                        .requestMatchers("/requestDeleteAccount").permitAll()
                         .requestMatchers("/rest/**").permitAll()
                         // allow any request to actuator health endpoint
                         .requestMatchers("/actuator/health").permitAll()
