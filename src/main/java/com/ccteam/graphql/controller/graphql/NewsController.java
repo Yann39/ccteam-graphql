@@ -70,7 +70,7 @@ public class NewsController {
      * @param sortDirection The sort direction ({@code asc} or {@code desc})
      * @return A list of {@link News} object representing the news
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public List<News> getAllNewsFilteredPaginated(@Argument String text,
                                                   @Argument int pageNumber,

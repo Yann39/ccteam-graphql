@@ -60,9 +60,7 @@ public class SecurityConfig {
      */
     @Bean
     public RoleHierarchyImpl roleHierarchy() {
-        final RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MEMBER > ROLE_USER");
-        return roleHierarchy;
+        return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_MEMBER > ROLE_USER");
     }
 
     /**
@@ -73,7 +71,7 @@ public class SecurityConfig {
      */
     @Bean
     public DefaultMethodSecurityExpressionHandler expressionHandler() {
-        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        final DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy());
         return expressionHandler;
     }
