@@ -20,16 +20,12 @@
 
 package com.ccteam.graphql.config.security;
 
-import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * Custom service to allow Spring Security to load user information from a back-end structure, here the database.
@@ -44,15 +40,18 @@ import java.util.Optional;
 @Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+
+    public CustomUserDetailsService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         log.info("Calling CustomUserDetailsService loadUserByUsername");
-        final Optional<Member> user = memberRepository.findByEmailCustom(userName);
-        user.orElseThrow(() -> new UsernameNotFoundException("Not found: " + userName));
-        return user.map(CustomUserDetails::new).get();
+        return memberRepository.findByEmailCustom(userName)
+                .map(CustomUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Not found: " + userName));
     }
 
 }

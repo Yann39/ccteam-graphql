@@ -24,14 +24,15 @@ import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.model.*;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.service.MailService;
-import com.ccteam.graphql.service.NewsService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,17 +51,17 @@ import java.util.concurrent.ThreadLocalRandom;
 @Slf4j
 public class AccountController {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    public static final String ZONE_ID_EUROPE_PARIS = "Europe/Paris";
 
-    @Autowired
-    private MailService mailService;
+    private final MemberRepository memberRepository;
+    private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private NewsService newsService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AccountController(MemberRepository memberRepository, MailService mailService, PasswordEncoder passwordEncoder) {
+        this.memberRepository = memberRepository;
+        this.mailService = mailService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     /**
      * Check the account associated to the specified e-mail address.
@@ -79,8 +80,8 @@ public class AccountController {
      * <li>200 Ok if account has been found and is verified</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/checkAccount", method = RequestMethod.POST)
-    public ResponseEntity<?> checkAccount(@RequestBody CheckAccountRequest checkAccountRequest) {
+    @PostMapping("/rest/checkAccount")
+    public ResponseEntity<HttpStatus> checkAccount(@RequestBody CheckAccountRequest checkAccountRequest) {
 
         log.info("Call to checkAccount REST endpoint");
 
@@ -100,13 +101,13 @@ public class AccountController {
         }
 
         // account exist, OTP has been sent and is still valid
-        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isBefore(LocalDateTime.now(ZoneId.of("Europe/Paris")).plusMinutes(10))) {
+        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isBefore(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)).plusMinutes(10))) {
             log.info("Account with e-mail address {} exist, OTP has been sent and is still valid", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.FOUND).build();
         }
 
         // account exist, OTP has been sent but is not valid anymore
-        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isAfter(LocalDateTime.now(ZoneId.of("Europe/Paris")).plusMinutes(10))) {
+        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isAfter(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)).plusMinutes(10))) {
             log.info("Account with e-mail address {} exist, OTP has been sent but is not valid anymore", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
@@ -137,8 +138,9 @@ public class AccountController {
      * <li>201 Created if succeeded</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/preRegister", method = RequestMethod.POST)
-    public ResponseEntity<?> preRegister(@RequestBody PreRegisterRequest preRegisterRequest) {
+
+    @PostMapping("/rest/preRegister")
+    public ResponseEntity<HttpStatus> preRegister(@RequestBody PreRegisterRequest preRegisterRequest) {
 
         log.info("Call to preRegister REST endpoint");
 
@@ -171,9 +173,9 @@ public class AccountController {
         member.setFirstName(preRegisterRequest.getFirstName());
         member.setLastName(preRegisterRequest.getLastName());
         member.setEmail(preRegisterRequest.getEmail());
-        member.setCreatedOn(LocalDateTime.now(ZoneId.of("Europe/Paris")));
+        member.setCreatedOn(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
-        member.setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
+        member.setOtpDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         member.setRole(Member.Role.ROLE_USER);
         memberRepository.save(member);
 
@@ -205,8 +207,8 @@ public class AccountController {
      * <li>200 Ok if OTP has been resent successfully</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/resendOtp", method = RequestMethod.POST)
-    public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
+    @PostMapping("/rest/resendOtp")
+    public ResponseEntity<HttpStatus> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
 
         log.info("Call to resendOtp REST endpoint");
 
@@ -227,7 +229,7 @@ public class AccountController {
 
         // generate a new OTP and save the user
         member.get().setOtp(ThreadLocalRandom.current().nextInt(1000, 10000) + "");
-        member.get().setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
+        member.get().setOtpDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         memberRepository.save(member.get());
         log.info("New OTP has been generated and saved for e-mail address {}", resendOtpRequest.getEmail());
 
@@ -257,8 +259,8 @@ public class AccountController {
      * <li>202 Accepted if e-mail has been verified successfully</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/confirmEmail", method = RequestMethod.POST)
-    public ResponseEntity<?> confirmEmail(@RequestBody ConfirmEmailRequest confirmEmailRequest) {
+    @PostMapping("/rest/confirmEmail")
+    public ResponseEntity<HttpStatus> confirmEmail(@RequestBody ConfirmEmailRequest confirmEmailRequest) {
 
         log.info("Call to confirmEmail REST endpoint");
 
@@ -286,7 +288,7 @@ public class AccountController {
         final Member member = optMember.get();
 
         // specified OTP has expired
-        if (member.getOtpDate().isAfter(LocalDateTime.now(ZoneId.of("Europe/Paris")).plusMinutes(10))) {
+        if (member.getOtpDate().isAfter(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)).plusMinutes(10))) {
             log.info("Specified OTP has expired");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
@@ -319,8 +321,8 @@ public class AccountController {
      * <li>200 Ok if succeeded</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/completeRegistration", method = RequestMethod.POST)
-    public ResponseEntity<?> completeRegistration(@RequestBody CompleteRegistrationRequest completeRegistrationRequest) {
+    @PostMapping("/rest/completeRegistration")
+    public ResponseEntity<HttpStatus> completeRegistration(@RequestBody CompleteRegistrationRequest completeRegistrationRequest) {
 
         // e-mail address has not been specified
         if (completeRegistrationRequest.getEmail() == null || completeRegistrationRequest.getEmail().isEmpty()) {
@@ -349,7 +351,7 @@ public class AccountController {
         member.setPassword(passwordEncoder.encode(completeRegistrationRequest.getPassword()));
         member.setRole(Member.Role.ROLE_USER);
         member.setActive(true);
-        member.setRegistrationDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
+        member.setRegistrationDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         memberRepository.save(member);
 
         log.info("Registration completed for member {}", member.getEmail());
@@ -369,8 +371,8 @@ public class AccountController {
      * <li>200 Ok if succeeded</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/forgotPassword", method = RequestMethod.POST)
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+    @PostMapping("/rest/forgotPassword")
+    public ResponseEntity<HttpStatus> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
 
         // e-mail address has not been specified
         if (forgotPasswordRequest.getEmail() == null || forgotPasswordRequest.getEmail().isEmpty()) {
@@ -391,7 +393,7 @@ public class AccountController {
 
         // set new OTP
         member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
-        member.setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
+        member.setOtpDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         memberRepository.save(member);
 
         // send forgot password e-mail

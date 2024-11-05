@@ -24,11 +24,13 @@ import com.ccteam.graphql.entities.Attachment;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -47,8 +49,11 @@ import java.util.Optional;
 @Slf4j
 public class UploadController {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+
+    public UploadController(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     /**
      * Set the specified file as avatar for the specified member ID.
@@ -64,8 +69,8 @@ public class UploadController {
      * <li>200 Ok if the avatar file has been successfully associated to the member</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/uploadAvatar", method = RequestMethod.POST)
-    public ResponseEntity<?> uploadAvatar(@RequestParam("memberId") Long memberId, @RequestParam("file") MultipartFile file) {
+    @PostMapping("/rest/uploadAvatar")
+    public ResponseEntity<HttpStatus> uploadAvatar(@RequestParam("memberId") Long memberId, @RequestParam("file") MultipartFile file) {
 
         log.info("Call to checkAccount REST endpoint");
 

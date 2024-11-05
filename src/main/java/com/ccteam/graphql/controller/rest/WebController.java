@@ -25,7 +25,6 @@ import com.ccteam.graphql.model.DeleteAccountRequest;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.service.MailService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -52,11 +51,13 @@ import java.util.concurrent.ThreadLocalRandom;
 @Controller
 public class WebController {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final MailService mailService;
 
-    @Autowired
-    private MailService mailService;
+    public WebController(MemberRepository memberRepository, MailService mailService) {
+        this.memberRepository = memberRepository;
+        this.mailService = mailService;
+    }
 
     /**
      * Display the form to request the deletion of the account.
@@ -127,7 +128,7 @@ public class WebController {
      * </ul>
      */
     @PostMapping("/requestDeleteAccountOtp")
-    public ResponseEntity<?> requestDeleteAccountOtp(@RequestBody Map<String, String> request) {
+    public ResponseEntity<HttpStatus> requestDeleteAccountOtp(@RequestBody Map<String, String> request) {
         log.info("Call to requestDeleteAccountOtp REST endpoint");
 
         // e-mail address has not been specified

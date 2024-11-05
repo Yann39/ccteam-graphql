@@ -20,12 +20,11 @@
 
 package com.ccteam.graphql.controller.rest;
 
-import com.ccteam.graphql.config.security.JWTResponse;
-import com.ccteam.graphql.config.security.JWTTokenUtils;
 import com.ccteam.graphql.config.security.CustomUserDetails;
 import com.ccteam.graphql.config.security.JWTRequest;
+import com.ccteam.graphql.config.security.JWTResponse;
+import com.ccteam.graphql.config.security.JWTTokenUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -35,7 +34,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST authentication controller.
@@ -49,11 +51,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AuthController {
 
-    @Autowired
-    private JWTTokenUtils jwtTokenUtils;
+    private final JWTTokenUtils jwtTokenUtils;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public AuthController(JWTTokenUtils jwtTokenUtils, AuthenticationManager authenticationManager) {
+        this.jwtTokenUtils = jwtTokenUtils;
+        this.authenticationManager = authenticationManager;
+    }
 
     /**
      * Authenticate the user according to the specified email and password.
@@ -66,8 +70,8 @@ public class AuthController {
      * <li>200 Ok if authentication succeeded, with the issued JWT token in the response body</li>
      * </ul>
      */
-    @RequestMapping(value = "/rest/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> authenticate(@RequestBody JWTRequest userRequest) {
+    @PostMapping("/rest/authenticate")
+    public ResponseEntity<JWTResponse> authenticate(@RequestBody JWTRequest userRequest) {
 
         log.info("Call to authenticate REST endpoint");
 

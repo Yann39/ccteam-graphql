@@ -61,7 +61,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
 
-        log.info("Calling JWTAuthorizationFilter doFilterInternal with URL = " + req.getRequestURL());
+        log.info("Calling JWTAuthorizationFilter doFilterInternal with URL = {}", req.getRequestURL());
 
         // retrieve request authorization header
         final String authorizationHeader = req.getHeader("Authorization");
@@ -93,15 +93,15 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 }
 
             } catch (TokenExpiredException e) {
-                log.info("Token expired : " + e.getMessage());
+                log.info("Token expired : {}", e.getMessage());
                 req.setAttribute("token_expired", e.getMessage());
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } catch (BadCredentialsException e) {
-                log.info("Bad credentials in token : " + e.getMessage());
+                log.info("Bad credentials in token : {}", e.getMessage());
                 req.setAttribute("bad_credentials", e.getMessage());
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
             } catch (JWTDecodeException e) {
-                log.info("Problem when decoding token : " + e.getMessage());
+                log.info("Problem when decoding token : {}", e.getMessage());
                 req.setAttribute("wrong_token_format", e.getMessage());
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
