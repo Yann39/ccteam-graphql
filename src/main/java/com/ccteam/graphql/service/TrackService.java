@@ -25,7 +25,6 @@ import com.ccteam.graphql.entities.News;
 import com.ccteam.graphql.entities.Track;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -42,8 +41,11 @@ import java.util.Optional;
 @Slf4j
 public class TrackService {
 
-    @Autowired
-    private TrackRepository trackRepository;
+    private final TrackRepository trackRepository;
+
+    public TrackService(TrackRepository trackRepository) {
+        this.trackRepository = trackRepository;
+    }
 
     /**
      * Get all tracks.

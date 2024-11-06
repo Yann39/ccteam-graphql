@@ -25,6 +25,7 @@ import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 
 import java.io.Serial;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class CustomGraphQLException extends RuntimeException implements GraphQLE
 
     @Override
     public List<SourceLocation> getLocations() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -69,6 +70,6 @@ public class CustomGraphQLException extends RuntimeException implements GraphQLE
 
     @Override
     public StackTraceElement[] getStackTrace() {
-        return null;
+        return new StackTraceElement[0];
     }
 }

@@ -21,7 +21,6 @@
 package com.ccteam.graphql.config.security;
 
 import jakarta.servlet.DispatcherType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,8 +49,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JWTTokenUtils jwtTokenUtils;
+    private final JWTTokenUtils jwtTokenUtils;
+
+    public SecurityConfig(JWTTokenUtils jwtTokenUtils) {
+        this.jwtTokenUtils = jwtTokenUtils;
+    }
 
     /**
      * Define a new role hierarchy.

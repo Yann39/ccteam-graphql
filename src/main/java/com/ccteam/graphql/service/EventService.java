@@ -28,7 +28,6 @@ import com.ccteam.graphql.repository.EventRepository;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -46,14 +45,15 @@ import java.util.Optional;
 @Slf4j
 public class EventService {
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
+    private final TrackRepository trackRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private TrackRepository trackRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
+    public EventService(EventRepository eventRepository, TrackRepository trackRepository, MemberRepository memberRepository) {
+        this.eventRepository = eventRepository;
+        this.trackRepository = trackRepository;
+        this.memberRepository = memberRepository;
+    }
 
     /**
      * Get all events.

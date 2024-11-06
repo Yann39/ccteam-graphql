@@ -26,7 +26,6 @@ import com.ccteam.graphql.entities.News;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.NewsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +44,13 @@ import java.util.Optional;
 @Slf4j
 public class NewsService {
 
-    @Autowired
-    private NewsRepository newsRepository;
+    private final NewsRepository newsRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    public NewsService(NewsRepository newsRepository, MemberRepository memberRepository) {
+        this.newsRepository = newsRepository;
+        this.memberRepository = memberRepository;
+    }
 
     /**
      * Get all news.

@@ -27,7 +27,6 @@ import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.News;
 import com.ccteam.graphql.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -45,8 +44,11 @@ import java.util.Optional;
 @Slf4j
 public class MemberService {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     /**
      * Get all members.

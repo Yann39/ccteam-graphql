@@ -21,8 +21,8 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.entities.Member;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -36,16 +36,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class MailService {
 
-    @Autowired
-    private JavaMailSender sender;
+    private final JavaMailSender sender;
+
+    public MailService(JavaMailSender sender) {
+        this.sender = sender;
+    }
 
     /**
      * Send registration email to the specified member.
      *
      * @param member the {@link Member} to send the email to
-     * @throws Exception An error occurred while sending the email
+     * @throws MessagingException An error occurred while sending the email
      */
-    public void sendRegistrationEmail(Member member) throws Exception {
+    public void sendRegistrationEmail(Member member) throws MessagingException {
         final MimeMessage message = sender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -68,9 +71,9 @@ public class MailService {
      * Send delete account request OTP email to the specified member.
      *
      * @param member the {@link Member} to send the email to
-     * @throws Exception An error occurred while sending the email
+     * @throws MessagingException An error occurred while sending the email
      */
-    public void sendDeleteAccountRequestOtpEmail(Member member) throws Exception {
+    public void sendDeleteAccountRequestOtpEmail(Member member) throws MessagingException {
         final MimeMessage message = sender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -93,9 +96,9 @@ public class MailService {
      * Send forgot password email to the specified email address.
      *
      * @param email the email address to send the email to
-     * @throws Exception An error occurred while sending the email
+     * @throws MessagingException An error occurred while sending the email
      */
-    public void sendForgotPasswordEmail(String email) throws Exception {
+    public void sendForgotPasswordEmail(String email) throws MessagingException {
         final MimeMessage message = sender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
 

@@ -25,7 +25,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ccteam.graphql.entities.Member;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -43,8 +42,13 @@ import java.util.Date;
 @Slf4j
 public class JWTTokenUtils {
 
-    @Autowired
-    private JWTTokenProperties jwtTokenProperties;
+    public static final String ZONE_ID_EUROPE_PARIS = "Europe/Paris";
+
+    private final JWTTokenProperties jwtTokenProperties;
+
+    public JWTTokenUtils(JWTTokenProperties jwtTokenProperties) {
+        this.jwtTokenProperties = jwtTokenProperties;
+    }
 
     /**
      * Decode the JWT token from the specified authorization header content.
@@ -67,10 +71,10 @@ public class JWTTokenUtils {
      */
     public String generateToken(String subject, String role) {
         log.info("Calling JWTTokenUtils generateToken");
-        final LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Zurich"));
-        final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of("Europe/Zurich")).toInstant();
+        final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
+        final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of(ZONE_ID_EUROPE_PARIS)).toInstant();
 
-        log.info("Building JWT... it will expire on " + instant.atZone(ZoneId.of("Europe/Zurich")));
+        log.info("Building JWT... it will expire on {}", instant.atZone(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
 
         return JWT.create()
                 .withSubject(subject)
