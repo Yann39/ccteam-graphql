@@ -45,6 +45,7 @@ type Query {
 
     getAllTracks: [Track]
     getTrackById(id: Int!): Track
+    getTracksFiltered(text: String): [Track]
 
     getAllLapRecords: [LapRecord]
     getMemberLapRecords(memberId: Long!): [LapRecord]

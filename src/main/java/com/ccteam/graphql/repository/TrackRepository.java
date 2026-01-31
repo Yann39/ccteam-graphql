@@ -43,4 +43,10 @@ public interface TrackRepository extends JpaRepository<Track, Long> {
     @Query("select t from Track t where t.id = :id")
     Optional<Track> findByIdCustom(long id);
 
+    @Query("select t from Track t " +
+            "where :text is null or ( " +
+            "t.name like %:text%" +
+            ")")
+    List<Track> findFilteredCustom(String text);
+
 }

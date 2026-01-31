@@ -57,6 +57,18 @@ public class TrackService {
     }
 
     /**
+     * Get all tracks according to the specified filter {@code text}.<br/>
+     * Search is done on track name.<br/>
+     * If {@code text} filter is null, all records will be returned.
+     *
+     * @param text The text filter string
+     * @return A list of {@link Track} objects representing the tracks
+     */
+    public List<Track> getTracksFiltered(String text) {
+        return trackRepository.findFilteredCustom(text);
+    }
+
+    /**
      * Get a track given its {@code id}.
      *
      * @param id The ID of the track to retrieve
@@ -82,7 +94,8 @@ public class TrackService {
      * @param longitude The track longitude coordinate
      * @return A {@link Track} object representing the track just created
      */
-    public Track createTrack(String name, int distance, int lapRecord, String website, BigDecimal latitude, BigDecimal longitude) {
+    public Track createTrack(String name, int distance, int lapRecord, String website, BigDecimal latitude,
+            BigDecimal longitude) {
         final Track track = new Track();
         track.setName(name);
         track.setDistance(distance);
@@ -104,11 +117,13 @@ public class TrackService {
      * @param longitude The track longitude coordinate
      * @return A {@link Track} object representing the track just updated
      */
-    public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website, BigDecimal latitude, BigDecimal longitude) {
+    public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website,
+            BigDecimal latitude, BigDecimal longitude) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
-            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+            throw new CustomGraphQLException("track_not_found",
+                    "Specified track ID has not been found in the database");
         }
 
         final Track track = trackOptional.get();
@@ -131,7 +146,8 @@ public class TrackService {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
-            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+            throw new CustomGraphQLException("track_not_found",
+                    "Specified track ID has not been found in the database");
         }
 
         final Track track = trackOptional.get();

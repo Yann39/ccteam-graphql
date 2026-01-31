@@ -48,11 +48,13 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             "left join fetch n.likedNews ln " +
             "left join fetch n.createdBy " +
             "left join fetch n.modifiedBy " +
-            "left join fetch ln.member")
+            "left join fetch ln.member" +
+            "order by n.newsDate desc")
     List<News> findAllCustom();
 
     @EntityGraph(attributePaths = {"likedNews", "createdBy", "modifiedBy", "likedNews.member"})
-    @Query("select distinct n from News n")
+    @Query("select distinct n from News n " +
+           "order by n.newsDate desc")
     Page<News> findFilteredCustom(Example<News> example, Pageable pageable);
 
     @Query("select n from News n " +

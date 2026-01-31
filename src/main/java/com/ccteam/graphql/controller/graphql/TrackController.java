@@ -61,6 +61,21 @@ public class TrackController {
     }
 
     /**
+     * Get all tracks according to the specified filter {@code text}.<br/>
+     * Search is done on track name.<br/>
+     * If {@code text} filter is null, all records will be returned.
+     *
+     * @param text The text filter string
+     * @return A list of {@link Track} objects representing the tracks
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @QueryMapping
+    public List<Track> getTracksFiltered(@Argument String text) {
+        log.info("Received call to getTracksFiltered with parameter text = {}", text);
+        return trackService.getTracksFiltered(text);
+    }
+
+    /**
      * Get a track given its {@code id}.
      *
      * @param id The ID of the track to retrieve
@@ -87,12 +102,13 @@ public class TrackController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Track createTrack(@Argument String name,
-                             @Argument int distance,
-                             @Argument int lapRecord,
-                             @Argument String website,
-                             @Argument BigDecimal latitude,
-                             @Argument BigDecimal longitude) {
-        log.info("Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
+            @Argument int distance,
+            @Argument int lapRecord,
+            @Argument String website,
+            @Argument BigDecimal latitude,
+            @Argument BigDecimal longitude) {
+        log.info(
+                "Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
                 name, distance, lapRecord, website, latitude, longitude);
         return trackService.createTrack(name, distance, lapRecord, website, latitude, longitude);
     }
@@ -112,13 +128,14 @@ public class TrackController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Track updateTrack(@Argument long trackId,
-                             @Argument String name,
-                             @Argument int distance,
-                             @Argument int lapRecord,
-                             @Argument String website,
-                             @Argument BigDecimal latitude,
-                             @Argument BigDecimal longitude) {
-        log.info("Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
+            @Argument String name,
+            @Argument int distance,
+            @Argument int lapRecord,
+            @Argument String website,
+            @Argument BigDecimal latitude,
+            @Argument BigDecimal longitude) {
+        log.info(
+                "Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
                 trackId, name, distance, lapRecord, website, latitude, longitude);
         return trackService.updateTrack(trackId, name, distance, lapRecord, website, latitude, longitude);
     }
