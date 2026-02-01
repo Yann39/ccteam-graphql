@@ -49,7 +49,8 @@ public class EventService {
     private final TrackRepository trackRepository;
     private final MemberRepository memberRepository;
 
-    public EventService(EventRepository eventRepository, TrackRepository trackRepository, MemberRepository memberRepository) {
+    public EventService(EventRepository eventRepository, TrackRepository trackRepository,
+            MemberRepository memberRepository) {
         this.eventRepository = eventRepository;
         this.trackRepository = trackRepository;
         this.memberRepository = memberRepository;
@@ -77,7 +78,8 @@ public class EventService {
     /**
      * Get all events in the specified month and year, based on event start date.
      *
-     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
+     * @param month The month of the events to retrieve as integer from 1 to 12
+     *              (January to December)
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
@@ -86,10 +88,12 @@ public class EventService {
     }
 
     /**
-     * Get all events in the specified day, month and year, based on event start date.
+     * Get all events in the specified day, month and year, based on event start
+     * date.
      *
      * @param day   The day of the events to retrieve
-     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
+     * @param month The month of the events to retrieve as integer from 1 to 12
+     *              (January to December)
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
@@ -135,17 +139,20 @@ public class EventService {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
      */
-    public Event createEvent(String title, String description, String startDate, String endDate, long trackId, String organizer, BigDecimal price, long memberId) {
+    public Event createEvent(String title, String description, String startDate, String endDate, long trackId,
+            String organizer, BigDecimal price, long memberId) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
-            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+            throw new CustomGraphQLException("track_not_found",
+                    "Specified track ID has not been found in the database");
         }
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
-            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+            throw new CustomGraphQLException("member_not_found",
+                    "Specified member ID has not been found in the database");
         }
 
         final Event event = new Event();
@@ -175,23 +182,27 @@ public class EventService {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just updated
      */
-    public Event updateEvent(long eventId, String title, String description, String startDate, String endDate, long trackId, String organizer, BigDecimal price, long memberId) {
+    public Event updateEvent(long eventId, String title, String description, String startDate, String endDate,
+            long trackId, String organizer, BigDecimal price, long memberId) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
             log.error("Event with id {} not found in the database", eventId);
-            throw new CustomGraphQLException("event_not_found", "Specified event ID has not been found in the database");
+            throw new CustomGraphQLException("event_not_found",
+                    "Specified event ID has not been found in the database");
         }
 
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
-            throw new CustomGraphQLException("track_not_found", "Specified track ID has not been found in the database");
+            throw new CustomGraphQLException("track_not_found",
+                    "Specified track ID has not been found in the database");
         }
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
-            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+            throw new CustomGraphQLException("member_not_found",
+                    "Specified member ID has not been found in the database");
         }
 
         final Event event = eventOptional.get();
@@ -217,7 +228,8 @@ public class EventService {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
             log.error("Event with id {} not found in the database", eventId);
-            throw new CustomGraphQLException("event_not_found", "Specified event ID has not been found in the database");
+            throw new CustomGraphQLException("event_not_found",
+                    "Specified event ID has not been found in the database");
         }
 
         final Event event = eventOptional.get();

@@ -44,36 +44,36 @@ import java.util.Optional;
 @Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
 
-    @Query("select distinct n from News n " +
-            "left join fetch n.likedNews ln " +
-            "left join fetch n.createdBy " +
-            "left join fetch n.modifiedBy " +
-            "left join fetch ln.member" +
-            "order by n.newsDate desc")
-    List<News> findAllCustom();
+        @Query("select distinct n from News n " +
+                        "left join fetch n.likedNews ln " +
+                        "left join fetch n.createdBy " +
+                        "left join fetch n.modifiedBy " +
+                        "left join fetch ln.member " +
+                        "order by n.newsDate desc")
+        List<News> findAllCustom();
 
-    @EntityGraph(attributePaths = {"likedNews", "createdBy", "modifiedBy", "likedNews.member"})
-    @Query("select distinct n from News n " +
-           "order by n.newsDate desc")
-    Page<News> findFilteredCustom(Example<News> example, Pageable pageable);
+        @EntityGraph(attributePaths = { "likedNews", "createdBy", "modifiedBy", "likedNews.member" })
+        @Query("select distinct n from News n " +
+                        "order by n.newsDate desc")
+        Page<News> findFilteredCustom(Example<News> example, Pageable pageable);
 
-    @Query("select n from News n " +
-            "left join fetch n.likedNews ln " +
-            "left join fetch n.createdBy " +
-            "left join fetch n.modifiedBy " +
-            "left join fetch ln.news " +
-            "left join fetch ln.member " +
-            "where n.id = :id")
-    Optional<News> findByIdCustom(long id);
+        @Query("select n from News n " +
+                        "left join fetch n.likedNews ln " +
+                        "left join fetch n.createdBy " +
+                        "left join fetch n.modifiedBy " +
+                        "left join fetch ln.news " +
+                        "left join fetch ln.member " +
+                        "where n.id = :id")
+        Optional<News> findByIdCustom(long id);
 
-    @Modifying
-    @Transactional
-    @Query(value = "insert into liked_news(member_id, news_id, created_on) values (:memberId, :newsId, :createdOn)", nativeQuery = true)
-    int likeNews(long memberId, long newsId, LocalDateTime createdOn);
+        @Modifying
+        @Transactional
+        @Query(value = "insert into liked_news(member_id, news_id, created_on) values (:memberId, :newsId, :createdOn)", nativeQuery = true)
+        int likeNews(long memberId, long newsId, LocalDateTime createdOn);
 
-    @Modifying
-    @Transactional
-    @Query(value = "delete from liked_news where member_id = :memberId and news_id = :newsId", nativeQuery = true)
-    int unlikeNews(long memberId, long newsId);
+        @Modifying
+        @Transactional
+        @Query(value = "delete from liked_news where member_id = :memberId and news_id = :newsId", nativeQuery = true)
+        int unlikeNews(long memberId, long newsId);
 
 }

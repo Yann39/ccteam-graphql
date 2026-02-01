@@ -1,4 +1,4 @@
-query GetEventById ($id: Int!) {
+query GetEventById ($id: Long!) {
     getEventById(id: $id) {
         id
         title

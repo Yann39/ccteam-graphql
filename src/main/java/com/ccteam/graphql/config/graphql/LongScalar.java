@@ -26,8 +26,6 @@ import graphql.schema.idl.RuntimeWiring;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeParseException;
-
 /**
  * Custom GraphQL scalar implementation of the {@link Long} type.
  * <p>
@@ -45,44 +43,44 @@ public class LongScalar implements RuntimeWiringConfigurer {
         builder.scalar(GraphQLScalarType.newScalar()
                 .name("Long")
                 .description("Long type")
-                .coercing(new Coercing<Long, Integer>() {
+                .coercing(new Coercing<Long, Object>() {
 
                     @Override
-                    public Integer serialize(final Object dataFetcherResult) {
-                        if (dataFetcherResult instanceof Long value) {
-                            return Math.toIntExact(value);
-                        } else {
-                            throw new CoercingSerializeException("Expected a Long object");
-                        }
+                    public Object serialize(final Object dataFetcherResult) {
+                        return dataFetcherResult instanceof Long value ? value : dataFetcherResult.toString();
                     }
 
                     @Override
                     public Long parseValue(final Object input) {
-                        try {
-                            if (input instanceof Integer value) {
-                                return Long.valueOf(value);
-                            } else {
-                                throw new CoercingParseValueException("Expected an Integer value");
+                        if (input instanceof Number number) {
+                            return number.longValue();
+                        } else if (input instanceof String string) {
+                            try {
+                                return Long.parseLong(string);
+                            } catch (NumberFormatException e) {
+                                throw new CoercingParseValueException("Value is not a valid Long: " + input);
                             }
-                        } catch (DateTimeParseException e) {
-                            throw new CoercingParseValueException(input + " is not a valid integer", e);
                         }
+                        throw new CoercingParseValueException("Expected a Number or String value, but got: "
+                                + (input == null ? "null" : input.getClass().getName()));
                     }
 
                     @Override
                     public Long parseLiteral(final Object input) {
                         if (input instanceof IntValue value) {
+                            return value.getValue().longValue();
+                        } else if (input instanceof graphql.language.StringValue value) {
                             try {
-                                return (value).getValue().longValue();
-                            } catch (DateTimeParseException e) {
-                                throw new CoercingParseLiteralException(e);
+                                return Long.parseLong(value.getValue());
+                            } catch (NumberFormatException e) {
+                                throw new CoercingParseLiteralException(
+                                        "Value is not a valid Long: " + value.getValue());
                             }
                         } else {
-                            throw new CoercingParseLiteralException("Expected an Int literal");
+                            throw new CoercingParseLiteralException("Expected an Int or String literal");
                         }
                     }
                 }).build());
     }
 
 }
-

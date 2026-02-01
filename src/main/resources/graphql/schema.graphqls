@@ -40,11 +40,11 @@ type Query {
     getEventsByYear(year: Int!): [Event]
     getEventsByMonthAndYear(month: Int!, year: Int!): [Event]
     getEventsByDayAndMonthAndYear(day: Int!, month: Int!, year: Int!): [Event]
-    getEventById(id: Int!): Event
+    getEventById(id: Long!): Event
     getEventsByTitle(title: String!): [Event]
 
     getAllTracks: [Track]
-    getTrackById(id: Int!): Track
+    getTrackById(id: Long!): Track
     getTracksFiltered(text: String): [Track]
 
     getAllLapRecords: [LapRecord]
