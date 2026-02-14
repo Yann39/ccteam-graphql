@@ -66,6 +66,8 @@ type Mutation {
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     deleteEvent(eventId: Long!): Event
+    registerToEvent(eventId: Long!, memberId: Long!): Event
+    unregisterFromEvent(eventId: Long!, memberId: Long!): Event
 
     createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
     updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track

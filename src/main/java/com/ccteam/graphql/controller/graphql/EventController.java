@@ -211,4 +211,32 @@ public class EventController {
         return eventService.deleteEvent(eventId);
     }
 
+    /**
+     * Mark the specified event as registered by the specified member.
+     *
+     * @param eventId  The event ID
+     * @param memberId The member ID
+     * @return An {@link Event} object representing the event just registered
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @MutationMapping
+    public Event registerToEvent(@Argument long eventId, @Argument long memberId) {
+        log.info("Received call to registerToEvent with parameters eventId = {}, memberId = {}", eventId, memberId);
+        return eventService.registerToEvent(eventId, memberId);
+    }
+
+    /**
+     * Mark the specified event as not registered by the specified member.
+     *
+     * @param eventId  The event ID
+     * @param memberId The member ID
+     * @return An {@link Event} object representing the event just unregistered
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @MutationMapping
+    public Event unregisterFromEvent(@Argument long eventId, @Argument long memberId) {
+        log.info("Received call to unregisterFromEvent with parameters eventId = {}, memberId = {}", eventId, memberId);
+        return eventService.unregisterFromEvent(eventId, memberId);
+    }
+
 }

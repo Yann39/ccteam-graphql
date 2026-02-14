@@ -22,6 +22,7 @@ package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Event;
+import com.ccteam.graphql.entities.EventMember;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.Track;
 import com.ccteam.graphql.repository.EventRepository;
@@ -235,6 +236,91 @@ public class EventService {
         final Event event = eventOptional.get();
         eventRepository.delete(event);
         return event;
+    }
+
+    /**
+     * Mark the specified event as registered by the specified member.
+     *
+     * @param eventId  The event ID
+     * @param memberId The member ID
+     * @return An {@link Event} object representing the event just registered
+     */
+    public Event registerToEvent(long eventId, long memberId) throws CustomGraphQLException {
+
+        // check that the event exists
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id {} not found in the database", eventId);
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
+        }
+
+        // check that the member exists
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with id {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found", "Specified member has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+
+        // check that the member is not already registered to the event
+        if (event.getParticipants().stream().anyMatch(em -> em.getMember().getId().equals(memberId))) {
+            log.error("Member with id {} already registered to event id {}", memberId, eventId);
+            throw new CustomGraphQLException("member_already_registered_to_event",
+                    "Specified member is already registered to specified event");
+        }
+
+        // create new participation and add it to the event (JPA will handle the rest
+        // via cascade)
+        final EventMember participation = new EventMember();
+        participation.setEvent(event);
+        participation.setMember(memberOptional.get());
+        participation.setCreatedOn(LocalDateTime.now());
+        event.getParticipants().add(participation);
+
+        // save the event to persist the new participation
+        return eventRepository.save(event);
+    }
+
+    /**
+     * Mark the specified event as not registered by the specified member.
+     *
+     * @param eventId  The event ID
+     * @param memberId The member ID
+     * @return An {@link Event} object representing the event just unregistered
+     */
+    public Event unregisterFromEvent(long eventId, long memberId) throws CustomGraphQLException {
+
+        // check that event exists
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id {} not found in the database", eventId);
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
+        }
+
+        // check that member exists
+        if (!memberRepository.existsById(memberId)) {
+            log.error("Member with id {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found", "Specified member has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+
+        // check that the member is indeed registered to the event
+        final Optional<EventMember> participationOptional = event.getParticipants().stream()
+                .filter(em -> em.getMember().getId().equals(memberId)).findFirst();
+        if (participationOptional.isEmpty()) {
+            log.error("Member with id {} is not registered to event id {}, cannot unregister", memberId, eventId);
+            throw new CustomGraphQLException("member_not_registered_to_event",
+                    "Specified member is not registered to specified event");
+        }
+
+        // remove the participation from the event (JPA will handle the rest via
+        // orphanRemoval)
+        event.getParticipants().remove(participationOptional.get());
+
+        // save the event to persist the removal
+        return eventRepository.save(event);
     }
 
 }
