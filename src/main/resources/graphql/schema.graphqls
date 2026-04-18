@@ -73,9 +73,13 @@ type Mutation {
     updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
     deleteTrack(trackId: Long!): Track
 
-    createLapRecord(memberId: Long!, trackId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
-    updateLapRecord(lapRecordId: Long!, trackId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
+    createLapRecord(memberId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
+    updateLapRecord(lapRecordId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
     deleteLapRecord(lapRecordId: Long!): LapRecord
+
+    addBikeToMember(memberId: Long!, manufacturer: String!, modelName: String!, engineSize: Int, year: Int): Bike
+    updateBike(bikeId: Long!, manufacturer: String!, modelName: String!, engineSize: Int, year: Int): Bike
+    deleteBike(bikeId: Long!): Bike
 }
 
 type NewsListProjection {
@@ -136,6 +140,7 @@ type LapRecord {
     id: ID!
     track: Track!
     member: Member
+    bike: Bike!
     lapTime: Int!
     recordDate: LocalDateTime!
     conditions: String!

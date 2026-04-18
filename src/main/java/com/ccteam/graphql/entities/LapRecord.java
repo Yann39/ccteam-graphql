@@ -48,6 +48,10 @@ public class LapRecord {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne
+    @JoinColumn(name = "bike_id")
+    private Bike bike;
+
     @Column(nullable = false)
     private int lapTime;
 

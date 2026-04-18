@@ -96,17 +96,18 @@ public class LapRecordController {
      * @param comments   Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public LapRecord createLapRecord(@Argument long memberId,
                                      @Argument long trackId,
+                                     @Argument long bikeId,
                                      @Argument String recordDate,
                                      @Argument int lapTime,
                                      @Argument String conditions,
                                      @Argument String comments) {
-        log.info("Received call to createLapRecord with parameters memberId = {}, trackId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
-                memberId, trackId, recordDate, lapTime, conditions, comments);
-        return lapRecordService.createLapRecord(memberId, trackId, recordDate, lapTime, conditions, comments);
+        log.info("Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
+                memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
+        return lapRecordService.createLapRecord(memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
     }
 
     /**
@@ -120,17 +121,18 @@ public class LapRecordController {
      * @param comments    Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public LapRecord updateLapRecord(@Argument long lapRecordId,
                                      @Argument long trackId,
+                                     @Argument long bikeId,
                                      @Argument String recordDate,
                                      @Argument int lapTime,
                                      @Argument String conditions,
                                      @Argument String comments) {
-        log.info("Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
-                lapRecordId, trackId, recordDate, lapTime, conditions, comments);
-        return lapRecordService.updateLapRecord(lapRecordId, trackId, recordDate, lapTime, conditions, comments);
+        log.info("Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
+                lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);
+        return lapRecordService.updateLapRecord(lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);
     }
 
     /**
