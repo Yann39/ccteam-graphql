@@ -61,8 +61,8 @@ public class Member {
     @JoinColumn(name = "attachment_id")
     private Attachment avatar;
 
-    @Column(length = 128)
-    private String bike;
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Bike> bikes;
 
     @Column(nullable = false)
     private boolean active = false;

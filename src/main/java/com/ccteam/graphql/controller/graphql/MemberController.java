@@ -20,7 +20,6 @@
 
 package com.ccteam.graphql.controller.graphql;
 
-import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +111,6 @@ public class MemberController {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param bike           The member bike model
      * @param active         A boolean indicating if the member is active
      * @param admin          A boolean indicating if the member is admin
      * @return A {@link Member} object representing the member just created
@@ -120,17 +118,17 @@ public class MemberController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Member createMember(@Argument String firstName,
-                               @Argument String lastName,
-                               @Argument String email,
-                               @Argument String phone,
-                               @Argument String avatarFile,
-                               @Argument String avatarFileName,
-                               @Argument String bike,
-                               @Argument boolean active,
-                               @Argument boolean admin) {
-        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, bike = {}, active = {}, admin = {}",
-                firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
-        return memberService.createMember(firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
+            @Argument String lastName,
+            @Argument String email,
+            @Argument String phone,
+            @Argument String avatarFile,
+            @Argument String avatarFileName,
+            @Argument boolean active,
+            @Argument boolean admin) {
+        log.info(
+                "Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
+                firstName, lastName, email, phone, avatarFile, avatarFileName, active, admin);
+        return memberService.createMember(firstName, lastName, email, phone, avatarFile, avatarFileName, active, admin);
     }
 
     /**
@@ -143,26 +141,26 @@ public class MemberController {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param bike           The member bike model
      * @param active         A boolean indicating if the member is active
      * @param admin          A boolean indicating if the member is admin
-     * @return An {@link Event} object representing the event just updated
+     * @return An {@link Member} object representing the member just updated
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @MutationMapping
     public Member updateMember(@Argument long memberId,
-                               @Argument String firstName,
-                               @Argument String lastName,
-                               @Argument String email,
-                               @Argument String phone,
-                               @Argument String avatarFile,
-                               @Argument String avatarFileName,
-                               @Argument String bike,
-                               @Argument boolean active,
-                               @Argument boolean admin) {
-        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, bike = {}, active = {}, admin = {}",
-                memberId, firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
-        return memberService.updateMember(memberId, firstName, lastName, email, phone, avatarFile, avatarFileName, bike, active, admin);
+            @Argument String firstName,
+            @Argument String lastName,
+            @Argument String email,
+            @Argument String phone,
+            @Argument String avatarFile,
+            @Argument String avatarFileName,
+            @Argument boolean active,
+            @Argument boolean admin) {
+        log.info(
+                "Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
+                memberId, firstName, lastName, email, phone, avatarFile, avatarFileName, active, admin);
+        return memberService.updateMember(memberId, firstName, lastName, email, phone, avatarFile, avatarFileName,
+                active, admin);
     }
 
     /**

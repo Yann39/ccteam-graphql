@@ -59,8 +59,8 @@ type Mutation {
     likeNews(newsId: Long!, memberId: Long!): News
     unlikeNews(newsId: Long!, memberId: Long!): News
 
-    createMember(firstName: String!, lastName: String!, email: String!, phone: String, avatarFile: String, avatarFileName: String, bike: String, active: Boolean!, admin: Boolean!): Member
-    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, avatarFile: String, avatarFileName: String, bike: String, active: Boolean!, admin: Boolean!): Member
+    createMember(firstName: String!, lastName: String!, email: String!, phone: String, avatarFile: String, avatarFileName: String, active: Boolean!, admin: Boolean!): Member
+    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, avatarFile: String, avatarFileName: String, active: Boolean!, admin: Boolean!): Member
     deleteMember(memberId: Long!): Member
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
@@ -91,6 +91,14 @@ type NewsDetailsProjection {
     content: String!
     newsDate: LocalDateTime!
     createdBy: String!
+}
+
+type Bike {
+    id: ID!
+    manufacturer: String!
+    modelName: String!
+    engineSize: Int
+    year: Int
 }
 
 type Event {
@@ -152,7 +160,7 @@ type Member {
     phone: String
     avatarFile: String
     avatarFileName: String
-    bike: String
+    bikes: [Bike]
     active: Boolean!
     admin: Boolean!
     eventMembers: [EventMember]

@@ -101,7 +101,6 @@ public class MemberService {
         return memberRepository.findFilteredCustom(text);
     }
 
-
     /**
      * Create a new member.
      *
@@ -111,17 +110,18 @@ public class MemberService {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param bike           The member bike model
      * @param active         A boolean indicating if the member is active
      * @param admin          A boolean indicating if the member is admin
      * @return A {@link Member} object representing the member just created
      */
-    public Member createMember(String firstName, String lastName, String email, String phone, String avatarFile, String avatarFileName, String bike, boolean active, boolean admin) {
+    public Member createMember(String firstName, String lastName, String email, String phone, String avatarFile,
+            String avatarFileName, boolean active, boolean admin) {
 
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
         if (memberOptional.isPresent()) {
             log.error("Member with e-mail address {} already exist in the database", email);
-            throw new CustomGraphQLException("member_email_already_exist", "A member with the same e-mail address already exist in the database");
+            throw new CustomGraphQLException("member_email_already_exist",
+                    "A member with the same e-mail address already exist in the database");
         }
 
         final Member member = new Member();
@@ -129,7 +129,6 @@ public class MemberService {
         member.setLastName(lastName);
         member.setEmail(email);
         member.setPhone(phone);
-        member.setBike(bike);
         member.setActive(active);
         member.setAdmin(admin);
         member.setRegistrationDate(LocalDateTime.now());
@@ -158,16 +157,17 @@ public class MemberService {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param bike           The member bike model
      * @param active         A boolean indicating if the member is active
      * @param admin          A boolean indicating if the member is admin
      * @return An {@link Event} object representing the event just updated
      */
-    public Member updateMember(long memberId, String firstName, String lastName, String email, String phone, String avatarFile, String avatarFileName, String bike, boolean active, boolean admin) {
+    public Member updateMember(long memberId, String firstName, String lastName, String email, String phone,
+            String avatarFile, String avatarFileName, boolean active, boolean admin) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
-            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+            throw new CustomGraphQLException("member_not_found",
+                    "Specified member ID has not been found in the database");
         }
 
         final Member member = memberOptional.get();
@@ -175,7 +175,6 @@ public class MemberService {
         member.setLastName(lastName);
         member.setEmail(email);
         member.setPhone(phone);
-        member.setBike(bike);
         member.setActive(active);
         member.setAdmin(admin);
         member.setModifiedOn(LocalDateTime.now());
@@ -208,7 +207,8 @@ public class MemberService {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
-            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+            throw new CustomGraphQLException("member_not_found",
+                    "Specified member ID has not been found in the database");
         }
 
         final Member member = memberOptional.get();

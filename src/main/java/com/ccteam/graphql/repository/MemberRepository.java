@@ -37,40 +37,44 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query("select distinct m from Member m " +
-            "left join fetch m.eventMembers em " +
-            "left join fetch em.event " +
-            "left join fetch m.likedNews ln " +
-            "left join fetch ln.news")
-    List<Member> findAllCustom();
+        @Query("select distinct m from Member m " +
+                        "left join fetch m.eventMembers em " +
+                        "left join fetch em.event " +
+                        "left join fetch m.likedNews ln " +
+                        "left join fetch ln.news " +
+                        "left join fetch m.bikes")
+        List<Member> findAllCustom();
 
-    @Query("select m from Member m " +
-            "left join fetch m.eventMembers em " +
-            "left join fetch em.event " +
-            "left join fetch m.likedNews ln " +
-            "left join fetch ln.news " +
-            "where m.id = :id")
-    Optional<Member> findByIdCustom(long id);
+        @Query("select m from Member m " +
+                        "left join fetch m.eventMembers em " +
+                        "left join fetch em.event " +
+                        "left join fetch m.likedNews ln " +
+                        "left join fetch ln.news " +
+                        "left join fetch m.bikes " +
+                        "where m.id = :id")
+        Optional<Member> findByIdCustom(long id);
 
-    @Query("select m from Member m " +
-            "left join fetch m.eventMembers em " +
-            "left join fetch em.event " +
-            "left join fetch m.likedNews ln " +
-            "left join fetch ln.news " +
-            "where m.email = :email")
-    Optional<Member> findByEmailCustom(String email);
+        @Query("select m from Member m " +
+                        "left join fetch m.eventMembers em " +
+                        "left join fetch em.event " +
+                        "left join fetch m.likedNews ln " +
+                        "left join fetch ln.news " +
+                        "left join fetch m.bikes " +
+                        "where m.email = :email")
+        Optional<Member> findByEmailCustom(String email);
 
-    @Query("select distinct m from Member m " +
-            "left join fetch m.eventMembers em " +
-            "left join fetch em.event " +
-            "left join fetch m.likedNews ln " +
-            "left join fetch ln.news " +
-            "where :text is null or ( " +
-            "m.firstName like %:text% " +
-            "or m.lastName like %:text% " +
-            "or m.email like %:text%" +
-            ")")
-    List<Member> findFilteredCustom(String text);
+        @Query("select distinct m from Member m " +
+                        "left join fetch m.eventMembers em " +
+                        "left join fetch em.event " +
+                        "left join fetch m.likedNews ln " +
+                        "left join fetch ln.news " +
+                        "left join fetch m.bikes " +
+                        "where :text is null or ( " +
+                        "m.firstName like %:text% " +
+                        "or m.lastName like %:text% " +
+                        "or m.email like %:text%" +
+                        ")")
+        List<Member> findFilteredCustom(String text);
 
-    boolean existsMemberByEmail(String email);
+        boolean existsMemberByEmail(String email);
 }
