@@ -114,8 +114,8 @@ public class MemberService {
      * @param admin          A boolean indicating if the member is admin
      * @return A {@link Member} object representing the member just created
      */
-    public Member createMember(String firstName, String lastName, String email, String phone, String avatarFile,
-            String avatarFileName, boolean active, boolean admin) {
+    public Member createMember(String firstName, String lastName, String email, String phone, Integer riderNumber,
+            String avatarFile, String avatarFileName, boolean active, boolean admin) {
 
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
         if (memberOptional.isPresent()) {
@@ -129,6 +129,7 @@ public class MemberService {
         member.setLastName(lastName);
         member.setEmail(email);
         member.setPhone(phone);
+        member.setRiderNumber(riderNumber);
         member.setActive(active);
         member.setAdmin(admin);
         member.setRegistrationDate(LocalDateTime.now());
@@ -162,7 +163,7 @@ public class MemberService {
      * @return An {@link Event} object representing the event just updated
      */
     public Member updateMember(long memberId, String firstName, String lastName, String email, String phone,
-            String avatarFile, String avatarFileName, boolean active, boolean admin) {
+            Integer riderNumber, String avatarFile, String avatarFileName, boolean active, boolean admin) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
@@ -175,6 +176,7 @@ public class MemberService {
         member.setLastName(lastName);
         member.setEmail(email);
         member.setPhone(phone);
+        member.setRiderNumber(riderNumber);
         member.setActive(active);
         member.setAdmin(admin);
         member.setModifiedOn(LocalDateTime.now());

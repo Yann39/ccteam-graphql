@@ -61,6 +61,9 @@ public class Member {
     @JoinColumn(name = "attachment_id")
     private Attachment avatar;
 
+    @Column
+    private Integer riderNumber;
+
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Bike> bikes;
 

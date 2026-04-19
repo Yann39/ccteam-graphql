@@ -123,12 +123,14 @@ public class MemberController {
             @Argument String phone,
             @Argument String avatarFile,
             @Argument String avatarFileName,
+            @Argument Integer riderNumber,
             @Argument boolean active,
             @Argument boolean admin) {
         log.info(
-                "Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
-                firstName, lastName, email, phone, avatarFile, avatarFileName, active, admin);
-        return memberService.createMember(firstName, lastName, email, phone, avatarFile, avatarFileName, active, admin);
+                "Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
+                firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, admin);
+        return memberService.createMember(firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName,
+                active, admin);
     }
 
     /**
@@ -154,12 +156,14 @@ public class MemberController {
             @Argument String phone,
             @Argument String avatarFile,
             @Argument String avatarFileName,
+            @Argument Integer riderNumber,
             @Argument boolean active,
             @Argument boolean admin) {
         log.info(
-                "Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
-                memberId, firstName, lastName, email, phone, avatarFile, avatarFileName, active, admin);
-        return memberService.updateMember(memberId, firstName, lastName, email, phone, avatarFile, avatarFileName,
+                "Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
+                memberId, firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, admin);
+        return memberService.updateMember(memberId, firstName, lastName, email, phone, riderNumber, avatarFile,
+                avatarFileName,
                 active, admin);
     }
 
