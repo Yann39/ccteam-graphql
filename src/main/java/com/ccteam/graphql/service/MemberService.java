@@ -111,11 +111,10 @@ public class MemberService {
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
      * @param active         A boolean indicating if the member is active
-     * @param admin          A boolean indicating if the member is admin
      * @return A {@link Member} object representing the member just created
      */
     public Member createMember(String firstName, String lastName, String email, String phone, Integer riderNumber,
-            String avatarFile, String avatarFileName, boolean active, boolean admin) {
+            String avatarFile, String avatarFileName, boolean active, Member.Role role) {
 
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
         if (memberOptional.isPresent()) {
@@ -131,10 +130,9 @@ public class MemberService {
         member.setPhone(phone);
         member.setRiderNumber(riderNumber);
         member.setActive(active);
-        member.setAdmin(admin);
         member.setRegistrationDate(LocalDateTime.now());
         member.setCreatedOn(LocalDateTime.now());
-        member.setRole(Member.Role.ROLE_USER);
+        member.setRole(role);
 
         if (avatarFile != null) {
             final byte[] decoded = Base64.getDecoder().decode(avatarFile.getBytes());
@@ -159,11 +157,10 @@ public class MemberService {
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
      * @param active         A boolean indicating if the member is active
-     * @param admin          A boolean indicating if the member is admin
      * @return An {@link Event} object representing the event just updated
      */
     public Member updateMember(long memberId, String firstName, String lastName, String email, String phone,
-            Integer riderNumber, String avatarFile, String avatarFileName, boolean active, boolean admin) {
+            Integer riderNumber, String avatarFile, String avatarFileName, boolean active, Member.Role role) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
@@ -178,7 +175,7 @@ public class MemberService {
         member.setPhone(phone);
         member.setRiderNumber(riderNumber);
         member.setActive(active);
-        member.setAdmin(admin);
+        member.setRole(role);
         member.setModifiedOn(LocalDateTime.now());
 
         if (avatarFile != null) {

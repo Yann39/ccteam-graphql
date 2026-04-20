@@ -87,21 +87,21 @@ class EventControllerTest {
         memberBobAdmin.setFirstName("Bob");
         memberBobAdmin.setLastName("Douglas");
         memberBobAdmin.setEmail("Bob.Douglas@example.com");
-        memberBobAdmin.setAdmin(true);
+        memberBobAdmin.setRole(Member.Role.ROLE_ADMIN);
 
         final Member memberJohn = new Member();
         memberJohn.setId(2L);
         memberJohn.setFirstName("John");
         memberJohn.setLastName("Doe");
         memberJohn.setEmail("John.Doe@example.com");
-        memberJohn.setAdmin(false);
+        memberJohn.setRole(Member.Role.ROLE_MEMBER);
 
         final Member memberJane = new Member();
         memberJane.setId(3L);
         memberJane.setFirstName("Jane");
         memberJane.setLastName("Doe");
         memberJane.setEmail("Jane.Doe@example.com");
-        memberJane.setAdmin(false);
+        memberJane.setRole(Member.Role.ROLE_MEMBER);
 
         eventBresse = new Event();
         eventBresse.setId(1L);
@@ -162,89 +162,88 @@ class EventControllerTest {
                 .execute()
                 .path("getAllEvents")
                 .matchesJsonStrictly("""
-                        [
-                          {
-                            "id": "1",
-                            "title": "Event Bresse",
-                            "description": "Event Bresse description",
-                            "startDate": "2018-07-13 08:00:00",
-                            "endDate": "2018-07-13 16:30:00",
-                            "track": {
-                              "name": "Bresse",
-                              "distance": 3000,
-                              "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
-                            },
-                            "participants": [
-                              {
-                                "member": {
-                                  "firstName": "Jane",
-                                  "lastName": "Doe",
-                                  "email": "Jane.Doe@example.com"
-                                }
-                              }
-                            ],
-                            "organizer": "Organizer A",
-                            "price": 180,
-                            "createdOn": "2018-04-11 20:41:05",
-                            "createdBy": {
-                              "id": "1",
-                              "firstName": "Bob",
-                              "lastName": "Douglas"
-                            },
-                            "modifiedOn": "2018-04-11 20:46:17",
-                            "modifiedBy": {
-                              "id": "2",
-                              "firstName": "John",
-                              "lastName": "Doe"
-                            }
-                          },
-                          {
-                            "id": "2",
-                            "title": "Event Magny-Cours",
-                            "description": "Event Magny-Cours description",
-                            "startDate": "2019-05-24 09:00:00",
-                            "endDate": "2019-05-24 18:00:00",
-                            "track": {
-                              "name": "Magny-cours",
-                              "distance": 4411,
-                              "lapRecord": 96950,
-                              "website": "https://www.circuitmagnycours.com/",
-                              "latitude": 46.86390367017831,
-                              "longitude": 3.162750730649732
-                            },
-                            "participants": [
-                              {
-                                "member": {
-                                  "firstName": "John",
-                                  "lastName": "Doe",
-                                  "email": "John.Doe@example.com"
-                                }
-                              },
-                              {
-                                "member": {
-                                  "firstName": "John",
-                                  "lastName": "Doe",
-                                  "email": "John.Doe@example.com"
-                                }
-                              }
-                            ],
-                            "organizer": "Organizer B",
-                            "price": 240,
-                            "createdOn": "2019-01-29 22:15:14",
-                            "createdBy": {
-                              "id": "1",
-                              "firstName": "Bob",
-                              "lastName": "Douglas"
-                            },
-                            "modifiedOn": null,
-                            "modifiedBy": null
-                          }
-                        ]
-                        """
-                );
+            [
+              {
+                "id": "1",
+                "title": "Event Bresse",
+                "description": "Event Bresse description",
+                "startDate": "2018-07-13 08:00:00",
+                "endDate": "2018-07-13 16:30:00",
+                "track": {
+                  "name": "Bresse",
+                  "distance": 3000,
+                  "lapRecord": 84330,
+                  "website": "https://www.circuitdebresse.com",
+                  "latitude": 46.551756882687776,
+                  "longitude": 5.3285273408879394
+                },
+                "participants": [
+                  {
+                    "member": {
+                      "firstName": "Jane",
+                      "lastName": "Doe",
+                      "email": "Jane.Doe@example.com"
+                    }
+                  }
+                ],
+                "organizer": "Organizer A",
+                "price": 180,
+                "createdOn": "2018-04-11 20:41:05",
+                "createdBy": {
+                  "id": "1",
+                  "firstName": "Bob",
+                  "lastName": "Douglas"
+                },
+                "modifiedOn": "2018-04-11 20:46:17",
+                "modifiedBy": {
+                  "id": "2",
+                  "firstName": "John",
+                  "lastName": "Doe"
+                }
+              },
+              {
+                "id": "2",
+                "title": "Event Magny-Cours",
+                "description": "Event Magny-Cours description",
+                "startDate": "2019-05-24 09:00:00",
+                "endDate": "2019-05-24 18:00:00",
+                "track": {
+                  "name": "Magny-cours",
+                  "distance": 4411,
+                  "lapRecord": 96950,
+                  "website": "https://www.circuitmagnycours.com/",
+                  "latitude": 46.86390367017831,
+                  "longitude": 3.162750730649732
+                },
+                "participants": [
+                  {
+                    "member": {
+                      "firstName": "John",
+                      "lastName": "Doe",
+                      "email": "John.Doe@example.com"
+                    }
+                  },
+                  {
+                    "member": {
+                      "firstName": "John",
+                      "lastName": "Doe",
+                      "email": "John.Doe@example.com"
+                    }
+                  }
+                ],
+                "organizer": "Organizer B",
+                "price": 240,
+                "createdOn": "2019-01-29 22:15:14",
+                "createdBy": {
+                  "id": "1",
+                  "firstName": "Bob",
+                  "lastName": "Douglas"
+                },
+                "modifiedOn": null,
+                "modifiedBy": null
+              }
+            ]
+            """);
 
         verify(eventService, times(1)).getAllEvents();
         assertThat(output).contains("Received call to getAllEvents");
@@ -260,48 +259,47 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByYear")
                 .matchesJsonStrictly("""
-                        [
-                          {
-                            "id": "1",
-                            "title": "Event Bresse",
-                            "description": "Event Bresse description",
-                            "startDate": "2018-07-13 08:00:00",
-                            "endDate": "2018-07-13 16:30:00",
-                            "track": {
-                              "name": "Bresse",
-                              "distance": 3000,
-                              "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
-                            },
-                            "participants": [
-                              {
-                                "member": {
-                                  "firstName": "Jane",
-                                  "lastName": "Doe",
-                                  "email": "Jane.Doe@example.com"
-                                }
-                              }
-                            ],
-                            "organizer": "Organizer A",
-                            "price": 180,
-                            "createdOn": "2018-04-11 20:41:05",
-                            "createdBy": {
-                              "id": "1",
-                              "firstName": "Bob",
-                              "lastName": "Douglas"
-                            },
-                            "modifiedOn": "2018-04-11 20:46:17",
-                            "modifiedBy": {
-                              "id": "2",
-                              "firstName": "John",
-                              "lastName": "Doe"
-                            }
-                          }
-                        ]
-                        """
-                );
+            [
+              {
+                "id": "1",
+                "title": "Event Bresse",
+                "description": "Event Bresse description",
+                "startDate": "2018-07-13 08:00:00",
+                "endDate": "2018-07-13 16:30:00",
+                "track": {
+                  "name": "Bresse",
+                  "distance": 3000,
+                  "lapRecord": 84330,
+                  "website": "https://www.circuitdebresse.com",
+                  "latitude": 46.551756882687776,
+                  "longitude": 5.3285273408879394
+                },
+                "participants": [
+                  {
+                    "member": {
+                      "firstName": "Jane",
+                      "lastName": "Doe",
+                      "email": "Jane.Doe@example.com"
+                    }
+                  }
+                ],
+                "organizer": "Organizer A",
+                "price": 180,
+                "createdOn": "2018-04-11 20:41:05",
+                "createdBy": {
+                  "id": "1",
+                  "firstName": "Bob",
+                  "lastName": "Douglas"
+                },
+                "modifiedOn": "2018-04-11 20:46:17",
+                "modifiedBy": {
+                  "id": "2",
+                  "firstName": "John",
+                  "lastName": "Doe"
+                }
+              }
+            ]
+            """);
 
         verify(eventService, times(1)).getEventsByYear(2018);
         assertThat(output).contains("Received call to getEventsByYear with parameter year = 2018");
@@ -316,8 +314,7 @@ class EventControllerTest {
                 .variable("year", 2020)
                 .execute()
                 .path("getEventsByYear")
-                .matchesJsonStrictly("[]"
-                );
+                .matchesJsonStrictly("[]");
 
         verify(eventService, times(1)).getEventsByYear(2020);
         assertThat(output).contains("Received call to getEventsByYear with parameter year = 2020");
@@ -334,48 +331,47 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByMonthAndYear")
                 .matchesJsonStrictly("""
-                        [
-                          {
-                            "id": "1",
-                            "title": "Event Bresse",
-                            "description": "Event Bresse description",
-                            "startDate": "2018-07-13 08:00:00",
-                            "endDate": "2018-07-13 16:30:00",
-                            "track": {
-                              "name": "Bresse",
-                              "distance": 3000,
-                              "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
-                            },
-                            "participants": [
-                              {
-                                "member": {
-                                  "firstName": "Jane",
-                                  "lastName": "Doe",
-                                  "email": "Jane.Doe@example.com"
-                                }
-                              }
-                            ],
-                            "organizer": "Organizer A",
-                            "price": 180,
-                            "createdOn": "2018-04-11 20:41:05",
-                            "createdBy": {
-                              "id": "1",
-                              "firstName": "Bob",
-                              "lastName": "Douglas"
-                            },
-                            "modifiedOn": "2018-04-11 20:46:17",
-                            "modifiedBy": {
-                              "id": "2",
-                              "firstName": "John",
-                              "lastName": "Doe"
-                            }
-                          }
-                        ]
-                        """
-                );
+            [
+              {
+                "id": "1",
+                "title": "Event Bresse",
+                "description": "Event Bresse description",
+                "startDate": "2018-07-13 08:00:00",
+                "endDate": "2018-07-13 16:30:00",
+                "track": {
+                  "name": "Bresse",
+                  "distance": 3000,
+                  "lapRecord": 84330,
+                  "website": "https://www.circuitdebresse.com",
+                  "latitude": 46.551756882687776,
+                  "longitude": 5.3285273408879394
+                },
+                "participants": [
+                  {
+                    "member": {
+                      "firstName": "Jane",
+                      "lastName": "Doe",
+                      "email": "Jane.Doe@example.com"
+                    }
+                  }
+                ],
+                "organizer": "Organizer A",
+                "price": 180,
+                "createdOn": "2018-04-11 20:41:05",
+                "createdBy": {
+                  "id": "1",
+                  "firstName": "Bob",
+                  "lastName": "Douglas"
+                },
+                "modifiedOn": "2018-04-11 20:46:17",
+                "modifiedBy": {
+                  "id": "2",
+                  "firstName": "John",
+                  "lastName": "Doe"
+                }
+              }
+            ]
+            """);
 
         verify(eventService, times(1)).getEventsByMonthAndYear(7, 2018);
         assertThat(output).contains("Received call to getEventsByMonthAndYear with parameters month = 7, year = 2018");
@@ -391,8 +387,7 @@ class EventControllerTest {
                 .variable("year", 2018)
                 .execute()
                 .path("getEventsByMonthAndYear")
-                .matchesJsonStrictly("[]"
-                );
+                .matchesJsonStrictly("[]");
 
         verify(eventService, times(1)).getEventsByMonthAndYear(6, 2018);
         assertThat(output).contains("Received call to getEventsByMonthAndYear with parameters month = 6, year = 2018");
@@ -410,48 +405,47 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByDayAndMonthAndYear")
                 .matchesJsonStrictly("""
-                        [
-                          {
-                            "id": "1",
-                            "title": "Event Bresse",
-                            "description": "Event Bresse description",
-                            "startDate": "2018-07-13 08:00:00",
-                            "endDate": "2018-07-13 16:30:00",
-                            "track": {
-                              "name": "Bresse",
-                              "distance": 3000,
-                              "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
-                            },
-                            "participants": [
-                              {
-                                "member": {
-                                  "firstName": "Jane",
-                                  "lastName": "Doe",
-                                  "email": "Jane.Doe@example.com"
-                                }
-                              }
-                            ],
-                            "organizer": "Organizer A",
-                            "price": 180,
-                            "createdOn": "2018-04-11 20:41:05",
-                            "createdBy": {
-                              "id": "1",
-                              "firstName": "Bob",
-                              "lastName": "Douglas"
-                            },
-                            "modifiedOn": "2018-04-11 20:46:17",
-                            "modifiedBy": {
-                              "id": "2",
-                              "firstName": "John",
-                              "lastName": "Doe"
-                            }
-                          }
-                        ]
-                        """
-                );
+            [
+              {
+                "id": "1",
+                "title": "Event Bresse",
+                "description": "Event Bresse description",
+                "startDate": "2018-07-13 08:00:00",
+                "endDate": "2018-07-13 16:30:00",
+                "track": {
+                  "name": "Bresse",
+                  "distance": 3000,
+                  "lapRecord": 84330,
+                  "website": "https://www.circuitdebresse.com",
+                  "latitude": 46.551756882687776,
+                  "longitude": 5.3285273408879394
+                },
+                "participants": [
+                  {
+                    "member": {
+                      "firstName": "Jane",
+                      "lastName": "Doe",
+                      "email": "Jane.Doe@example.com"
+                    }
+                  }
+                ],
+                "organizer": "Organizer A",
+                "price": 180,
+                "createdOn": "2018-04-11 20:41:05",
+                "createdBy": {
+                  "id": "1",
+                  "firstName": "Bob",
+                  "lastName": "Douglas"
+                },
+                "modifiedOn": "2018-04-11 20:46:17",
+                "modifiedBy": {
+                  "id": "2",
+                  "firstName": "John",
+                  "lastName": "Doe"
+                }
+              }
+            ]
+            """);
 
         verify(eventService, times(1)).getEventsByDayAndMonthAndYear(13, 7, 2018);
         assertThat(output).contains("Received call to getEventsByDayAndMonthAndYear with parameters day = 13, month = 7, year = 2018");
@@ -468,8 +462,7 @@ class EventControllerTest {
                 .variable("year", 2018)
                 .execute()
                 .path("getEventsByDayAndMonthAndYear")
-                .matchesJsonStrictly("[]"
-                );
+                .matchesJsonStrictly("[]");
 
         verify(eventService, times(1)).getEventsByDayAndMonthAndYear(14, 7, 2018);
         assertThat(output).contains("Received call to getEventsByDayAndMonthAndYear with parameters day = 14, month = 7, year = 2018");
@@ -485,49 +478,48 @@ class EventControllerTest {
                 .execute()
                 .path("getEventById")
                 .matchesJsonStrictly("""
-                        {
-                          "id": "2",
-                          "title": "Event Magny-Cours",
-                          "description": "Event Magny-Cours description",
-                          "startDate": "2019-05-24 09:00:00",
-                          "endDate": "2019-05-24 18:00:00",
-                          "track": {
-                            "name": "Magny-cours",
-                            "distance": 4411,
-                            "lapRecord": 96950,
-                            "website": "https://www.circuitmagnycours.com/",
-                            "latitude": 46.86390367017831,
-                            "longitude": 3.162750730649732
-                          },
-                          "participants": [
-                            {
-                              "member": {
-                                "firstName": "John",
-                                "lastName": "Doe",
-                                "email": "John.Doe@example.com"
-                              }
-                            },
-                            {
-                              "member": {
-                                "firstName": "John",
-                                "lastName": "Doe",
-                                "email": "John.Doe@example.com"
-                              }
-                            }
-                          ],
-                          "organizer": "Organizer B",
-                          "price": 240,
-                          "createdOn": "2019-01-29 22:15:14",
-                          "createdBy": {
-                            "id": "1",
-                            "firstName": "Bob",
-                            "lastName": "Douglas"
-                          },
-                          "modifiedOn": null,
-                          "modifiedBy": null
-                        }
-                        """
-                );
+            {
+              "id": "2",
+              "title": "Event Magny-Cours",
+              "description": "Event Magny-Cours description",
+              "startDate": "2019-05-24 09:00:00",
+              "endDate": "2019-05-24 18:00:00",
+              "track": {
+                "name": "Magny-cours",
+                "distance": 4411,
+                "lapRecord": 96950,
+                "website": "https://www.circuitmagnycours.com/",
+                "latitude": 46.86390367017831,
+                "longitude": 3.162750730649732
+              },
+              "participants": [
+                {
+                  "member": {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "email": "John.Doe@example.com"
+                  }
+                },
+                {
+                  "member": {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "email": "John.Doe@example.com"
+                  }
+                }
+              ],
+              "organizer": "Organizer B",
+              "price": 240,
+              "createdOn": "2019-01-29 22:15:14",
+              "createdBy": {
+                "id": "1",
+                "firstName": "Bob",
+                "lastName": "Douglas"
+              },
+              "modifiedOn": null,
+              "modifiedBy": null
+            }
+            """);
 
         verify(eventService, times(1)).getEventById(2L);
         assertThat(output).contains("Received call to getEventById with parameter ID = 2");
@@ -558,48 +550,47 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByTitle")
                 .matchesJsonStrictly("""
-                        [
-                          {
-                            "id": "1",
-                            "title": "Event Bresse",
-                            "description": "Event Bresse description",
-                            "startDate": "2018-07-13 08:00:00",
-                            "endDate": "2018-07-13 16:30:00",
-                            "track": {
-                              "name": "Bresse",
-                              "distance": 3000,
-                              "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
-                            },
-                            "participants": [
-                              {
-                                "member": {
-                                  "firstName": "Jane",
-                                  "lastName": "Doe",
-                                  "email": "Jane.Doe@example.com"
-                                }
-                              }
-                            ],
-                            "organizer": "Organizer A",
-                            "price": 180,
-                            "createdOn": "2018-04-11 20:41:05",
-                            "createdBy": {
-                              "id": "1",
-                              "firstName": "Bob",
-                              "lastName": "Douglas"
-                            },
-                            "modifiedOn": "2018-04-11 20:46:17",
-                            "modifiedBy": {
-                              "id": "2",
-                              "firstName": "John",
-                              "lastName": "Doe"
-                            }
-                          }
-                        ]
-                        """
-                );
+            [
+              {
+                "id": "1",
+                "title": "Event Bresse",
+                "description": "Event Bresse description",
+                "startDate": "2018-07-13 08:00:00",
+                "endDate": "2018-07-13 16:30:00",
+                "track": {
+                  "name": "Bresse",
+                  "distance": 3000,
+                  "lapRecord": 84330,
+                  "website": "https://www.circuitdebresse.com",
+                  "latitude": 46.551756882687776,
+                  "longitude": 5.3285273408879394
+                },
+                "participants": [
+                  {
+                    "member": {
+                      "firstName": "Jane",
+                      "lastName": "Doe",
+                      "email": "Jane.Doe@example.com"
+                    }
+                  }
+                ],
+                "organizer": "Organizer A",
+                "price": 180,
+                "createdOn": "2018-04-11 20:41:05",
+                "createdBy": {
+                  "id": "1",
+                  "firstName": "Bob",
+                  "lastName": "Douglas"
+                },
+                "modifiedOn": "2018-04-11 20:46:17",
+                "modifiedBy": {
+                  "id": "2",
+                  "firstName": "John",
+                  "lastName": "Doe"
+                }
+              }
+            ]
+            """);
 
         verify(eventService, times(1)).getEventsByTitle("Bres");
         assertThat(output).contains("Received call to getEventsByTitle with parameter title = Bres");
@@ -614,8 +605,7 @@ class EventControllerTest {
                 .variable("title", "blabla")
                 .execute()
                 .path("getEventsByTitle")
-                .matchesJsonStrictly("[]"
-                );
+                .matchesJsonStrictly("[]");
 
         verify(eventService, times(1)).getEventsByTitle("blabla");
         assertThat(output).contains("Received call to getEventsByTitle with parameter title = blabla");

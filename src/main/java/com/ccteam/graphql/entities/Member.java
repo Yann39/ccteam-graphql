@@ -73,9 +73,6 @@ public class Member {
     @Column(nullable = false)
     private boolean verified = false;
 
-    @Column(nullable = false)
-    private boolean admin = false;
-
     @Column
     private String otp;
 

@@ -99,19 +99,21 @@ public class LapRecordController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public LapRecord createLapRecord(@Argument long memberId,
-                                     @Argument long trackId,
-                                     @Argument long bikeId,
-                                     @Argument String recordDate,
-                                     @Argument int lapTime,
-                                     @Argument String conditions,
-                                     @Argument String comments) {
-        log.info("Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
+            @Argument long trackId,
+            @Argument long bikeId,
+            @Argument String recordDate,
+            @Argument int lapTime,
+            @Argument String conditions,
+            @Argument String comments) {
+        log.info(
+                "Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
                 memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
         return lapRecordService.createLapRecord(memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
     }
 
     /**
-     * Update the lap record represented by the given lap record ID with the specified data.
+     * Update the lap record represented by the given lap record ID with the
+     * specified data.
      *
      * @param lapRecordId The lap record ID
      * @param trackId     The track ID
@@ -124,15 +126,17 @@ public class LapRecordController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public LapRecord updateLapRecord(@Argument long lapRecordId,
-                                     @Argument long trackId,
-                                     @Argument long bikeId,
-                                     @Argument String recordDate,
-                                     @Argument int lapTime,
-                                     @Argument String conditions,
-                                     @Argument String comments) {
-        log.info("Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
+            @Argument long trackId,
+            @Argument long bikeId,
+            @Argument String recordDate,
+            @Argument int lapTime,
+            @Argument String conditions,
+            @Argument String comments) {
+        log.info(
+                "Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
                 lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);
-        return lapRecordService.updateLapRecord(lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);
+        return lapRecordService.updateLapRecord(lapRecordId, trackId, bikeId, recordDate, lapTime, conditions,
+                comments);
     }
 
     /**
@@ -141,7 +145,7 @@ public class LapRecordController {
      * @param lapRecordId The ID of the {@link LapRecord} to delete
      * @return A {@link LapRecord} object representing the lap record just deleted
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @MutationMapping
     public LapRecord deleteLapRecord(@Argument long lapRecordId) {
         log.info("Received call to deleteLapRecord with parameters lapRecordId = {}", lapRecordId);

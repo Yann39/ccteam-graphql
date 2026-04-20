@@ -80,7 +80,7 @@ public class MemberController {
      * @param email The member's e-mail address
      * @return A {@link Member} object representing the member
      */
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @QueryMapping
     public Member getMemberByEmail(@Argument String email) {
         log.info("Received call to getMemberByEmail with parameters email = {}", email);
@@ -111,8 +111,9 @@ public class MemberController {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param active         A boolean indicating if the member is active
-     * @param admin          A boolean indicating if the member is admin
+     * @param riderNumber    The member rider number
+     * @param active         The member active status
+     * @param role           The member role
      * @return A {@link Member} object representing the member just created
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -125,12 +126,11 @@ public class MemberController {
             @Argument String avatarFileName,
             @Argument Integer riderNumber,
             @Argument boolean active,
-            @Argument boolean admin) {
-        log.info(
-                "Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
-                firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, admin);
+            @Argument Member.Role role) {
+        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, role = {}",
+                firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, role);
         return memberService.createMember(firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName,
-                active, admin);
+                active, role);
     }
 
     /**
@@ -143,8 +143,9 @@ public class MemberController {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param active         A boolean indicating if the member is active
-     * @param admin          A boolean indicating if the member is admin
+     * @param riderNumber    The member rider number
+     * @param active         The member active status
+     * @param role           The member role
      * @return An {@link Member} object representing the member just updated
      */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -158,13 +159,11 @@ public class MemberController {
             @Argument String avatarFileName,
             @Argument Integer riderNumber,
             @Argument boolean active,
-            @Argument boolean admin) {
-        log.info(
-                "Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, admin = {}",
-                memberId, firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, admin);
+            @Argument Member.Role role) {
+        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, role = {}",
+                memberId, firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, role);
         return memberService.updateMember(memberId, firstName, lastName, email, phone, riderNumber, avatarFile,
-                avatarFileName,
-                active, admin);
+                avatarFileName, active, role);
     }
 
     /**
@@ -180,11 +179,25 @@ public class MemberController {
         return memberService.deleteMember(memberId);
     }
 
+    /**
+     * Get the avatar file of the member.
+     *
+     * @param member The member
+     * @return The avatar file as base64 encoded string
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @SchemaMapping(typeName = "Member", field = "avatarFile")
     public String getAvatarFile(Member member) {
         return member.getAvatar() != null ? new String(Base64.getEncoder().encode(member.getAvatar().getFile())) : null;
     }
 
+    /**
+     * Get the avatar file name of the member.
+     *
+     * @param member The member
+     * @return The avatar file name
+     */
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     @SchemaMapping(typeName = "Member", field = "avatarFileName")
     public String getAvatarFileName(Member member) {
         return member.getAvatar() != null ? member.getAvatar().getFilename() : null;
