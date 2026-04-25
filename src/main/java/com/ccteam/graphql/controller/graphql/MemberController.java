@@ -21,6 +21,7 @@
 package com.ccteam.graphql.controller.graphql;
 
 import com.ccteam.graphql.entities.Member;
+import com.ccteam.graphql.entities.MembershipFee;
 import com.ccteam.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -80,7 +81,7 @@ public class MemberController {
      * @param email The member's e-mail address
      * @return A {@link Member} object representing the member
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @QueryMapping
     public Member getMemberByEmail(@Argument String email) {
         log.info("Received call to getMemberByEmail with parameters email = {}", email);
@@ -201,6 +202,51 @@ public class MemberController {
     @SchemaMapping(typeName = "Member", field = "avatarFileName")
     public String getAvatarFileName(Member member) {
         return member.getAvatar() != null ? member.getAvatar().getFilename() : null;
+    }
+
+    /**
+     * Add membership fee for the given member.
+     *
+     * @param memberId The ID of the {@link Member} to add membership fee for
+     * @param year     The membership fee year
+     * @param amount   The membership fee amount
+     * @param paid     A boolean indicating if the membership fee is paid
+     * @return A {@link MembershipFee} object representing the membership fee just added
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public MembershipFee addMembershipFee(@Argument Long memberId, @Argument Integer year, @Argument Float amount, @Argument boolean paid) {
+        log.info("Received call to addMembershipFee with parameters memberId = {}, year = {}, amount = {}, paid = {}", memberId, year, amount, paid);
+        return memberService.addMembershipFee(memberId, year, amount, paid);
+    }
+
+    /**
+     * Update membership fee for the given member.
+     * 
+     * @param feeId  The ID of the {@link MembershipFee} to update
+     * @param year   The membership fee year
+     * @param amount The membership fee amount
+     * @param paid   A boolean indicating if the membership fee is paid
+     * @return A {@link MembershipFee} object representing the membership fee just updated
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public MembershipFee updateMembershipFee(@Argument Long feeId, @Argument Integer year, @Argument Float amount, @Argument boolean paid) {
+        log.info("Received call to updateMembershipFee with parameters feeId = {}, year = {}, amount = {}, paid = {}", feeId, year, amount, paid);
+        return memberService.updateMembershipFee(feeId, year, amount, paid);
+    }
+
+    /**
+     * Delete membership fee for the given member.
+     * 
+     * @param feeId The ID of the {@link MembershipFee} to delete
+     * @return A {@link MembershipFee} object representing the membership fee just deleted
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @MutationMapping
+    public MembershipFee deleteMembershipFee(@Argument Long feeId) {
+        log.info("Received call to deleteMembershipFee with parameters feeId = {}", feeId);
+        return memberService.deleteMembershipFee(feeId);
     }
 
 }

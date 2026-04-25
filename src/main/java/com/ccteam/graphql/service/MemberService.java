@@ -24,8 +24,10 @@ import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Attachment;
 import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.Member;
+import com.ccteam.graphql.entities.MembershipFee;
 import com.ccteam.graphql.entities.News;
 import com.ccteam.graphql.repository.MemberRepository;
+import com.ccteam.graphql.repository.MembershipFeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +47,11 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final MembershipFeeRepository membershipFeeRepository;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, MembershipFeeRepository membershipFeeRepository) {
         this.memberRepository = memberRepository;
+        this.membershipFeeRepository = membershipFeeRepository;
     }
 
     /**
@@ -213,6 +217,81 @@ public class MemberService {
         final Member member = memberOptional.get();
         memberRepository.delete(member);
         return member;
+    }
+
+    /**
+     * Add membership fee for the given member.
+     *
+     * @param memberId The ID of the {@link Member} to add membership fee for
+     * @param year     The membership fee year
+     * @param amount   The membership fee amount
+     * @param paid     A boolean indicating if the membership fee is paid
+     * @return A {@link MembershipFee} object representing the membership fee just added
+     */
+    public MembershipFee addMembershipFee(Long memberId, Integer year, Float amount, boolean paid) {
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with id {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+        }
+
+        final Optional<MembershipFee> feeOptional = membershipFeeRepository.findByMemberIdAndYear(memberId, year);
+        if (feeOptional.isPresent()) {
+            log.error("Membership fee for member {} and year {} already exists", memberId, year);
+            throw new CustomGraphQLException("membership_fee_already_exists", "Membership fee for this member and year already exists");
+        }
+
+        final MembershipFee fee = new MembershipFee();
+        fee.setMember(memberOptional.get());
+        fee.setYear(year);
+        fee.setAmount(amount);
+        fee.setPaid(paid);
+        fee.setCreatedOn(LocalDateTime.now());
+
+        return membershipFeeRepository.save(fee);
+    }
+
+    /**
+     * Update membership fee for the given member.
+     *
+     * @param feeId  The ID of the {@link MembershipFee} to update
+     * @param year   The membership fee year
+     * @param amount The membership fee amount
+     * @param paid   A boolean indicating if the membership fee is paid
+     * @return A {@link MembershipFee} object representing the membership fee just updated
+     */
+    public MembershipFee updateMembershipFee(Long feeId, Integer year, Float amount, boolean paid) {
+        final Optional<MembershipFee> feeOptional = membershipFeeRepository.findById(feeId);
+        if (feeOptional.isEmpty()) {
+            log.error("MembershipFee with id {} not found in the database", feeId);
+            throw new CustomGraphQLException("membership_fee_not_found", "Specified membership fee ID has not been found in the database");
+        }
+
+        final MembershipFee fee = feeOptional.get();
+        fee.setYear(year);
+        fee.setAmount(amount);
+        fee.setPaid(paid);
+        fee.setModifiedOn(LocalDateTime.now());
+
+        return membershipFeeRepository.save(fee);
+    }
+
+    /**
+     * Delete membership fee for the given member.
+     *
+     * @param feeId The ID of the {@link MembershipFee} to delete
+     * @return A {@link MembershipFee} object representing the membership fee just deleted
+     */
+    public MembershipFee deleteMembershipFee(Long feeId) {
+        final Optional<MembershipFee> feeOptional = membershipFeeRepository.findById(feeId);
+        if (feeOptional.isEmpty()) {
+            log.error("MembershipFee with id {} not found in the database", feeId);
+            throw new CustomGraphQLException("membership_fee_not_found", "Specified membership fee ID has not been found in the database");
+        }
+
+        final MembershipFee fee = feeOptional.get();
+        membershipFeeRepository.delete(fee);
+        return fee;
     }
 
 }

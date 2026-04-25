@@ -42,7 +42,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                         "left join fetch em.event " +
                         "left join fetch m.likedNews ln " +
                         "left join fetch ln.news " +
-                        "left join fetch m.bikes")
+                        "left join fetch m.bikes " +
+                        "left join fetch m.membershipFees")
         List<Member> findAllCustom();
 
         @Query("select m from Member m " +
@@ -51,6 +52,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                         "left join fetch m.likedNews ln " +
                         "left join fetch ln.news " +
                         "left join fetch m.bikes " +
+                        "left join fetch m.membershipFees " +
                         "where m.id = :id")
         Optional<Member> findByIdCustom(long id);
 
@@ -60,6 +62,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                         "left join fetch m.likedNews ln " +
                         "left join fetch ln.news " +
                         "left join fetch m.bikes " +
+                        "left join fetch m.membershipFees " +
                         "where m.email = :email")
         Optional<Member> findByEmailCustom(String email);
 
@@ -69,6 +72,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                         "left join fetch m.likedNews ln " +
                         "left join fetch ln.news " +
                         "left join fetch m.bikes " +
+                        "left join fetch m.membershipFees " +
                         "where :text is null or ( " +
                         "m.firstName like %:text% " +
                         "or m.lastName like %:text% " +
