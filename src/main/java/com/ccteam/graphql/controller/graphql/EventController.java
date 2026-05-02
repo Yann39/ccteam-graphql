@@ -55,7 +55,7 @@ public class EventController {
      *
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getAllEvents() {
         log.info("Received call to getAllEvents");
@@ -68,7 +68,7 @@ public class EventController {
      * @param year The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getEventsByYear(@Argument int year) {
         log.info("Received call to getEventsByYear with parameter year = {}", year);
@@ -83,7 +83,7 @@ public class EventController {
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getEventsByMonthAndYear(@Argument int month,
             @Argument int year) {
@@ -101,7 +101,7 @@ public class EventController {
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getEventsByDayAndMonthAndYear(@Argument int day,
             @Argument int month,
@@ -117,7 +117,7 @@ public class EventController {
      * @param id The ID of the event to retrieve
      * @return An {@link Event} object representing the event
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public Event getEventById(@Argument Long id) {
         log.info("Received call to getEventById with parameter ID = {}", id);
@@ -130,7 +130,7 @@ public class EventController {
      * @param title The event title
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getEventsByTitle(@Argument String title) {
         log.info("Received call to getEventsByTitle with parameter title = {}", title);

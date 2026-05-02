@@ -53,7 +53,7 @@ public class NewsController {
      *
      * @return A list of {@link News} objects representing the news
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<News> getAllNews() {
         log.info("Received call to getAllNews");
@@ -70,7 +70,7 @@ public class NewsController {
      * @param sortDirection The sort direction ({@code asc} or {@code desc})
      * @return A list of {@link News} object representing the news
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<News> getAllNewsFilteredPaginated(@Argument String text,
                                                   @Argument int pageNumber,
@@ -88,7 +88,7 @@ public class NewsController {
      * @param id The ID of the news to retrieve
      * @return A {@link News} object representing the news
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public News getNewsById(@Argument Long id) {
         log.info("Received call to getNewsById with parameter ID = {}", id);
