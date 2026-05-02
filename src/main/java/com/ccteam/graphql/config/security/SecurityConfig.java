@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -69,10 +70,10 @@ public class SecurityConfig {
      * Define a new method security expression handler with the new defined role hierarchy, to be used instead
      * of the default one.
      *
-     * @return A {@link DefaultMethodSecurityExpressionHandler} object representing the new configured expression handler
+     * @return A {@link MethodSecurityExpressionHandler} object representing the new configured expression handler
      */
     @Bean
-    public DefaultMethodSecurityExpressionHandler expressionHandler() {
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
         final DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy());
         return expressionHandler;

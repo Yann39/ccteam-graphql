@@ -54,7 +54,7 @@ public class BikeController {
      * @param year         The year
      * @return The created {@link Bike}
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Bike addBikeToMember(@Argument Long memberId,
             @Argument String manufacturer,
@@ -76,7 +76,7 @@ public class BikeController {
      * @param year         The year
      * @return The updated {@link Bike}
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Bike updateBike(@Argument Long bikeId,
             @Argument String manufacturer,
@@ -94,7 +94,7 @@ public class BikeController {
      * @param bikeId The bike ID
      * @return The deleted {@link Bike}
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Bike deleteBike(@Argument Long bikeId) {
         log.info("Received call to deleteBike with parameters bikeId = {}", bikeId);

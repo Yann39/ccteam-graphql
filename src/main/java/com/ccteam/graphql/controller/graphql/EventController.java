@@ -55,7 +55,7 @@ public class EventController {
      *
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Event> getAllEvents() {
         log.info("Received call to getAllEvents");
@@ -68,7 +68,7 @@ public class EventController {
      * @param year The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Event> getEventsByYear(@Argument int year) {
         log.info("Received call to getEventsByYear with parameter year = {}", year);
@@ -83,7 +83,7 @@ public class EventController {
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Event> getEventsByMonthAndYear(@Argument int month,
             @Argument int year) {
@@ -101,7 +101,7 @@ public class EventController {
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Event> getEventsByDayAndMonthAndYear(@Argument int day,
             @Argument int month,
@@ -117,7 +117,7 @@ public class EventController {
      * @param id The ID of the event to retrieve
      * @return An {@link Event} object representing the event
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public Event getEventById(@Argument Long id) {
         log.info("Received call to getEventById with parameter ID = {}", id);
@@ -130,7 +130,7 @@ public class EventController {
      * @param title The event title
      * @return A list of {@link Event} objects representing the events
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Event> getEventsByTitle(@Argument String title) {
         log.info("Received call to getEventsByTitle with parameter title = {}", title);
@@ -150,7 +150,7 @@ public class EventController {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Event createEvent(@Argument String title,
             @Argument String description,
@@ -180,7 +180,7 @@ public class EventController {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just updated
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Event updateEvent(@Argument long eventId,
             @Argument String title,
@@ -204,7 +204,7 @@ public class EventController {
      * @param eventId The ID of the {@link Event} to delete
      * @return A {@link Event} object representing the event just deleted
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Event deleteEvent(@Argument long eventId) {
         log.info("Received call to deleteEvent with parameter eventId = {}", eventId);
@@ -218,7 +218,7 @@ public class EventController {
      * @param memberId The member ID
      * @return An {@link Event} object representing the event just registered
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Event registerToEvent(@Argument long eventId, @Argument long memberId) {
         log.info("Received call to registerToEvent with parameters eventId = {}, memberId = {}", eventId, memberId);
@@ -232,7 +232,7 @@ public class EventController {
      * @param memberId The member ID
      * @return An {@link Event} object representing the event just unregistered
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Event unregisterFromEvent(@Argument long eventId, @Argument long memberId) {
         log.info("Received call to unregisterFromEvent with parameters eventId = {}, memberId = {}", eventId, memberId);

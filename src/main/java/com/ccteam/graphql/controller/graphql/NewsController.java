@@ -53,7 +53,7 @@ public class NewsController {
      *
      * @return A list of {@link News} objects representing the news
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<News> getAllNews() {
         log.info("Received call to getAllNews");
@@ -70,7 +70,7 @@ public class NewsController {
      * @param sortDirection The sort direction ({@code asc} or {@code desc})
      * @return A list of {@link News} object representing the news
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<News> getAllNewsFilteredPaginated(@Argument String text,
                                                   @Argument int pageNumber,
@@ -88,7 +88,7 @@ public class NewsController {
      * @param id The ID of the news to retrieve
      * @return A {@link News} object representing the news
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public News getNewsById(@Argument Long id) {
         log.info("Received call to getNewsById with parameter ID = {}", id);
@@ -105,7 +105,7 @@ public class NewsController {
      * @param memberId  The ID of the {@link Member} to set as creator of the news
      * @return A {@link News} object representing the news just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public News createNews(@Argument String title,
                            @Argument String catchLine,
@@ -128,7 +128,7 @@ public class NewsController {
      * @param memberId  The ID of the {@link Member} to set as last modifier of the news
      * @return A {@link News} object representing the news just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public News updateNews(@Argument long newsId,
                            @Argument String title,
@@ -147,7 +147,7 @@ public class NewsController {
      * @param newsId The ID of the {@link News} to delete
      * @return A {@link News} object representing the news just deleted
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public News deleteNews(@Argument long newsId) {
         log.info("Received call to deleteNews with parameter newsId = {}", newsId);
@@ -161,7 +161,7 @@ public class NewsController {
      * @param memberId The member ID
      * @return A DTO object representing the news just liked
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public News likeNews(@Argument long newsId,
                          @Argument long memberId) {
@@ -176,7 +176,7 @@ public class NewsController {
      * @param memberId The member ID
      * @return {@code true} if the unlike succeeded, {@code false} if not
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public News unlikeNews(@Argument long newsId,
                            @Argument long memberId) {

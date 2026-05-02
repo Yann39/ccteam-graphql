@@ -74,8 +74,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 // decode JWT token
                 final JWTTokenPayload jwtTokenPayload = jwtTokenUtils.decodeToken(authorizationHeader);
 
-                // if user e-mail has been retrieved correctly from the token
-                if (jwtTokenPayload.getEmail() != null) {
+                // if user e-mail and role have been retrieved correctly from the token
+                if (jwtTokenPayload.getEmail() != null && jwtTokenPayload.getRole() != null) {
 
                     // if user is not already authenticated
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {

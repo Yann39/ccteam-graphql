@@ -52,7 +52,7 @@ public class LapRecordController {
      *
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<LapRecord> getAllLapRecords() {
         log.info("Received call to getAllLapRecords");
@@ -65,7 +65,7 @@ public class LapRecordController {
      * @param memberId The ID of the member for which to retrieve lap records
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<LapRecord> getMemberLapRecords(@Argument Long memberId) {
         log.info("Received call to getMemberLapRecords with parameters memberId = {}", memberId);
@@ -78,7 +78,7 @@ public class LapRecordController {
      * @param trackId The ID of the track for which to retrieve lap records
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<LapRecord> getTrackLapRecords(@Argument Long trackId) {
         log.info("Received call to getTrackLapRecords with parameters trackId = {}", trackId);
@@ -96,7 +96,7 @@ public class LapRecordController {
      * @param comments   Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public LapRecord createLapRecord(@Argument long memberId,
             @Argument long trackId,
@@ -123,7 +123,7 @@ public class LapRecordController {
      * @param comments    Some comment about the lap record
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public LapRecord updateLapRecord(@Argument long lapRecordId,
             @Argument long trackId,
@@ -145,7 +145,7 @@ public class LapRecordController {
      * @param lapRecordId The ID of the {@link LapRecord} to delete
      * @return A {@link LapRecord} object representing the lap record just deleted
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public LapRecord deleteLapRecord(@Argument long lapRecordId) {
         log.info("Received call to deleteLapRecord with parameters lapRecordId = {}", lapRecordId);

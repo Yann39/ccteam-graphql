@@ -55,7 +55,7 @@ public class MemberController {
      *
      * @return A list of {@link Member} objects representing the members
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Member> getAllMembers() {
         log.info("Received call to getAllMembers");
@@ -68,7 +68,7 @@ public class MemberController {
      * @param id The ID of the member to retrieve
      * @return A {@link Member} object representing the member
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public Member getMemberById(@Argument Long id) {
         log.info("Received call to getMemberById with parameters ID = {}", id);
@@ -81,7 +81,7 @@ public class MemberController {
      * @param email The member's e-mail address
      * @return A {@link Member} object representing the member
      */
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public Member getMemberByEmail(@Argument String email) {
         log.info("Received call to getMemberByEmail with parameters email = {}", email);
@@ -96,7 +96,7 @@ public class MemberController {
      * @param text The text filter string
      * @return A list of {@link Member} objects representing the members
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Member> getMembersFiltered(@Argument String text) {
         log.info("Received call to getMembersFiltered with parameters text = {}", text);
@@ -117,7 +117,7 @@ public class MemberController {
      * @param role           The member role
      * @return A {@link Member} object representing the member just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Member createMember(@Argument String firstName,
             @Argument String lastName,
@@ -149,7 +149,7 @@ public class MemberController {
      * @param role           The member role
      * @return An {@link Member} object representing the member just updated
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Member updateMember(@Argument long memberId,
             @Argument String firstName,
@@ -173,7 +173,7 @@ public class MemberController {
      * @param memberId The ID of the {@link Event} to delete
      * @return A {@link Event} object representing the member just deleted
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Member deleteMember(@Argument long memberId) {
         log.info("Received call to deleteMember with parameters memberId = {}", memberId);
@@ -186,7 +186,7 @@ public class MemberController {
      * @param member The member
      * @return The avatar file as base64 encoded string
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @SchemaMapping(typeName = "Member", field = "avatarFile")
     public String getAvatarFile(Member member) {
         return member.getAvatar() != null ? new String(Base64.getEncoder().encode(member.getAvatar().getFile())) : null;
@@ -198,7 +198,7 @@ public class MemberController {
      * @param member The member
      * @return The avatar file name
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @SchemaMapping(typeName = "Member", field = "avatarFileName")
     public String getAvatarFileName(Member member) {
         return member.getAvatar() != null ? member.getAvatar().getFilename() : null;
@@ -213,7 +213,7 @@ public class MemberController {
      * @param paid     A boolean indicating if the membership fee is paid
      * @return A {@link MembershipFee} object representing the membership fee just added
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public MembershipFee addMembershipFee(@Argument Long memberId, @Argument Integer year, @Argument Float amount, @Argument boolean paid) {
         log.info("Received call to addMembershipFee with parameters memberId = {}, year = {}, amount = {}, paid = {}", memberId, year, amount, paid);
@@ -229,7 +229,7 @@ public class MemberController {
      * @param paid   A boolean indicating if the membership fee is paid
      * @return A {@link MembershipFee} object representing the membership fee just updated
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public MembershipFee updateMembershipFee(@Argument Long feeId, @Argument Integer year, @Argument Float amount, @Argument boolean paid) {
         log.info("Received call to updateMembershipFee with parameters feeId = {}, year = {}, amount = {}, paid = {}", feeId, year, amount, paid);
@@ -242,7 +242,7 @@ public class MemberController {
      * @param feeId The ID of the {@link MembershipFee} to delete
      * @return A {@link MembershipFee} object representing the membership fee just deleted
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public MembershipFee deleteMembershipFee(@Argument Long feeId) {
         log.info("Received call to deleteMembershipFee with parameters feeId = {}", feeId);

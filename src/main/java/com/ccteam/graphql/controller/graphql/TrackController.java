@@ -53,7 +53,7 @@ public class TrackController {
      *
      * @return A list of {@link Track} objects representing the tracks
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Track> getAllTracks() {
         log.info("Received call to getAllTracks");
@@ -68,7 +68,7 @@ public class TrackController {
      * @param text The text filter string
      * @return A list of {@link Track} objects representing the tracks
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public List<Track> getTracksFiltered(@Argument String text) {
         log.info("Received call to getTracksFiltered with parameter text = {}", text);
@@ -81,7 +81,7 @@ public class TrackController {
      * @param id The ID of the track to retrieve
      * @return A {@link Track} object representing the track
      */
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @QueryMapping
     public Track getTrackById(@Argument Long id) {
         log.info("Received call to getTrackById with parameter ID = {}", id);
@@ -99,7 +99,7 @@ public class TrackController {
      * @param longitude The track longitude coordinate
      * @return A {@link Track} object representing the track just created
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Track createTrack(@Argument String name,
             @Argument int distance,
@@ -125,7 +125,7 @@ public class TrackController {
      * @param longitude The track longitude coordinate
      * @return A {@link Track} object representing the track just updated
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Track updateTrack(@Argument long trackId,
             @Argument String name,
@@ -146,7 +146,7 @@ public class TrackController {
      * @param trackId The ID of the {@link Track} to delete
      * @return A {@link Track} object representing the track just deleted
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Track deleteTrack(@Argument long trackId) {
         log.info("Received call to deleteTrack with parameter trackId = {}", trackId);
