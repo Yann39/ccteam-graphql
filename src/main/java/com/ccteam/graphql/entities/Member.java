@@ -86,6 +86,10 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "board_role")
+    private BoardRole boardRole;
+
     @Column
     private LocalDateTime registrationDate;
 

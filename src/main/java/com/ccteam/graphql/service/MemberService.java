@@ -21,15 +21,12 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
-import com.ccteam.graphql.entities.Attachment;
-import com.ccteam.graphql.entities.Event;
-import com.ccteam.graphql.entities.Member;
-import com.ccteam.graphql.entities.MembershipFee;
-import com.ccteam.graphql.entities.News;
+import com.ccteam.graphql.entities.*;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.MembershipFeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -118,7 +115,7 @@ public class MemberService {
      * @return A {@link Member} object representing the member just created
      */
     public Member createMember(String firstName, String lastName, String email, String phone, Integer riderNumber,
-            String avatarFile, String avatarFileName, boolean active, Member.Role role) {
+                               String avatarFile, String avatarFileName, boolean active, Member.Role role) {
 
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
         if (memberOptional.isPresent()) {
@@ -164,7 +161,7 @@ public class MemberService {
      * @return An {@link Event} object representing the event just updated
      */
     public Member updateMember(long memberId, String firstName, String lastName, String email, String phone,
-            Integer riderNumber, String avatarFile, String avatarFileName, boolean active, Member.Role role) {
+                               Integer riderNumber, String avatarFile, String avatarFileName, boolean active, Member.Role role) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
@@ -217,6 +214,42 @@ public class MemberService {
         final Member member = memberOptional.get();
         memberRepository.delete(member);
         return member;
+    }
+
+    /**
+     * Assign (or clear) the executive board role of the given member.
+     * <p>If a non-null {@code boardRole} is provided, any other member
+     * previously holding that role is automatically demoted (their
+     * {@code boardRole} is set to {@code null}) so that only one member at
+     * a time holds each board position.</p>
+     *
+     * @param memberId  the id of the member whose role is being set
+     * @param boardRole the role to assign, or {@code null} to clear
+     * @return the updated {@link Member}
+     */
+    @Transactional
+    public Member setBoardRole(long memberId, BoardRole boardRole) {
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with id {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found",
+                    "Specified member ID has not been found in the database");
+        }
+
+        final Member member = memberOptional.get();
+
+        if (boardRole != null) {
+            // demote any other member that already holds the same role
+            final List<Member> previousHolders =
+                    memberRepository.findByBoardRoleAndIdNot(boardRole, memberId);
+            for (Member previous : previousHolders) {
+                previous.setBoardRole(null);
+                memberRepository.save(previous);
+            }
+        }
+
+        member.setBoardRole(boardRole);
+        return memberRepository.save(member);
     }
 
     /**

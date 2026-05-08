@@ -20,6 +20,7 @@
 
 package com.ccteam.graphql.controller.graphql;
 
+import com.ccteam.graphql.entities.BoardRole;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.MembershipFee;
 import com.ccteam.graphql.service.MemberService;
@@ -120,14 +121,14 @@ public class MemberController {
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Member createMember(@Argument String firstName,
-            @Argument String lastName,
-            @Argument String email,
-            @Argument String phone,
-            @Argument String avatarFile,
-            @Argument String avatarFileName,
-            @Argument Integer riderNumber,
-            @Argument boolean active,
-            @Argument Member.Role role) {
+                               @Argument String lastName,
+                               @Argument String email,
+                               @Argument String phone,
+                               @Argument String avatarFile,
+                               @Argument String avatarFileName,
+                               @Argument Integer riderNumber,
+                               @Argument boolean active,
+                               @Argument Member.Role role) {
         log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, role = {}",
                 firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, role);
         return memberService.createMember(firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName,
@@ -152,15 +153,15 @@ public class MemberController {
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Member updateMember(@Argument long memberId,
-            @Argument String firstName,
-            @Argument String lastName,
-            @Argument String email,
-            @Argument String phone,
-            @Argument String avatarFile,
-            @Argument String avatarFileName,
-            @Argument Integer riderNumber,
-            @Argument boolean active,
-            @Argument Member.Role role) {
+                               @Argument String firstName,
+                               @Argument String lastName,
+                               @Argument String email,
+                               @Argument String phone,
+                               @Argument String avatarFile,
+                               @Argument String avatarFileName,
+                               @Argument Integer riderNumber,
+                               @Argument boolean active,
+                               @Argument Member.Role role) {
         log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, role = {}",
                 memberId, firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, role);
         return memberService.updateMember(memberId, firstName, lastName, email, phone, riderNumber, avatarFile,
@@ -178,6 +179,21 @@ public class MemberController {
     public Member deleteMember(@Argument long memberId) {
         log.info("Received call to deleteMember with parameters memberId = {}", memberId);
         return memberService.deleteMember(memberId);
+    }
+
+    /**
+     * Assign (or clear) the executive board role of the given member.
+     *
+     * @param memberId  ID of the member whose board role is being set
+     * @param boardRole the role to assign, or {@code null} to clear the current role
+     * @return the updated {@link Member}
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @MutationMapping
+    public Member setBoardRole(@Argument long memberId, @Argument BoardRole boardRole) {
+        log.info("Received call to setBoardRole with parameters memberId = {}, boardRole = {}",
+                memberId, boardRole);
+        return memberService.setBoardRole(memberId, boardRole);
     }
 
     /**
@@ -222,7 +238,7 @@ public class MemberController {
 
     /**
      * Update membership fee for the given member.
-     * 
+     *
      * @param feeId  The ID of the {@link MembershipFee} to update
      * @param year   The membership fee year
      * @param amount The membership fee amount
@@ -238,7 +254,7 @@ public class MemberController {
 
     /**
      * Delete membership fee for the given member.
-     * 
+     *
      * @param feeId The ID of the {@link MembershipFee} to delete
      * @return A {@link MembershipFee} object representing the membership fee just deleted
      */

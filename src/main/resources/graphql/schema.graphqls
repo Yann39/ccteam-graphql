@@ -62,6 +62,7 @@ type Mutation {
     createMember(firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, active: Boolean!, role: Role!): Member
     updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, active: Boolean!, role: Role!): Member
     deleteMember(memberId: Long!): Member
+    setBoardRole(memberId: Long!, boardRole: BoardRole): Member
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
@@ -185,6 +186,7 @@ type Member {
     membershipFees: [MembershipFee]
     active: Boolean!
     role: Role!
+    boardRole: BoardRole
     eventMembers: [EventMember]
     likedNews: [LikedNews]
     registrationDate: LocalDateTime
@@ -196,6 +198,13 @@ enum Role {
     ROLE_USER
     ROLE_MEMBER
     ROLE_ADMIN
+}
+
+enum BoardRole {
+    PRESIDENT
+    VICE_PRESIDENT
+    SECRETARY
+    TREASURER
 }
 
 type News {

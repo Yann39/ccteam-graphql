@@ -20,6 +20,7 @@
 
 package com.ccteam.graphql.repository;
 
+import com.ccteam.graphql.entities.BoardRole;
 import com.ccteam.graphql.entities.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,48 +38,55 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-        @Query("select distinct m from Member m " +
-                        "left join fetch m.eventMembers em " +
-                        "left join fetch em.event " +
-                        "left join fetch m.likedNews ln " +
-                        "left join fetch ln.news " +
-                        "left join fetch m.bikes " +
-                        "left join fetch m.membershipFees")
-        List<Member> findAllCustom();
+    @Query("select distinct m from Member m " +
+           "left join fetch m.eventMembers em " +
+           "left join fetch em.event " +
+           "left join fetch m.likedNews ln " +
+           "left join fetch ln.news " +
+           "left join fetch m.bikes " +
+           "left join fetch m.membershipFees")
+    List<Member> findAllCustom();
 
-        @Query("select m from Member m " +
-                        "left join fetch m.eventMembers em " +
-                        "left join fetch em.event " +
-                        "left join fetch m.likedNews ln " +
-                        "left join fetch ln.news " +
-                        "left join fetch m.bikes " +
-                        "left join fetch m.membershipFees " +
-                        "where m.id = :id")
-        Optional<Member> findByIdCustom(long id);
+    @Query("select m from Member m " +
+           "left join fetch m.eventMembers em " +
+           "left join fetch em.event " +
+           "left join fetch m.likedNews ln " +
+           "left join fetch ln.news " +
+           "left join fetch m.bikes " +
+           "left join fetch m.membershipFees " +
+           "where m.id = :id")
+    Optional<Member> findByIdCustom(long id);
 
-        @Query("select m from Member m " +
-                        "left join fetch m.eventMembers em " +
-                        "left join fetch em.event " +
-                        "left join fetch m.likedNews ln " +
-                        "left join fetch ln.news " +
-                        "left join fetch m.bikes " +
-                        "left join fetch m.membershipFees " +
-                        "where m.email = :email")
-        Optional<Member> findByEmailCustom(String email);
+    @Query("select m from Member m " +
+           "left join fetch m.eventMembers em " +
+           "left join fetch em.event " +
+           "left join fetch m.likedNews ln " +
+           "left join fetch ln.news " +
+           "left join fetch m.bikes " +
+           "left join fetch m.membershipFees " +
+           "where m.email = :email")
+    Optional<Member> findByEmailCustom(String email);
 
-        @Query("select distinct m from Member m " +
-                        "left join fetch m.eventMembers em " +
-                        "left join fetch em.event " +
-                        "left join fetch m.likedNews ln " +
-                        "left join fetch ln.news " +
-                        "left join fetch m.bikes " +
-                        "left join fetch m.membershipFees " +
-                        "where :text is null or ( " +
-                        "m.firstName like %:text% " +
-                        "or m.lastName like %:text% " +
-                        "or m.email like %:text%" +
-                        ")")
-        List<Member> findFilteredCustom(String text);
+    @Query("select distinct m from Member m " +
+           "left join fetch m.eventMembers em " +
+           "left join fetch em.event " +
+           "left join fetch m.likedNews ln " +
+           "left join fetch ln.news " +
+           "left join fetch m.bikes " +
+           "left join fetch m.membershipFees " +
+           "where :text is null or ( " +
+           "m.firstName like %:text% " +
+           "or m.lastName like %:text% " +
+           "or m.email like %:text%" +
+           ")")
+    List<Member> findFilteredCustom(String text);
 
-        boolean existsMemberByEmail(String email);
+    boolean existsMemberByEmail(String email);
+
+    /**
+     * Find all members currently holding the given board role,
+     * excluding the member with id {@code excludedId} (typically the
+     * one being assigned the role).
+     */
+    List<Member> findByBoardRoleAndIdNot(BoardRole boardRole, Long excludedId);
 }
