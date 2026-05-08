@@ -21,8 +21,10 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
+import com.ccteam.graphql.entities.Country;
 import com.ccteam.graphql.entities.News;
 import com.ccteam.graphql.entities.Track;
+import com.ccteam.graphql.repository.CountryRepository;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,9 +44,35 @@ import java.util.Optional;
 public class TrackService {
 
     private final TrackRepository trackRepository;
+    private final CountryRepository countryRepository;
 
-    public TrackService(TrackRepository trackRepository) {
+    public TrackService(TrackRepository trackRepository, CountryRepository countryRepository) {
         this.trackRepository = trackRepository;
+        this.countryRepository = countryRepository;
+    }
+
+    /**
+     * Resolve a {@link Country} from its ISO 3166-1 alpha-2 code. The
+     * country is mandatory on tracks, so a {@code null} or blank code is
+     * rejected.
+     *
+     * @param countryCode the country code (mandatory)
+     * @return the matching {@link Country}
+     * @throws CustomGraphQLException if the code is missing or does not
+     *         match any known country
+     */
+    private Country resolveCountry(String countryCode) {
+        if (countryCode == null || countryCode.isBlank()) {
+            log.error("Country code is required for track creation/update");
+            throw new CustomGraphQLException("country_required",
+                    "A country code is required");
+        }
+        return countryRepository.findById(countryCode.toUpperCase())
+                .orElseThrow(() -> {
+                    log.error("Country with code {} not found", countryCode);
+                    return new CustomGraphQLException("country_not_found",
+                            "Specified country code has not been found");
+                });
     }
 
     /**
@@ -86,16 +114,18 @@ public class TrackService {
     /**
      * Create a new track.
      *
-     * @param name      The official name of the track
-     * @param distance  The track distance (in meters)
-     * @param lapRecord The lap record (in milliseconds)
-     * @param website   The official website of the track
-     * @param latitude  The track latitude coordinate
-     * @param longitude The track longitude coordinate
+     * @param name        The official name of the track
+     * @param distance    The track distance (in meters)
+     * @param lapRecord   The lap record (in milliseconds)
+     * @param website     The official website of the track
+     * @param latitude    The track latitude coordinate
+     * @param longitude   The track longitude coordinate
+     * @param countryCode ISO 3166-1 alpha-2 code of the country where the
+     *                    track is located (optional)
      * @return A {@link Track} object representing the track just created
      */
     public Track createTrack(String name, int distance, int lapRecord, String website, BigDecimal latitude,
-            BigDecimal longitude) {
+            BigDecimal longitude, String countryCode) {
         final Track track = new Track();
         track.setName(name);
         track.setDistance(distance);
@@ -103,22 +133,25 @@ public class TrackService {
         track.setWebsite(website);
         track.setLatitude(latitude);
         track.setLongitude(longitude);
+        track.setCountry(resolveCountry(countryCode));
         return trackRepository.save(track);
     }
 
     /**
      * Update the track represented by the given track ID with the specified data.
      *
-     * @param name      The official name of the track
-     * @param distance  The track distance (in meters)
-     * @param lapRecord The lap record (in milliseconds)
-     * @param website   The official website of the track
-     * @param latitude  The track latitude coordinate
-     * @param longitude The track longitude coordinate
+     * @param name        The official name of the track
+     * @param distance    The track distance (in meters)
+     * @param lapRecord   The lap record (in milliseconds)
+     * @param website     The official website of the track
+     * @param latitude    The track latitude coordinate
+     * @param longitude   The track longitude coordinate
+     * @param countryCode ISO 3166-1 alpha-2 code of the country where the
+     *                    track is located (optional)
      * @return A {@link Track} object representing the track just updated
      */
     public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website,
-            BigDecimal latitude, BigDecimal longitude) {
+            BigDecimal latitude, BigDecimal longitude, String countryCode) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
@@ -133,6 +166,7 @@ public class TrackService {
         track.setWebsite(website);
         track.setLatitude(latitude);
         track.setLongitude(longitude);
+        track.setCountry(resolveCountry(countryCode));
         return trackRepository.save(track);
     }
 
