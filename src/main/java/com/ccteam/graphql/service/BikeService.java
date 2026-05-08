@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -81,15 +82,23 @@ public class BikeService {
     /**
      * Update an existing bike.
      *
+     * <p>If {@code current} is set to {@code true}, any other bike of the
+     * same member that was previously flagged as current will be unflagged
+     * so that the "one current bike per member" invariant is preserved.</p>
+     *
      * @param bikeId       The ID of the bike to update
      * @param manufacturer The manufacturer
      * @param modelName    The model name
      * @param engineSize   The engine size
      * @param year         The year
+     * @param current      Whether this bike should become the member's
+     *                     current bike (may be {@code null}, in which case
+     *                     the existing flag is preserved)
      * @return The updated {@link Bike}
      */
     @Transactional
-    public Bike updateBike(Long bikeId, String manufacturer, String modelName, Integer engineSize, Integer year) {
+    public Bike updateBike(Long bikeId, String manufacturer, String modelName, Integer engineSize, Integer year,
+            Boolean current) {
         final Optional<Bike> bikeOptional = bikeRepository.findById(bikeId);
         if (bikeOptional.isEmpty()) {
             log.error("Bike with id {} not found", bikeId);
@@ -101,6 +110,20 @@ public class BikeService {
         bike.setModelName(modelName);
         bike.setEngineSize(engineSize);
         bike.setYear(year);
+
+        if (current != null) {
+            // when marking this bike as current, unflag any other bike of
+            // the same member that was previously flagged as current
+            if (current && bike.getMember() != null) {
+                final List<Bike> previousCurrents = bikeRepository
+                        .findByMemberIdAndCurrentTrueAndIdNot(bike.getMember().getId(), bike.getId());
+                for (Bike previous : previousCurrents) {
+                    previous.setCurrent(false);
+                    bikeRepository.save(previous);
+                }
+            }
+            bike.setCurrent(current);
+        }
 
         return bikeRepository.save(bike);
     }

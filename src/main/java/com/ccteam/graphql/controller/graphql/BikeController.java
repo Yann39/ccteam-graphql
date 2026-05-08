@@ -74,6 +74,9 @@ public class BikeController {
      * @param modelName    The model name
      * @param engineSize   The engine size
      * @param year         The year
+     * @param current      Whether this bike is the member's current bike
+     *                     (optional). When set to {@code true} the service
+     *                     unflags any other bike of the same member.
      * @return The updated {@link Bike}
      */
     @PreAuthorize("hasRole('MEMBER')")
@@ -82,10 +85,11 @@ public class BikeController {
             @Argument String manufacturer,
             @Argument String modelName,
             @Argument Integer engineSize,
-            @Argument Integer year) {
-        log.info("Received call to updateBike with parameters bikeId = {}, manufacturer = {}, modelName = {}",
-                bikeId, manufacturer, modelName);
-        return bikeService.updateBike(bikeId, manufacturer, modelName, engineSize, year);
+            @Argument Integer year,
+            @Argument Boolean current) {
+        log.info("Received call to updateBike with parameters bikeId = {}, manufacturer = {}, modelName = {}, current = {}",
+                bikeId, manufacturer, modelName, current);
+        return bikeService.updateBike(bikeId, manufacturer, modelName, engineSize, year, current);
     }
 
     /**
