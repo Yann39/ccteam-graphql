@@ -91,12 +91,14 @@ public class TrackController {
     /**
      * Create a new track.
      *
-     * @param name      The official name of the track
-     * @param distance  The track distance (in meters)
-     * @param lapRecord The lap record (in milliseconds)
-     * @param website   The official website of the track
-     * @param latitude  The track latitude coordinate
-     * @param longitude The track longitude coordinate
+     * @param name        The official name of the track
+     * @param distance    The track distance (in meters)
+     * @param lapRecord   The lap record (in milliseconds)
+     * @param website     The official website of the track
+     * @param latitude    The track latitude coordinate
+     * @param longitude   The track longitude coordinate
+     * @param countryCode ISO 3166-1 alpha-2 code of the country where the
+     *                    track is located (mandatory, e.g. "FR")
      * @return A {@link Track} object representing the track just created
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -106,23 +108,26 @@ public class TrackController {
             @Argument int lapRecord,
             @Argument String website,
             @Argument BigDecimal latitude,
-            @Argument BigDecimal longitude) {
+            @Argument BigDecimal longitude,
+            @Argument String countryCode) {
         log.info(
-                "Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
-                name, distance, lapRecord, website, latitude, longitude);
-        return trackService.createTrack(name, distance, lapRecord, website, latitude, longitude);
+                "Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
+                name, distance, lapRecord, website, latitude, longitude, countryCode);
+        return trackService.createTrack(name, distance, lapRecord, website, latitude, longitude, countryCode);
     }
 
     /**
      * Update the track represented by the given track ID with the specified data.
      *
-     * @param trackId   The ID of the {@link Track} to update
-     * @param name      The official name of the track
-     * @param distance  The track distance (in meters)
-     * @param lapRecord The lap record (in milliseconds)
-     * @param website   The official website of the track
-     * @param latitude  The track latitude coordinate
-     * @param longitude The track longitude coordinate
+     * @param trackId     The ID of the {@link Track} to update
+     * @param name        The official name of the track
+     * @param distance    The track distance (in meters)
+     * @param lapRecord   The lap record (in milliseconds)
+     * @param website     The official website of the track
+     * @param latitude    The track latitude coordinate
+     * @param longitude   The track longitude coordinate
+     * @param countryCode ISO 3166-1 alpha-2 code of the country where the
+     *                    track is located (mandatory, e.g. "FR")
      * @return A {@link Track} object representing the track just updated
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -133,11 +138,12 @@ public class TrackController {
             @Argument int lapRecord,
             @Argument String website,
             @Argument BigDecimal latitude,
-            @Argument BigDecimal longitude) {
+            @Argument BigDecimal longitude,
+            @Argument String countryCode) {
         log.info(
-                "Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}",
-                trackId, name, distance, lapRecord, website, latitude, longitude);
-        return trackService.updateTrack(trackId, name, distance, lapRecord, website, latitude, longitude);
+                "Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
+                trackId, name, distance, lapRecord, website, latitude, longitude, countryCode);
+        return trackService.updateTrack(trackId, name, distance, lapRecord, website, latitude, longitude, countryCode);
     }
 
     /**

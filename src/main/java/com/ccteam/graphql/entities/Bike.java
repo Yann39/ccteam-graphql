@@ -52,14 +52,7 @@ public class Bike {
     @Column
     private Integer year;
 
-    /**
-     * Whether this bike is the member's "current" bike. Only one bike per
-     * member should be flagged as current at any given time; the service
-     * layer enforces this on update. Kept nullable in the database so the
-     * column can be added on existing data without a migration; new
-     * objects default to {@code false}.
-     */
-    @Column
+    @Column(nullable = false)
     private Boolean current = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

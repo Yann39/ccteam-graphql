@@ -58,4 +58,8 @@ public class Track {
     @Column(precision = 11, scale = 8)
     private BigDecimal longitude;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "country_code", nullable = false)
+    private Country country;
+
 }

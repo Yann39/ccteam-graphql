@@ -69,8 +69,8 @@ type Mutation {
     registerToEvent(eventId: Long!, memberId: Long!): Event
     unregisterFromEvent(eventId: Long!, memberId: Long!): Event
 
-    createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
-    updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!): Track
+    createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
+    updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
     deleteTrack(trackId: Long!): Track
 
     createLapRecord(memberId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
@@ -107,7 +107,7 @@ type Bike {
     modelName: String!
     engineSize: Int
     year: Int
-    current: Boolean
+    current: Boolean!
 }
 
 type MembershipFee {
@@ -229,4 +229,11 @@ type Track {
     website: String
     latitude: Float
     longitude: Float
+    country: Country!
+}
+
+type Country {
+    code: String!
+    nameFr: String!
+    nameEn: String!
 }
