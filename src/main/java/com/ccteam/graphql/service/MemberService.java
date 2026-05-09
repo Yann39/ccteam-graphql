@@ -149,6 +149,15 @@ public class MemberService {
 
     /**
      * Update the member represented by the given member ID with the specified data.
+     * <p>
+     * Annotated {@code @Transactional} so the {@code findByIdCustom} (which
+     * eagerly join-fetches {@code likedNews → news}, {@code bikes}, etc.)
+     * and the subsequent {@code save} share a single Hibernate session.
+     * Without it — and with {@code spring.jpa.open-in-view=false} — the
+     * detached entity returned by {@code save} carries uninitialised
+     * lazy proxies (e.g. {@code likedNews[].news}) that blow up with
+     * {@code LazyInitializationException} during GraphQL response
+     * serialization.
      *
      * @param memberId       The ID of the {@link Member} to update
      * @param firstName      The member first name
@@ -160,6 +169,7 @@ public class MemberService {
      * @param active         A boolean indicating if the member is active
      * @return An {@link Event} object representing the event just updated
      */
+    @Transactional
     public Member updateMember(long memberId, String firstName, String lastName, String email, String phone,
                                Integer riderNumber, String avatarFile, String avatarFileName, boolean active, Member.Role role) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
@@ -180,7 +190,15 @@ public class MemberService {
         member.setModifiedOn(LocalDateTime.now());
 
         if (avatarFile != null) {
-            final byte[] decoded = Base64.getDecoder().decode(avatarFile.getBytes());
+            final byte[] decoded;
+            try {
+                decoded = Base64.getDecoder().decode(avatarFile);
+            } catch (IllegalArgumentException e) {
+                log.error("Member {} tried to update avatar with invalid base64 (length = {} chars) : {}",
+                        memberId, avatarFile.length(), e.getMessage());
+                throw new CustomGraphQLException("invalid_avatar", "The avatar file is not valid base64");
+            }
+
             if (member.getAvatar() != null) {
                 member.getAvatar().setFilename(avatarFileName);
                 member.getAvatar().setFile(decoded);
@@ -192,6 +210,8 @@ public class MemberService {
                 attachment.setUploadDate(LocalDateTime.now());
                 member.setAvatar(attachment);
             }
+        } else {
+            log.info("Member {} tried to update avatar with null file, skipping avatar change", memberId);
         }
 
         return memberRepository.save(member);

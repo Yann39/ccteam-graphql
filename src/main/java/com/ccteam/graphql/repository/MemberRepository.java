@@ -48,6 +48,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAllCustom();
 
     @Query("select m from Member m " +
+           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event " +
            "left join fetch m.likedNews ln " +
@@ -58,6 +59,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByIdCustom(long id);
 
     @Query("select m from Member m " +
+           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event " +
            "left join fetch m.likedNews ln " +

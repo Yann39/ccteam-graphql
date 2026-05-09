@@ -150,7 +150,7 @@ public class MemberController {
      * @param role           The member role
      * @return An {@link Member} object representing the member just updated
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Member updateMember(@Argument long memberId,
                                @Argument String firstName,
