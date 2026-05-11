@@ -30,6 +30,7 @@ import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public class EventService {
     private final MemberRepository memberRepository;
 
     public EventService(EventRepository eventRepository, TrackRepository trackRepository,
-            MemberRepository memberRepository) {
+                        MemberRepository memberRepository) {
         this.eventRepository = eventRepository;
         this.trackRepository = trackRepository;
         this.memberRepository = memberRepository;
@@ -140,8 +141,9 @@ public class EventService {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
      */
+    @Transactional
     public Event createEvent(String title, String description, String startDate, String endDate, long trackId,
-            String organizer, BigDecimal price, long memberId) {
+                             String organizer, BigDecimal price, long memberId) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
@@ -183,8 +185,9 @@ public class EventService {
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just updated
      */
+    @Transactional
     public Event updateEvent(long eventId, String title, String description, String startDate, String endDate,
-            long trackId, String organizer, BigDecimal price, long memberId) {
+                             long trackId, String organizer, BigDecimal price, long memberId) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
             log.error("Event with id {} not found in the database", eventId);
@@ -225,6 +228,7 @@ public class EventService {
      * @param eventId The ID of the {@link Event} to delete
      * @return A {@link Event} object representing the event just deleted
      */
+    @Transactional
     public Event deleteEvent(long eventId) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
@@ -245,6 +249,7 @@ public class EventService {
      * @param memberId The member ID
      * @return An {@link Event} object representing the event just registered
      */
+    @Transactional
     public Event registerToEvent(long eventId, long memberId) throws CustomGraphQLException {
 
         // check that the event exists
@@ -289,6 +294,7 @@ public class EventService {
      * @param memberId The member ID
      * @return An {@link Event} object representing the event just unregistered
      */
+    @Transactional
     public Event unregisterFromEvent(long eventId, long memberId) throws CustomGraphQLException {
 
         // check that event exists

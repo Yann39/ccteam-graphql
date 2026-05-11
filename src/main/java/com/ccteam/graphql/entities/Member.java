@@ -65,6 +65,7 @@ public class Member {
     private Integer riderNumber;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("manufacturer ASC, modelName ASC")
     private Set<Bike> bikes;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
