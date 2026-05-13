@@ -197,6 +197,25 @@ public class MemberController {
     }
 
     /**
+     * Set the color palette the member has chosen for their
+     * detail-page header background. Any authenticated member can
+     * call this — the client only exposes the picker on the
+     * logged-in user's own profile, so in practice it acts as a
+     * "self-edit" operation.
+     *
+     * @param memberId      ID of the member whose palette is being set
+     * @param headerPalette palette index, or {@code null} to clear
+     * @return the updated {@link Member}
+     */
+    @PreAuthorize("hasRole('MEMBER')")
+    @MutationMapping
+    public Member setMemberPalette(@Argument long memberId, @Argument Integer headerPalette) {
+        log.info("Received call to setMemberPalette with parameters memberId = {}, headerPalette = {}",
+                memberId, headerPalette);
+        return memberService.setMemberPalette(memberId, headerPalette);
+    }
+
+    /**
      * Get the avatar file of the member.
      *
      * @param member The member

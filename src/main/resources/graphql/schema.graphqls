@@ -63,6 +63,7 @@ type Mutation {
     updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, active: Boolean!, role: Role!): Member
     deleteMember(memberId: Long!): Member
     setBoardRole(memberId: Long!, boardRole: BoardRole): Member
+    setMemberPalette(memberId: Long!, headerPalette: Int): Member
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
@@ -180,6 +181,7 @@ type Member {
     password: String!
     phone: String
     riderNumber: Int
+    headerPalette: Int
     avatarFile: String
     avatarFileName: String
     bikes: [Bike]

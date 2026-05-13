@@ -273,6 +273,28 @@ public class MemberService {
     }
 
     /**
+     * Set the color palette index the member has chosen for their
+     * detail-page header background. Passing {@code null} resets the
+     * choice (the client will fall back to the id-based default).
+     *
+     * @param memberId      ID of the member
+     * @param headerPalette index in the client-side palette list, or
+     *                      {@code null} to clear the choice
+     * @return the updated {@link Member}
+     */
+    @Transactional
+    public Member setMemberPalette(long memberId, Integer headerPalette) {
+        final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with id {} not found in the database", memberId);
+            throw new CustomGraphQLException("member_not_found", "Specified member ID has not been found in the database");
+        }
+        final Member member = memberOptional.get();
+        member.setHeaderPalette(headerPalette);
+        return memberRepository.save(member);
+    }
+
+    /**
      * Add membership fee for the given member.
      *
      * @param memberId The ID of the {@link Member} to add membership fee for
