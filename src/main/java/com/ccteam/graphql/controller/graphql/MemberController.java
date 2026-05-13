@@ -32,6 +32,7 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.Base64;
 import java.util.List;
 
@@ -199,7 +200,7 @@ public class MemberController {
     /**
      * Set the color palette the member has chosen for their
      * detail-page header background. Any authenticated member can
-     * call this — the client only exposes the picker on the
+     * call this, the client only exposes the picker on the
      * logged-in user's own profile, so in practice it acts as a
      * "self-edit" operation.
      *
@@ -213,6 +214,30 @@ public class MemberController {
         log.info("Received call to setMemberPalette with parameters memberId = {}, headerPalette = {}",
                 memberId, headerPalette);
         return memberService.setMemberPalette(memberId, headerPalette);
+    }
+
+    /**
+     * Change the passcode of the currently authenticated member.
+     * <p>
+     * The target member is taken from the {@link Principal} (the JWT subject)
+     * rather than passed as an argument, a member can only change their own
+     * passcode, never anyone else's. {@code currentPasscode} is verified
+     * against the stored hash to prove ownership; mismatch returns
+     * {@code bad_credentials}.
+     *
+     * @param currentPasscode the current 6-digit passcode (for verification)
+     * @param newPasscode     the new 6-digit passcode
+     * @param principal       the authenticated user's principal (e-mail)
+     * @return {@code true} on success
+     */
+    @PreAuthorize("hasRole('USER')")
+    @MutationMapping
+    public Boolean changePasscode(@Argument String currentPasscode,
+                                  @Argument String newPasscode,
+                                  Principal principal) {
+        // intentionally NOT logging the passcodes
+        log.info("Received call to changePasscode for {}", principal.getName());
+        return memberService.changePasscode(principal.getName(), currentPasscode, newPasscode);
     }
 
     /**

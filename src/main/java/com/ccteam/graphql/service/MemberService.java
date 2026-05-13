@@ -25,6 +25,7 @@ import com.ccteam.graphql.entities.*;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.MembershipFeeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,10 +46,13 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MembershipFeeRepository membershipFeeRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public MemberService(MemberRepository memberRepository, MembershipFeeRepository membershipFeeRepository) {
+    public MemberService(MemberRepository memberRepository, MembershipFeeRepository membershipFeeRepository,
+                         PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.membershipFeeRepository = membershipFeeRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -153,7 +157,7 @@ public class MemberService {
      * Annotated {@code @Transactional} so the {@code findByIdCustom} (which
      * eagerly join-fetches {@code likedNews → news}, {@code bikes}, etc.)
      * and the subsequent {@code save} share a single Hibernate session.
-     * Without it — and with {@code spring.jpa.open-in-view=false} — the
+     * Without it, and with {@code spring.jpa.open-in-view=false}, the
      * detached entity returned by {@code save} carries uninitialised
      * lazy proxies (e.g. {@code likedNews[].news}) that blow up with
      * {@code LazyInitializationException} during GraphQL response
@@ -292,6 +296,61 @@ public class MemberService {
         final Member member = memberOptional.get();
         member.setHeaderPalette(headerPalette);
         return memberRepository.save(member);
+    }
+
+    /**
+     * Change the passcode (BCrypt-hashed "password") of the member identified by
+     * the given e-mail address.
+     * <p>
+     * The {@code currentPasscode} is verified against the stored hash; on mismatch
+     * a {@code bad_credentials} error is thrown so the client can display an
+     * inline error and keep the user on the form. The new passcode must be
+     * exactly 6 digits and different from the current one.
+     * <p>
+     * The JWT is intentionally NOT invalidated, only the credential changes,
+     * the session continues seamlessly.
+     *
+     * @param email           the e-mail of the member changing their passcode (from the JWT principal)
+     * @param currentPasscode the current passcode, to verify ownership
+     * @param newPasscode     the new passcode (6 digits)
+     * @return {@code true} on success
+     */
+    @Transactional
+    public boolean changePasscode(String email, String currentPasscode, String newPasscode) {
+        final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
+        if (memberOptional.isEmpty()) {
+            log.error("Member with e-mail {} not found in the database", email);
+            throw new CustomGraphQLException("member_not_found",
+                    "Specified member has not been found in the database");
+        }
+        final Member member = memberOptional.get();
+
+        // verify ownership: current passcode must match the stored hash
+        if (member.getPassword() == null || !passwordEncoder.matches(currentPasscode, member.getPassword())) {
+            log.info("Passcode change refused for {} : current passcode does not match", email);
+            throw new CustomGraphQLException("bad_credentials",
+                    "Current passcode does not match");
+        }
+
+        // validate new passcode shape (server-side, even though the client enforces it too)
+        if (newPasscode == null || !newPasscode.matches("\\d{6}")) {
+            log.info("Passcode change refused for {} : new passcode is not 6 digits", email);
+            throw new CustomGraphQLException("invalid_passcode",
+                    "New passcode must be exactly 6 digits");
+        }
+
+        // refuse a no-op change so the user gets a clear feedback instead of a silent success
+        if (passwordEncoder.matches(newPasscode, member.getPassword())) {
+            log.info("Passcode change refused for {} : new passcode is identical to the current one", email);
+            throw new CustomGraphQLException("same_passcode",
+                    "New passcode must be different from the current one");
+        }
+
+        member.setPassword(passwordEncoder.encode(newPasscode));
+        member.setModifiedOn(LocalDateTime.now());
+        memberRepository.save(member);
+        log.info("Passcode successfully updated for {}", email);
+        return true;
     }
 
     /**

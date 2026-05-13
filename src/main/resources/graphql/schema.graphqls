@@ -64,6 +64,7 @@ type Mutation {
     deleteMember(memberId: Long!): Member
     setBoardRole(memberId: Long!, boardRole: BoardRole): Member
     setMemberPalette(memberId: Long!, headerPalette: Int): Member
+    changePasscode(currentPasscode: String!, newPasscode: String!): Boolean
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
