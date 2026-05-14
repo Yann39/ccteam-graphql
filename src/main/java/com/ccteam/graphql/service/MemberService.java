@@ -22,6 +22,7 @@ package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.*;
+import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.MembershipFeeRepository;
 import lombok.extern.slf4j.Slf4j;

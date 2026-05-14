@@ -18,7 +18,9 @@
  *
  */
 
-package com.ccteam.graphql.entities;
+package com.ccteam.graphql.enums;
+
+import com.ccteam.graphql.entities.Member;
 
 /**
  * Position held by a member in the club's executive board.

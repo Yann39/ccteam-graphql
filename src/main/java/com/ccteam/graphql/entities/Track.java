@@ -49,6 +49,9 @@ public class Track {
     @Column
     private int lapRecord;
 
+    @Column
+    private String lapRecordInfo;
+
     @Column(columnDefinition = "longtext")
     private String website;
 

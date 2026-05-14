@@ -20,7 +20,8 @@
 
 package com.ccteam.graphql.controller.graphql;
 
-import com.ccteam.graphql.entities.BoardRole;
+import com.ccteam.graphql.config.graphql.CustomGraphQLException;
+import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.MembershipFee;
 import com.ccteam.graphql.service.MemberService;
@@ -30,6 +31,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -138,6 +140,15 @@ public class MemberController {
 
     /**
      * Update the member represented by the given member ID with the specified data.
+     * <p>
+     * Authorization model: any authenticated user can call this
+     * endpoint, but only to edit their own profile — admins can edit
+     * anyone. We lowered the role gate from {@code MEMBER} to
+     * {@code USER} so a freshly-registered member (who is still
+     * {@code ROLE_USER} until promoted) can set up their avatar,
+     * palette and personal info without waiting for admin approval.
+     * The self-vs-other check is enforced at runtime via
+     * {@link #ensureCanEdit(long, Authentication)}.
      *
      * @param memberId       The ID of the {@link Member} to update
      * @param firstName      The member first name
@@ -151,7 +162,7 @@ public class MemberController {
      * @param role           The member role
      * @return An {@link Member} object representing the member just updated
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @MutationMapping
     public Member updateMember(@Argument long memberId,
                                @Argument String firstName,
@@ -162,9 +173,22 @@ public class MemberController {
                                @Argument String avatarFileName,
                                @Argument Integer riderNumber,
                                @Argument boolean active,
-                               @Argument Member.Role role) {
-        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, role = {}",
-                memberId, firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, role);
+                               @Argument Member.Role role,
+                               Authentication authentication) {
+        // intentionally not logging the avatar file to keep the log readable
+        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFileName = {}, active = {}, role = {}",
+                memberId, firstName, lastName, email, phone, riderNumber, avatarFileName, active, role);
+        final Member target = ensureCanEdit(memberId, authentication);
+        // privilege-escalation guard: non-admins can't bump their own
+        // role (or anyone else's, defensively). The form's role
+        // dropdown is already gated to admins on the client, so this
+        // is purely a server-side guarantee against tampered requests.
+        if (!isAdmin(authentication) && target.getRole() != role) {
+            log.info("Caller {} tried to change role of member {} from {} to {} — refused",
+                    authentication.getName(), memberId, target.getRole(), role);
+            throw new CustomGraphQLException("forbidden",
+                    "You cannot change your role");
+        }
         return memberService.updateMember(memberId, firstName, lastName, email, phone, riderNumber, avatarFile,
                 avatarFileName, active, role);
     }
@@ -199,21 +223,71 @@ public class MemberController {
 
     /**
      * Set the color palette the member has chosen for their
-     * detail-page header background. Any authenticated member can
-     * call this, the client only exposes the picker on the
-     * logged-in user's own profile, so in practice it acts as a
-     * "self-edit" operation.
+     * detail-page header background.
+     * <p>
+     * Authorization model: any authenticated user can set their own
+     * palette; an admin can set anyone's. We lowered the role gate
+     * from {@code MEMBER} to {@code USER} so a freshly-registered
+     * member can customize their header without waiting for admin
+     * promotion. The self-vs-other check is enforced at runtime via
+     * {@link #ensureCanEdit(long, Authentication)}.
      *
      * @param memberId      ID of the member whose palette is being set
      * @param headerPalette palette index, or {@code null} to clear
      * @return the updated {@link Member}
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('USER')")
     @MutationMapping
-    public Member setMemberPalette(@Argument long memberId, @Argument Integer headerPalette) {
+    public Member setMemberPalette(@Argument long memberId,
+                                   @Argument Integer headerPalette,
+                                   Authentication authentication) {
         log.info("Received call to setMemberPalette with parameters memberId = {}, headerPalette = {}",
                 memberId, headerPalette);
+        ensureCanEdit(memberId, authentication);
         return memberService.setMemberPalette(memberId, headerPalette);
+    }
+
+    /**
+     * Authorization guard for "self-edit or admin" mutations.
+     * <p>
+     * Allows the call when the caller is an admin, or when the target
+     * {@code memberId} resolves to a member whose e-mail matches the
+     * caller's authenticated principal. Throws a {@code forbidden}
+     * {@link CustomGraphQLException} otherwise so the client gets a
+     * stable error code (already mapped on the Flutter side as
+     * "permission denied").
+     * <p>
+     * Returns the fetched {@link Member} so callers that need to
+     * inspect the target (e.g. for additional privilege-escalation
+     * checks) can do so without a second DB read.
+     *
+     * @param memberId       the id of the member being edited
+     * @param authentication the current Spring Security authentication
+     * @return the target {@link Member}
+     */
+    private Member ensureCanEdit(long memberId, Authentication authentication) {
+        final Member target = memberService.getMemberById(memberId);
+        if (isAdmin(authentication)) return target;
+        if (target.getEmail() == null
+                || !target.getEmail().equalsIgnoreCase(authentication.getName())) {
+            log.info("Caller {} tried to edit member {} ({}) — refused", authentication.getName(), memberId, target.getEmail());
+            throw new CustomGraphQLException("forbidden",
+                    "You can only modify your own profile");
+        }
+        return target;
+    }
+
+    /**
+     * Returns whether the given authentication carries the
+     * {@code ROLE_ADMIN} authority. Stays role-string based (rather
+     * than depending on the role hierarchy) to keep the check
+     * unambiguous: a {@code MEMBER} or {@code USER} is NOT admin for
+     * the purpose of cross-member edits, regardless of any future
+     * hierarchy tweaks.
+     */
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
     }
 
     /**

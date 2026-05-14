@@ -20,7 +20,7 @@
 
 package com.ccteam.graphql.repository;
 
-import com.ccteam.graphql.entities.BoardRole;
+import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.entities.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -20,6 +20,7 @@
 
 package com.ccteam.graphql.entities;
 
+import com.ccteam.graphql.enums.BoardRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
