@@ -21,9 +21,9 @@
 package com.ccteam.graphql.controller.graphql;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
-import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.MembershipFee;
+import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -64,6 +64,17 @@ public class MemberController {
     public List<Member> getAllMembers() {
         log.info("Received call to getAllMembers");
         return memberService.getAllMembers();
+    }
+
+    /**
+     * Lightweight count of all members in the database. Exposed at
+     * the USER level so it can be accessible to non-MEMBER users.
+     */
+    @PreAuthorize("hasRole('USER')")
+    @QueryMapping
+    public Long getMembersCount() {
+        log.info("Received call to getMembersCount");
+        return memberService.getMembersCount();
     }
 
     /**
@@ -269,7 +280,7 @@ public class MemberController {
         final Member target = memberService.getMemberById(memberId);
         if (isAdmin(authentication)) return target;
         if (target.getEmail() == null
-                || !target.getEmail().equalsIgnoreCase(authentication.getName())) {
+            || !target.getEmail().equalsIgnoreCase(authentication.getName())) {
             log.info("Caller {} tried to edit member {} ({}) — refused", authentication.getName(), memberId, target.getEmail());
             throw new CustomGraphQLException("forbidden",
                     "You can only modify your own profile");

@@ -66,6 +66,14 @@ public class MemberService {
     }
 
     /**
+     * Lightweight count of all members. Exposed at
+     * the USER level so it can be accessible to non-MEMBER users.
+     */
+    public long getMembersCount() {
+        return memberRepository.count();
+    }
+
+    /**
      * Get a member given its {@code id}.
      *
      * @param id The ID of the member to retrieve

@@ -34,8 +34,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -52,6 +54,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AccountController {
 
     public static final String ZONE_ID_EUROPE_PARIS = "Europe/Paris";
+    public static final int OTP_RESEND_COOLDOWN_SECONDS = 60;
+    public static final int OTP_VALIDITY_MINUTES = 10;
 
     private final MemberRepository memberRepository;
     private final MailService mailService;
@@ -100,14 +104,18 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        // account exist, OTP has been sent and is still valid
-        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isBefore(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)).plusMinutes(10))) {
+        // account exist, OTP has been sent and is still valid (OTP was generated less than OTP_VALIDITY_MINUTES ago)
+        final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
+        final LocalDateTime expiryThreshold = now.minusMinutes(OTP_VALIDITY_MINUTES);
+        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate() != null
+            && member.get().getOtpDate().isAfter(expiryThreshold)) {
             log.info("Account with e-mail address {} exist, OTP has been sent and is still valid", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.FOUND).build();
         }
 
-        // account exist, OTP has been sent but is not valid anymore
-        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate().isAfter(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)).plusMinutes(10))) {
+        // account exist, OTP has been sent but is not valid anymore (OTP was generated more than OTP_VALIDITY_MINUTES ago)
+        if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate() != null
+            && member.get().getOtpDate().isBefore(expiryThreshold)) {
             log.info("Account with e-mail address {} exist, OTP has been sent but is not valid anymore", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
@@ -196,19 +204,27 @@ public class AccountController {
     /**
      * Send a new one-time password to the specified e-mail address.
      * <p>
-     * It is used in case user has not entered the OTP in the given time, or if he manually asks a new OTP.
+     * Used when the user didn't receive the first OTP or didn't enter
+     * it in time. Rate-limited to {@value OTP_RESEND_COOLDOWN_SECONDS}
+     * seconds between two resends per account, enforced by comparing
+     * {@code member.otpDate} (which is updated by both {@code preRegister}
+     * and this endpoint) to {@code now}. The cooldown therefore also
+     * applies between the initial registration and the first resend,
+     * not just between two consecutive resends.
      *
      * @param resendOtpRequest The request data containing the user's e-mail address
      * @return An empty body response with one of the following HTTP status :
      * <ul>
      * <li>400 Bad request if e-mail address is missing from the request</li>
      * <li>404 Not Found if no account has been found for the specified e-mail address</li>
+     * <li>429 Too Many Requests if the cooldown hasn't elapsed yet — body
+     *     carries {@code {"secondsLeft": N}}</li>
      * <li>207 Multi-status if the OTP has been successfully updated but the mail failed to be sent</li>
      * <li>200 Ok if OTP has been resent successfully</li>
      * </ul>
      */
     @PostMapping("/rest/resendOtp")
-    public ResponseEntity<HttpStatus> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
+    public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
 
         log.info("Call to resendOtp REST endpoint");
 
@@ -225,6 +241,19 @@ public class AccountController {
         if (member.isEmpty()) {
             log.info("E-mail address {} has not been found", resendOtpRequest.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // enforce the resend cooldown so a flood of clicks (or a script) can't trigger a flood of mails to the user's inbox
+        final LocalDateTime lastOtpDate = member.get().getOtpDate();
+        if (lastOtpDate != null) {
+            final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
+            final long elapsedSeconds = Duration.between(lastOtpDate, now).getSeconds();
+            if (elapsedSeconds < OTP_RESEND_COOLDOWN_SECONDS) {
+                final long secondsLeft = OTP_RESEND_COOLDOWN_SECONDS - elapsedSeconds;
+                log.info("Resend refused for {} — cooldown active, {} s left", resendOtpRequest.getEmail(), secondsLeft);
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(Collections.singletonMap("secondsLeft", secondsLeft));
+            }
         }
 
         // generate a new OTP and save the user
@@ -287,9 +316,10 @@ public class AccountController {
 
         final Member member = optMember.get();
 
-        // specified OTP has expired
-        if (member.getOtpDate().isAfter(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)).plusMinutes(10))) {
-            log.info("Specified OTP has expired");
+        // specified OTP has expired (generated more than OTP_VALIDITY_MINUTES ago)
+        final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
+        if (member.getOtpDate() == null || member.getOtpDate().isBefore(now.minusMinutes(OTP_VALIDITY_MINUTES))) {
+            log.info("Specified OTP has expired (otpDate = {}, now = {})", member.getOtpDate(), now);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 

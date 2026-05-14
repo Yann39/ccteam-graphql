@@ -20,10 +20,10 @@
 
 package com.ccteam.graphql.controller.graphql;
 
-import com.ccteam.graphql.service.EventService;
 import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.Track;
+import com.ccteam.graphql.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -63,6 +63,17 @@ public class EventController {
     }
 
     /**
+     * Lightweight count of all events in the database. USER-accessible
+     * even when the caller is not yet a fully-validated MEMBER.
+     */
+    @PreAuthorize("hasRole('USER')")
+    @QueryMapping
+    public Long getEventsCount() {
+        log.info("Received call to getEventsCount");
+        return eventService.getEventsCount();
+    }
+
+    /**
      * Get all events in the specified year, based on event start date.
      *
      * @param year The year of the events to retrieve
@@ -86,7 +97,7 @@ public class EventController {
     @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getEventsByMonthAndYear(@Argument int month,
-            @Argument int year) {
+                                               @Argument int year) {
         log.info("Received call to getEventsByMonthAndYear with parameters month = {}, year = {}", month, year);
         return eventService.getEventsByMonthAndYear(month, year);
     }
@@ -104,8 +115,8 @@ public class EventController {
     @PreAuthorize("hasRole('USER')")
     @QueryMapping
     public List<Event> getEventsByDayAndMonthAndYear(@Argument int day,
-            @Argument int month,
-            @Argument int year) {
+                                                     @Argument int month,
+                                                     @Argument int year) {
         log.info("Received call to getEventsByDayAndMonthAndYear with parameters day = {}, month = {}, year = {}", day,
                 month, year);
         return eventService.getEventsByDayAndMonthAndYear(day, month, year);
@@ -153,13 +164,13 @@ public class EventController {
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Event createEvent(@Argument String title,
-            @Argument String description,
-            @Argument String startDate,
-            @Argument String endDate,
-            @Argument long trackId,
-            @Argument String organizer,
-            @Argument BigDecimal price,
-            @Argument long memberId) {
+                             @Argument String description,
+                             @Argument String startDate,
+                             @Argument String endDate,
+                             @Argument long trackId,
+                             @Argument String organizer,
+                             @Argument BigDecimal price,
+                             @Argument long memberId) {
         log.info(
                 "Received call to createEvent with parameters title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizer = {}, price = {}, memberId = {}",
                 title, description, startDate, endDate, trackId, organizer, price, memberId);
@@ -183,14 +194,14 @@ public class EventController {
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Event updateEvent(@Argument long eventId,
-            @Argument String title,
-            @Argument String description,
-            @Argument String startDate,
-            @Argument String endDate,
-            @Argument long trackId,
-            @Argument String organizer,
-            @Argument BigDecimal price,
-            @Argument long memberId) {
+                             @Argument String title,
+                             @Argument String description,
+                             @Argument String startDate,
+                             @Argument String endDate,
+                             @Argument long trackId,
+                             @Argument String organizer,
+                             @Argument BigDecimal price,
+                             @Argument long memberId) {
         log.info(
                 "Received call to updateEvent with parameters eventId = {}, title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizer = {}, price = {}, memberId = {}",
                 eventId, title, description, startDate, endDate, trackId, organizer, price, memberId);

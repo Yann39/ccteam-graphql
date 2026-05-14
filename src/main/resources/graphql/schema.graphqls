@@ -35,8 +35,10 @@ type Query {
     getMemberById(id: Long!): Member
     getMemberByEmail(email: String!): Member
     getMembersFiltered(text: String): [Member]
+    getMembersCount: Long
 
     getAllEvents: [Event]
+    getEventsCount: Long
     getEventsByYear(year: Int!): [Event]
     getEventsByMonthAndYear(month: Int!, year: Int!): [Event]
     getEventsByDayAndMonthAndYear(day: Int!, month: Int!, year: Int!): [Event]

@@ -68,6 +68,14 @@ public class EventService {
     }
 
     /**
+     * Lightweight count of all events. USER-accessible
+     * even when the caller is not yet a fully-validated MEMBER.
+     */
+    public long getEventsCount() {
+        return eventRepository.count();
+    }
+
+    /**
      * Get all events in the specified year, based on event start date.
      *
      * @param year The year of the events to retrieve

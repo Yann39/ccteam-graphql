@@ -98,6 +98,12 @@ public class Member {
     @Column
     private LocalDateTime registrationDate;
 
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts = 0;
+    
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<LikedNews> likedNews;
 
