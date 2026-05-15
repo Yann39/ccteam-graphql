@@ -59,23 +59,6 @@ INSERT INTO `ccteam`.`event` (`id`, `title`, `description`, `start_date`, `end_d
 (13, 'Roulage Le Mans', 'Roulage libre au Mans avec H2S', '2019-07-22 00:00:00', '2019-07-23 00:00:00', 7, 'H2S', 340, '2019-03-01 12:00:00', 1, NULL, NULL),
 (14, 'Roulage Alès', 'Roulage libre à Alès avec ActivBike', '2019-10-27 00:00:00', '2019-10-28 00:00:00', 10, 'ActivBike', 254, '2019-03-01 12:00:00', 1, NULL, NULL);
 
-INSERT INTO `ccteam`.`gallery` (`id`, `title`, `description`, `created_on`, `modified_on`) VALUES
-(1, 'Divers', 'Gallerie par défaut', '2020-05-29 23:18:52', NULL),
-(2, 'Alès 2018', 'Roulage à Alès avec ActivBike en octobre 2018', '2020-06-02 09:25:17', NULL),
-(3, 'Lédenon 2018', 'Roulage à Alès avec ActivBike en octobre 2018', '2020-06-02 09:25:17', NULL);
-
-INSERT INTO `ccteam`.`photo` (`id`, `title`, `description`, `link`, `created_on`, `modified_on`) VALUES
-(1, 'Lorenzo', 'Lorenzo qui célèbre sa victoire', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1575.jpg', '2018-09-12 08:33:19', NULL),
-(2, 'Marc Màrquez', 'Marc Màrquez dans le 1er virage', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1548.jpg', '2018-02-08 13:30:29', NULL),
-(3, 'Johann Zarco', 'Johann Zarco', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1464.jpg', '2018-04-20 15:14:27', NULL),
-(4, 'Enea Bastianini', 'Enea Bastianini', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1274.jpg', '2018-11-21 13:09:04', NULL),
-(5, 'Jorge Lorenzo', 'Jorge Lorenzo', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1576', '2019-01-16 21:49:01', NULL),
-(6, 'Show aérien', 'Show aérien', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1417.jpg', '2019-01-16 21:50:52', NULL),
-(7, 'Marc Márquez', 'Marc Márquez', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1478.jpg', '2019-01-16 21:51:19', NULL),
-(8, 'Oliveira', 'Oliveira', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1293', '2019-01-16 21:50:31', NULL),
-(9, 'Départ MotoGP', 'Départ MotoGP', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1441', '2019-01-16 21:49:31', NULL),
-(10, 'Cal Crutchlow', 'Cal', 'http://photos.example.com/wp-content/uploads/2018/06/IMG_1400.jpg', '2019-02-11 21:05:16', NULL);
-
 INSERT INTO `ccteam`.`event_member` (`id`, `event_id`, `member_id`, `created_on`) VALUES
 (1, 3, 2, '2018-06-01 09:35:07'),
 (2, 1, 1, '2018-02-08 14:30:29'),

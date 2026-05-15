@@ -58,7 +58,7 @@ public class Member {
     @Column(length = 13)
     private String phone;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "attachment_id")
     private Attachment avatar;
 
@@ -100,7 +100,7 @@ public class Member {
 
     @Column(name = "failed_login_attempts", nullable = false)
     private int failedLoginAttempts = 0;
-    
+
     @Column(name = "locked_until")
     private LocalDateTime lockedUntil;
 

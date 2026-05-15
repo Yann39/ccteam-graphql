@@ -148,14 +148,6 @@ type EventMember {
     createdOn: LocalDateTime!
 }
 
-type Gallery {
-    id: ID!
-    title: String!
-    description: String
-    createdOn: LocalDateTime!
-    modifiedOn: LocalDateTime
-}
-
 type LapRecord {
     id: ID!
     track: Track!
@@ -223,16 +215,6 @@ type News {
     createdBy: Member!
     modifiedOn: LocalDateTime
     modifiedBy: Member
-}
-
-type Photo {
-    id: ID!
-    title: String!
-    description: String
-    link: String!
-    gallery: Gallery!
-    createdOn: LocalDateTime!
-    modifiedOn: LocalDateTime
 }
 
 type Track {

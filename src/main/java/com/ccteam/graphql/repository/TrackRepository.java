@@ -37,16 +37,16 @@ import java.util.Optional;
 @Repository
 public interface TrackRepository extends JpaRepository<Track, Long> {
 
-    @Query("select t from Track t join fetch t.country")
+    @Query("select t from Track t join fetch t.country order by t.name")
     List<Track> findAllCustom();
 
     @Query("select t from Track t join fetch t.country where t.id = :id")
     Optional<Track> findByIdCustom(long id);
 
     @Query("select t from Track t join fetch t.country " +
-            "where :text is null or ( " +
-            "t.name like %:text%" +
-            ")")
+           "where :text is null or ( " +
+           "t.name like %:text%" +
+           ") order by t.name")
     List<Track> findFilteredCustom(String text);
 
 }

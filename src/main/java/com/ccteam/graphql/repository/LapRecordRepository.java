@@ -38,26 +38,26 @@ import java.util.Optional;
 public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
 
     @Query("select distinct lr from LapRecord lr " +
-            "left join fetch lr.member " +
-            "left join fetch lr.track")
+           "left join fetch lr.member " +
+           "left join fetch lr.track")
     List<LapRecord> findAllCustom();
 
     @Query("select lr from LapRecord lr " +
-            "left join fetch lr.member " +
-            "left join fetch lr.track " +
-            "where lr.id = :id ")
+           "left join fetch lr.member " +
+           "left join fetch lr.track " +
+           "where lr.id = :id ")
     Optional<LapRecord> findByIdCustom(long id);
 
     @Query("select lr from LapRecord lr " +
-            "left join fetch lr.member m " +
-            "left join fetch lr.track " +
-            "where m.id = :id")
+           "left join fetch lr.member m " +
+           "left join fetch lr.track " +
+           "where m.id = :id")
     List<LapRecord> findByMemberIdCustom(long id);
 
     @Query("select lr from LapRecord lr " +
-            "left join fetch lr.member " +
-            "left join fetch lr.track t " +
-            "where t.id = :id")
+           "left join fetch lr.member " +
+           "left join fetch lr.track t " +
+           "where t.id = :id")
     List<LapRecord> findByTrackIdCustom(long id);
 
 }

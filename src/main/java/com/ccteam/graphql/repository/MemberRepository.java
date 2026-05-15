@@ -39,6 +39,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select distinct m from Member m " +
+           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event " +
            "left join fetch m.likedNews ln " +
@@ -72,6 +73,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmailCustom(String email);
 
     @Query("select distinct m from Member m " +
+           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event " +
            "left join fetch m.likedNews ln " +
