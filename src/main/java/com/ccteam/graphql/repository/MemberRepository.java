@@ -53,6 +53,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "left join fetch m.eventMembers em " +
            "left join fetch em.event e " +
            "left join fetch e.participants " +
+           "left join fetch em.bike " +
            "left join fetch m.likedNews ln " +
            "left join fetch ln.news " +
            "left join fetch m.bikes " +
@@ -65,6 +66,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "left join fetch m.eventMembers em " +
            "left join fetch em.event e " +
            "left join fetch e.participants " +
+           "left join fetch em.bike " +
            "left join fetch m.likedNews ln " +
            "left join fetch ln.news " +
            "left join fetch m.bikes " +

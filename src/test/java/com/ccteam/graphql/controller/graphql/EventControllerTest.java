@@ -25,6 +25,7 @@ import com.ccteam.graphql.entities.EventMember;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.Track;
 import com.ccteam.graphql.service.EventService;
+import com.ccteam.graphql.service.MemberService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -56,6 +57,9 @@ class EventControllerTest {
 
     @MockBean
     private EventService eventService;
+
+    @MockBean
+    private MemberService memberService;
 
     private Event eventBresse;
 

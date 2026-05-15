@@ -21,10 +21,8 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
-import com.ccteam.graphql.entities.Event;
-import com.ccteam.graphql.entities.EventMember;
-import com.ccteam.graphql.entities.Member;
-import com.ccteam.graphql.entities.Track;
+import com.ccteam.graphql.entities.*;
+import com.ccteam.graphql.repository.BikeRepository;
 import com.ccteam.graphql.repository.EventRepository;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.repository.TrackRepository;
@@ -50,12 +48,14 @@ public class EventService {
     private final EventRepository eventRepository;
     private final TrackRepository trackRepository;
     private final MemberRepository memberRepository;
+    private final BikeRepository bikeRepository;
 
     public EventService(EventRepository eventRepository, TrackRepository trackRepository,
-                        MemberRepository memberRepository) {
+                        MemberRepository memberRepository, BikeRepository bikeRepository) {
         this.eventRepository = eventRepository;
         this.trackRepository = trackRepository;
         this.memberRepository = memberRepository;
+        this.bikeRepository = bikeRepository;
     }
 
     /**
@@ -255,10 +255,15 @@ public class EventService {
      *
      * @param eventId  The event ID
      * @param memberId The member ID
+     * @param bikeId   Optional bike id to pin to the participation; pass
+     *                 {@code null} to register without committing to a
+     *                 bike (the member can pick later via
+     *                 {@link #setEventMemberBike}). When non-null, the
+     *                 bike must belong to {@code memberId}.
      * @return An {@link Event} object representing the event just registered
      */
     @Transactional
-    public Event registerToEvent(long eventId, long memberId) throws CustomGraphQLException {
+    public Event registerToEvent(long eventId, long memberId, Long bikeId) throws CustomGraphQLException {
 
         // check that the event exists
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
@@ -283,16 +288,77 @@ public class EventService {
                     "Specified member is already registered to specified event");
         }
 
+        // resolve and validate the optional bike — must belong to the same member
+        final Bike bike = bikeId != null ? resolveOwnedBike(bikeId, memberId) : null;
+
         // create new participation and add it to the event (JPA will handle the rest
         // via cascade)
         final EventMember participation = new EventMember();
         participation.setEvent(event);
         participation.setMember(memberOptional.get());
+        participation.setBike(bike);
         participation.setCreatedOn(LocalDateTime.now());
         event.getParticipants().add(participation);
 
         // save the event to persist the new participation
         return eventRepository.save(event);
+    }
+
+    /**
+     * Change (or clear, by passing {@code null}) the bike pinned to the
+     * participation of {@code memberId} in event {@code eventId}. The
+     * member must already be registered to the event, and the bike (if
+     * any) must belong to {@code memberId}.
+     *
+     * @param eventId  the event id
+     * @param memberId the member id
+     * @param bikeId   the bike id to pin, or {@code null} to clear
+     * @return the updated {@link Event}
+     */
+    @Transactional
+    public Event setEventMemberBike(long eventId, long memberId, Long bikeId) throws CustomGraphQLException {
+
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id {} not found in the database", eventId);
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+
+        final Optional<EventMember> participationOptional = event.getParticipants().stream()
+                .filter(em -> em.getMember().getId().equals(memberId)).findFirst();
+        if (participationOptional.isEmpty()) {
+            log.error("Member with id {} is not registered to event id {}, cannot set bike", memberId, eventId);
+            throw new CustomGraphQLException("member_not_registered_to_event",
+                    "Specified member is not registered to specified event");
+        }
+
+        final Bike bike = bikeId != null ? resolveOwnedBike(bikeId, memberId) : null;
+        participationOptional.get().setBike(bike);
+
+        return eventRepository.save(event);
+    }
+
+    /**
+     * Load the bike with the given id and verify it belongs to the
+     * specified member. Throws {@code bike_not_found} when the bike
+     * doesn't exist, and {@code bike_not_owned} when it belongs to
+     * someone else — the latter is the kind of cross-member tampering
+     * we explicitly want to forbid here.
+     */
+    private Bike resolveOwnedBike(long bikeId, long memberId) {
+        final Optional<Bike> bikeOptional = bikeRepository.findById(bikeId);
+        if (bikeOptional.isEmpty()) {
+            log.error("Bike with id {} not found in the database", bikeId);
+            throw new CustomGraphQLException("bike_not_found", "Specified bike has not been found in the database");
+        }
+        final Bike bike = bikeOptional.get();
+        if (bike.getMember() == null || !bike.getMember().getId().equals(memberId)) {
+            log.error("Bike id {} does not belong to member id {} — refusing", bikeId, memberId);
+            throw new CustomGraphQLException("bike_not_owned", "Specified bike does not belong to the specified member");
+        }
+        return bike;
     }
 
     /**
@@ -329,8 +395,7 @@ public class EventService {
                     "Specified member is not registered to specified event");
         }
 
-        // remove the participation from the event (JPA will handle the rest via
-        // orphanRemoval)
+        // remove the participation from the event (JPA will handle the rest via orphanRemoval)
         event.getParticipants().remove(participationOptional.get());
 
         // save the event to persist the removal

@@ -71,8 +71,9 @@ type Mutation {
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
     deleteEvent(eventId: Long!): Event
-    registerToEvent(eventId: Long!, memberId: Long!): Event
+    registerToEvent(eventId: Long!, memberId: Long!, bikeId: Long): Event
     unregisterFromEvent(eventId: Long!, memberId: Long!): Event
+    setEventMemberBike(eventId: Long!, bikeId: Long): Event
 
     createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
     updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
@@ -145,6 +146,7 @@ type EventMember {
     id: ID!
     member: Member!
     event: Event!
+    bike: Bike
     createdOn: LocalDateTime!
 }
 

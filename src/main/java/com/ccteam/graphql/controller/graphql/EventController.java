@@ -20,15 +20,18 @@
 
 package com.ccteam.graphql.controller.graphql;
 
+import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.Track;
 import com.ccteam.graphql.service.EventService;
+import com.ccteam.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
@@ -45,9 +48,11 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final MemberService memberService;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, MemberService memberService) {
         this.eventService = eventService;
+        this.memberService = memberService;
     }
 
     /**
@@ -227,13 +232,19 @@ public class EventController {
      *
      * @param eventId  The event ID
      * @param memberId The member ID
+     * @param bikeId   Optional bike id to pin to the participation (may
+     *                 be {@code null}). When non-null, the bike must
+     *                 belong to {@code memberId}.
      * @return An {@link Event} object representing the event just registered
      */
     @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
-    public Event registerToEvent(@Argument long eventId, @Argument long memberId) {
-        log.info("Received call to registerToEvent with parameters eventId = {}, memberId = {}", eventId, memberId);
-        return eventService.registerToEvent(eventId, memberId);
+    public Event registerToEvent(@Argument long eventId,
+                                 @Argument long memberId,
+                                 @Argument Long bikeId) {
+        log.info("Received call to registerToEvent with parameters eventId = {}, memberId = {}, bikeId = {}",
+                eventId, memberId, bikeId);
+        return eventService.registerToEvent(eventId, memberId, bikeId);
     }
 
     /**
@@ -248,6 +259,35 @@ public class EventController {
     public Event unregisterFromEvent(@Argument long eventId, @Argument long memberId) {
         log.info("Received call to unregisterFromEvent with parameters eventId = {}, memberId = {}", eventId, memberId);
         return eventService.unregisterFromEvent(eventId, memberId);
+    }
+
+    /**
+     * Change (or clear, by passing a {@code null} bike) the bike pinned
+     * to the caller's own participation in event {@code eventId}.
+     * <p>
+     * The acting member is derived from {@link Authentication} (JWT
+     * subject) rather than taken as a separate argument — a member can
+     * only edit their own participation, not anyone else's, so there's
+     * no need to surface a {@code memberId} parameter that an admin
+     * dashboard would otherwise be tempted to spoof. Keeps the mutation
+     * intent unambiguous on the wire.
+     *
+     * @param eventId        the event id
+     * @param bikeId         the bike id to pin, or {@code null} to clear
+     * @param authentication the current authentication (auto-injected)
+     * @return the updated {@link Event}
+     */
+    @PreAuthorize("hasRole('MEMBER')")
+    @MutationMapping
+    public Event setEventMemberBike(@Argument long eventId,
+                                    @Argument Long bikeId,
+                                    Authentication authentication) {
+        log.info("Received call to setEventMemberBike with parameters eventId = {}, bikeId = {}", eventId, bikeId);
+        final Member caller = memberService.getMemberByEmail(authentication.getName());
+        if (caller == null || caller.getId() == null) {
+            throw new CustomGraphQLException("member_not_found", "Authenticated member could not be resolved");
+        }
+        return eventService.setEventMemberBike(eventId, caller.getId(), bikeId);
     }
 
 }

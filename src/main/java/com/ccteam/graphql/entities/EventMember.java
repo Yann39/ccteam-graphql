@@ -49,6 +49,10 @@ public class EventMember {
     @JoinColumn(name = "event_id")
     Event event;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bike_id")
+    private Bike bike;
+
     @Column(nullable = false)
     private LocalDateTime createdOn = LocalDateTime.now();
 
