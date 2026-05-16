@@ -20,7 +20,9 @@ query GetEventsByDayAndMonthAndYear ($day: Int!, $month: Int!, $year: Int!) {
                 email
             }
         }
-        organizer
+        organizer {
+            name
+        }
         price
         createdOn
         createdBy {

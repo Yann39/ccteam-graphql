@@ -20,7 +20,9 @@ query {
                 email
             }
         }
-        organizer
+        organizer {
+            name
+        }
         price
         createdOn
         createdBy {

@@ -20,9 +20,9 @@
 
 package com.ccteam.graphql.repository;
 
-import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.entities.Attachment;
 import com.ccteam.graphql.entities.Member;
+import com.ccteam.graphql.enums.BoardRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -41,11 +41,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select distinct m from Member m " +
            "left join fetch m.eventMembers em " +
-           "left join fetch em.event " +
+           "left join fetch em.event e " +
+           "left join fetch e.organizer " +
            "left join fetch m.likedNews ln " +
            "left join fetch ln.news " +
            "left join fetch m.bikes " +
-           "left join fetch m.membershipFees")
+           "left join fetch m.membershipFees " +
+           "order by m.firstName, m.lastName")
     List<Member> findAllCustom();
 
     @Query("select m from Member m " +
@@ -53,6 +55,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "left join fetch m.eventMembers em " +
            "left join fetch em.event e " +
            "left join fetch e.participants " +
+           "left join fetch e.organizer " +
            "left join fetch em.bike " +
            "left join fetch m.likedNews ln " +
            "left join fetch ln.news " +
@@ -65,6 +68,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "left join fetch m.eventMembers em " +
            "left join fetch em.event e " +
            "left join fetch e.participants " +
+           "left join fetch e.organizer " +
            "left join fetch em.bike " +
            "left join fetch m.likedNews ln " +
            "left join fetch ln.news " +
@@ -75,7 +79,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select distinct m from Member m " +
            "left join fetch m.eventMembers em " +
-           "left join fetch em.event " +
+           "left join fetch em.event e " +
+           "left join fetch e.organizer " +
            "left join fetch m.likedNews ln " +
            "left join fetch ln.news " +
            "left join fetch m.bikes " +
@@ -84,7 +89,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "m.firstName like %:text% " +
            "or m.lastName like %:text% " +
            "or m.email like %:text%" +
-           ")")
+           ") " +
+           "order by m.firstName, m.lastName")
     List<Member> findFilteredCustom(String text);
 
     /**

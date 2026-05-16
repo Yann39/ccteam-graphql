@@ -25,6 +25,7 @@ import com.ccteam.graphql.entities.*;
 import com.ccteam.graphql.repository.BikeRepository;
 import com.ccteam.graphql.repository.EventRepository;
 import com.ccteam.graphql.repository.MemberRepository;
+import com.ccteam.graphql.repository.OrganizerRepository;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,13 +50,16 @@ public class EventService {
     private final TrackRepository trackRepository;
     private final MemberRepository memberRepository;
     private final BikeRepository bikeRepository;
+    private final OrganizerRepository organizerRepository;
 
     public EventService(EventRepository eventRepository, TrackRepository trackRepository,
-                        MemberRepository memberRepository, BikeRepository bikeRepository) {
+                        MemberRepository memberRepository, BikeRepository bikeRepository,
+                        OrganizerRepository organizerRepository) {
         this.eventRepository = eventRepository;
         this.trackRepository = trackRepository;
         this.memberRepository = memberRepository;
         this.bikeRepository = bikeRepository;
+        this.organizerRepository = organizerRepository;
     }
 
     /**
@@ -151,12 +155,19 @@ public class EventService {
      */
     @Transactional
     public Event createEvent(String title, String description, String startDate, String endDate, long trackId,
-                             String organizer, BigDecimal price, long memberId) {
+                             long organizerId, BigDecimal price, long memberId) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
             throw new CustomGraphQLException("track_not_found",
                     "Specified track ID has not been found in the database");
+        }
+
+        final Optional<Organizer> organizerOptional = organizerRepository.findById(organizerId);
+        if (organizerOptional.isEmpty()) {
+            log.error("Organizer with id {} not found in the database", organizerId);
+            throw new CustomGraphQLException("organizer_not_found",
+                    "Specified organizer ID has not been found in the database");
         }
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
@@ -172,7 +183,7 @@ public class EventService {
         event.setStartDate(LocalDateTime.parse(startDate));
         event.setEndDate(LocalDateTime.parse(endDate));
         event.setTrack(trackOptional.get());
-        event.setOrganizer(organizer);
+        event.setOrganizer(organizerOptional.get());
         event.setPrice(price);
         event.setCreatedBy(memberOptional.get());
         event.setCreatedOn(LocalDateTime.now());
@@ -188,14 +199,14 @@ public class EventService {
      * @param startDate   The start date of the event as ISO {@link String}
      * @param endDate     The end date of the event as ISO {@link String}
      * @param trackId     The ID of the {@link Track} where the event takes place
-     * @param organizer   The organizer of the event
+     * @param organizerId The ID of the organizer of the event
      * @param price       The event price
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just updated
      */
     @Transactional
     public Event updateEvent(long eventId, String title, String description, String startDate, String endDate,
-                             long trackId, String organizer, BigDecimal price, long memberId) {
+                             long trackId, long organizerId, BigDecimal price, long memberId) {
         final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
         if (eventOptional.isEmpty()) {
             log.error("Event with id {} not found in the database", eventId);
@@ -208,6 +219,13 @@ public class EventService {
             log.error("Track with id {} not found in the database", trackId);
             throw new CustomGraphQLException("track_not_found",
                     "Specified track ID has not been found in the database");
+        }
+
+        final Optional<Organizer> organizerOptional = organizerRepository.findById(organizerId);
+        if (organizerOptional.isEmpty()) {
+            log.error("Organizer with id {} not found in the database", organizerId);
+            throw new CustomGraphQLException("organizer_not_found",
+                    "Specified organizer ID has not been found in the database");
         }
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
@@ -223,7 +241,7 @@ public class EventService {
         event.setStartDate(LocalDateTime.parse(startDate));
         event.setEndDate(LocalDateTime.parse(endDate));
         event.setTrack(trackOptional.get());
-        event.setOrganizer(organizer);
+        event.setOrganizer(organizerOptional.get());
         event.setPrice(price);
         event.setModifiedBy(memberOptional.get());
         event.setModifiedOn(LocalDateTime.now());

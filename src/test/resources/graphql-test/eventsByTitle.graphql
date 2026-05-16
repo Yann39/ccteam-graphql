@@ -20,7 +20,9 @@ query GetEventsByTitle ($title: String!) {
                 email
             }
         }
-        organizer
+        organizer {
+            name
+        }
         price
         createdOn
         createdBy {

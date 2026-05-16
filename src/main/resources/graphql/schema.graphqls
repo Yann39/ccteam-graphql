@@ -45,6 +45,8 @@ type Query {
     getEventById(id: Long!): Event
     getEventsByTitle(title: String!): [Event]
 
+    getAllOrganizers: [Organizer]
+
     getAllTracks: [Track]
     getTrackById(id: Long!): Track
     getTracksFiltered(text: String): [Track]
@@ -68,12 +70,14 @@ type Mutation {
     setMemberPalette(memberId: Long!, headerPalette: Int): Member
     changePasscode(currentPasscode: String!, newPasscode: String!): Boolean
 
-    createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
-    updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizer: String!, price: Float!, memberId: Long!): Event
+    createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizerId: Long!, price: Float!, memberId: Long!): Event
+    updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizerId: Long!, price: Float!, memberId: Long!): Event
     deleteEvent(eventId: Long!): Event
     registerToEvent(eventId: Long!, memberId: Long!, bikeId: Long): Event
     unregisterFromEvent(eventId: Long!, memberId: Long!): Event
     setEventMemberBike(eventId: Long!, bikeId: Long): Event
+
+    createOrganizer(name: String!): Organizer
 
     createTrack(name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
     updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
@@ -133,13 +137,18 @@ type Event {
     startDate: LocalDateTime!
     endDate: LocalDateTime!
     track: Track
-    organizer: String
+    organizer: Organizer
     price: Float
     participants: [EventMember]
     createdOn: LocalDateTime!
     createdBy: Member!
     modifiedOn: LocalDateTime
     modifiedBy: Member
+}
+
+type Organizer {
+    id: ID!
+    name: String!
 }
 
 type EventMember {

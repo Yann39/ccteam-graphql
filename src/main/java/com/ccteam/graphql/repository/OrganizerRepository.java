@@ -20,41 +20,24 @@
 
 package com.ccteam.graphql.repository;
 
-import com.ccteam.graphql.entities.Track;
+import com.ccteam.graphql.entities.Organizer;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link Track} repository.
+ * {@link Organizer} repository.
  *
  * @author yann39
  * @since 1.0.0
  */
 @Repository
-public interface TrackRepository extends JpaRepository<Track, Long> {
+public interface OrganizerRepository extends JpaRepository<Organizer, Long> {
 
-    @Query("select t " +
-           "from Track t " +
-           "join fetch t.country " +
-           "order by t.name")
-    List<Track> findAllCustom();
-
-    @Query("select t " +
-           "from Track t " +
-           "join fetch t.country " +
-           "where t.id = :id")
-    Optional<Track> findByIdCustom(long id);
-
-    @Query("select t " +
-           "from Track t " +
-           "join fetch t.country " +
-           "where :text is null or ( " +
-           "t.name like %:text%" +
-           ") order by t.name")
-    List<Track> findFilteredCustom(String text);
+    /**
+     * Case-insensitive lookup by name.
+     */
+    Optional<Organizer> findByNameIgnoreCaseOrderByName(String name);
 
 }

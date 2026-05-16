@@ -58,8 +58,9 @@ public class Event {
     @JoinColumn(name = "track_id")
     private Track track;
 
-    @Column(length = 64)
-    private String organizer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organizer_id")
+    private Organizer organizer;
 
     @Column(precision = 6, scale = 2)
     private BigDecimal price;

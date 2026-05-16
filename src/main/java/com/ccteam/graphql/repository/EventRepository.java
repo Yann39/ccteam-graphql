@@ -41,35 +41,43 @@ public interface EventRepository extends JpaRepository<Event, Long> {
            "left join fetch e.track t " +
            "left join fetch e.participants p " +
            "left join fetch p.member " +
+           "left join fetch e.organizer " +
            "left join fetch e.createdBy " +
-           "left join fetch e.modifiedBy")
+           "left join fetch e.modifiedBy " +
+           "order by e.startDate desc")
     List<Event> findAllCustom();
 
     @Query("select e from Event e " +
            "left join fetch e.track t " +
            "left join fetch e.participants p " +
+           "left join fetch e.organizer " +
            "left join fetch e.createdBy " +
            "left join fetch e.modifiedBy " +
-           "where year(e.startDate) = :year")
+           "where year(e.startDate) = :year " +
+           "order by e.startDate desc")
     List<Event> findByYearCustom(int year);
 
     @Query("select e from Event e " +
            "left join fetch e.track t " +
            "left join fetch e.participants p " +
+           "left join fetch e.organizer " +
            "left join fetch e.createdBy " +
            "left join fetch e.modifiedBy " +
            "where month(e.startDate) = :month " +
-           "and year(e.startDate) = :year")
+           "and year(e.startDate) = :year " +
+           "order by e.startDate desc")
     List<Event> findByMonthAndYearCustom(int month, int year);
 
     @Query("select e from Event e " +
            "left join fetch e.track t " +
            "left join fetch e.participants p " +
+           "left join fetch e.organizer " +
            "left join fetch e.createdBy " +
            "left join fetch e.modifiedBy " +
            "where day(e.startDate) = :day " +
            "and month(e.startDate) = :month " +
-           "and year(e.startDate) = :year")
+           "and year(e.startDate) = :year " +
+           "order by e.startDate desc")
     List<Event> findByDayAndMonthAndYearCustom(int day, int month, int year);
 
     @Query("select e from Event e " +
@@ -77,6 +85,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
            "left join fetch e.participants p " +
            "left join fetch p.member " +
            "left join fetch p.bike " +
+           "left join fetch e.organizer " +
            "left join fetch e.createdBy " +
            "left join fetch e.modifiedBy " +
            "where e.id = :id")
@@ -86,9 +95,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
            "left join fetch e.track t " +
            "left join fetch e.participants p " +
            "left join fetch p.member " +
+           "left join fetch e.organizer " +
            "left join fetch e.createdBy " +
            "left join fetch e.modifiedBy " +
-           "where :title is null or e.title like %:title%")
+           "where :title is null or e.title like %:title% " +
+           "order by e.startDate desc")
     List<Event> findByTitleCustom(String title);
 
 }

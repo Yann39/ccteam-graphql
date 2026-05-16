@@ -161,7 +161,7 @@ public class EventController {
      * @param startDate   The start date of the event as ISO {@link String}
      * @param endDate     The end date of the event as ISO {@link String}
      * @param trackId     The ID of the {@link Track} where the event takes place
-     * @param organizer   The organizer of the event
+     * @param organizerId The ID of the {@link com.ccteam.graphql.entities.Organizer} of the event
      * @param price       The event price
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
@@ -173,13 +173,13 @@ public class EventController {
                              @Argument String startDate,
                              @Argument String endDate,
                              @Argument long trackId,
-                             @Argument String organizer,
+                             @Argument long organizerId,
                              @Argument BigDecimal price,
                              @Argument long memberId) {
         log.info(
-                "Received call to createEvent with parameters title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizer = {}, price = {}, memberId = {}",
-                title, description, startDate, endDate, trackId, organizer, price, memberId);
-        return eventService.createEvent(title, description, startDate, endDate, trackId, organizer, price, memberId);
+                "Received call to createEvent with parameters title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizerId = {}, price = {}, memberId = {}",
+                title, description, startDate, endDate, trackId, organizerId, price, memberId);
+        return eventService.createEvent(title, description, startDate, endDate, trackId, organizerId, price, memberId);
     }
 
     /**
@@ -191,7 +191,7 @@ public class EventController {
      * @param startDate   The start date of the event as ISO {@link String}
      * @param endDate     The end date of the event as ISO {@link String}
      * @param trackId     The ID of the {@link Track} where the event takes place
-     * @param organizer   The organizer of the event
+     * @param organizerId The ID of the {@link com.ccteam.graphql.entities.Organizer} of the event
      * @param price       The event price
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just updated
@@ -204,13 +204,13 @@ public class EventController {
                              @Argument String startDate,
                              @Argument String endDate,
                              @Argument long trackId,
-                             @Argument String organizer,
+                             @Argument long organizerId,
                              @Argument BigDecimal price,
                              @Argument long memberId) {
         log.info(
-                "Received call to updateEvent with parameters eventId = {}, title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizer = {}, price = {}, memberId = {}",
-                eventId, title, description, startDate, endDate, trackId, organizer, price, memberId);
-        return eventService.updateEvent(eventId, title, description, startDate, endDate, trackId, organizer, price,
+                "Received call to updateEvent with parameters eventId = {}, title = {}, description = {}, startDate = {}, endDate = {}, trackId = {}, organizerId = {}, price = {}, memberId = {}",
+                eventId, title, description, startDate, endDate, trackId, organizerId, price, memberId);
+        return eventService.updateEvent(eventId, title, description, startDate, endDate, trackId, organizerId, price,
                 memberId);
     }
 

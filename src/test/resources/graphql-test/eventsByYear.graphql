@@ -20,7 +20,9 @@ query GetEventsByYear ($year: Int!) {
                 email
             }
         }
-        organizer
+        organizer {
+            name
+        }
         price
         createdOn
         createdBy {

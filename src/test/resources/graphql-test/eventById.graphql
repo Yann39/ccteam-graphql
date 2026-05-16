@@ -20,7 +20,9 @@ query GetEventById ($id: Long!) {
                 email
             }
         }
-        organizer
+        organizer {
+            name
+        }
         price
         createdOn
         createdBy {

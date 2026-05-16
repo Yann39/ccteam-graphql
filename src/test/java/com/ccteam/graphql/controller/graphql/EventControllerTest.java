@@ -23,6 +23,7 @@ package com.ccteam.graphql.controller.graphql;
 import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.EventMember;
 import com.ccteam.graphql.entities.Member;
+import com.ccteam.graphql.entities.Organizer;
 import com.ccteam.graphql.entities.Track;
 import com.ccteam.graphql.service.EventService;
 import com.ccteam.graphql.service.MemberService;
@@ -107,13 +108,21 @@ class EventControllerTest {
         memberJane.setEmail("Jane.Doe@example.com");
         memberJane.setRole(Member.Role.ROLE_MEMBER);
 
+        final Organizer organizerA = new Organizer();
+        organizerA.setId(1L);
+        organizerA.setName("Organizer A");
+
+        final Organizer organizerB = new Organizer();
+        organizerB.setId(2L);
+        organizerB.setName("Organizer B");
+
         eventBresse = new Event();
         eventBresse.setId(1L);
         eventBresse.setTitle("Event Bresse");
         eventBresse.setDescription("Event Bresse description");
         eventBresse.setStartDate(LocalDateTime.of(2018, 7, 13, 8, 0, 0));
         eventBresse.setEndDate(LocalDateTime.of(2018, 7, 13, 16, 30, 0));
-        eventBresse.setOrganizer("Organizer A");
+        eventBresse.setOrganizer(organizerA);
         eventBresse.setPrice(BigDecimal.valueOf(180));
         eventBresse.setCreatedOn(LocalDateTime.of(2018, 4, 11, 20, 41, 5));
         eventBresse.setModifiedOn(LocalDateTime.of(2018, 4, 11, 20, 46, 17));
@@ -127,7 +136,7 @@ class EventControllerTest {
         eventMagnyCours.setDescription("Event Magny-Cours description");
         eventMagnyCours.setStartDate(LocalDateTime.of(2019, 5, 24, 9, 0, 0));
         eventMagnyCours.setEndDate(LocalDateTime.of(2019, 5, 24, 18, 0, 0));
-        eventMagnyCours.setOrganizer("Organizer B");
+        eventMagnyCours.setOrganizer(organizerB);
         eventMagnyCours.setPrice(BigDecimal.valueOf(240));
         eventMagnyCours.setCreatedOn(LocalDateTime.of(2019, 1, 29, 22, 15, 14));
         eventMagnyCours.setModifiedOn(null);
@@ -190,7 +199,9 @@ class EventControllerTest {
                     }
                   }
                 ],
-                "organizer": "Organizer A",
+                "organizer": {
+                  "name": "Organizer A"
+                },
                 "price": 180,
                 "createdOn": "2018-04-11 20:41:05",
                 "createdBy": {
@@ -235,7 +246,9 @@ class EventControllerTest {
                     }
                   }
                 ],
-                "organizer": "Organizer B",
+                "organizer": {
+                  "name": "Organizer B"
+                },
                 "price": 240,
                 "createdOn": "2019-01-29 22:15:14",
                 "createdBy": {
@@ -287,7 +300,9 @@ class EventControllerTest {
                     }
                   }
                 ],
-                "organizer": "Organizer A",
+                "organizer": {
+                  "name": "Organizer A"
+                },
                 "price": 180,
                 "createdOn": "2018-04-11 20:41:05",
                 "createdBy": {
@@ -359,7 +374,9 @@ class EventControllerTest {
                     }
                   }
                 ],
-                "organizer": "Organizer A",
+                "organizer": {
+                  "name": "Organizer A"
+                },
                 "price": 180,
                 "createdOn": "2018-04-11 20:41:05",
                 "createdBy": {
@@ -433,7 +450,9 @@ class EventControllerTest {
                     }
                   }
                 ],
-                "organizer": "Organizer A",
+                "organizer": {
+                  "name": "Organizer A"
+                },
                 "price": 180,
                 "createdOn": "2018-04-11 20:41:05",
                 "createdBy": {
@@ -512,7 +531,9 @@ class EventControllerTest {
                   }
                 }
               ],
-              "organizer": "Organizer B",
+              "organizer": {
+                "name": "Organizer B"
+              },
               "price": 240,
               "createdOn": "2019-01-29 22:15:14",
               "createdBy": {
@@ -578,7 +599,9 @@ class EventControllerTest {
                     }
                   }
                 ],
-                "organizer": "Organizer A",
+                "organizer": {
+                  "name": "Organizer A"
+                },
                 "price": 180,
                 "createdOn": "2018-04-11 20:41:05",
                 "createdBy": {
