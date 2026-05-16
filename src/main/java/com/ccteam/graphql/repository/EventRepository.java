@@ -75,8 +75,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("select e from Event e " +
            "left join fetch e.track t " +
            "left join fetch e.participants p " +
-           "left join fetch p.member m " +
-           "left join fetch m.avatar " +
+           "left join fetch p.member " +
            "left join fetch p.bike " +
            "left join fetch e.createdBy " +
            "left join fetch e.modifiedBy " +

@@ -179,8 +179,7 @@ type Member {
     phone: String
     riderNumber: Int
     headerPalette: Int
-    avatarFile: String
-    avatarFileName: String
+    hasAvatar: Boolean!
     bikes: [Bike]
     membershipFees: [MembershipFee]
     active: Boolean!

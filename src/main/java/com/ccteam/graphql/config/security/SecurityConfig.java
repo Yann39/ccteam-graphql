@@ -142,6 +142,8 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                         // authenticate requests to GraphQL endpoint
                         .requestMatchers("/graphql").authenticated()
+                        // avatar binary endpoint
+                        .requestMatchers("/avatars/**").authenticated()
                         // allow any other requests (will be restricted later in next security filter)
                         .anyRequest().permitAll()
                 )

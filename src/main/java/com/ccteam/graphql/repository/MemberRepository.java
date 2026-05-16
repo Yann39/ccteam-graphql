@@ -21,6 +21,7 @@
 package com.ccteam.graphql.repository;
 
 import com.ccteam.graphql.enums.BoardRole;
+import com.ccteam.graphql.entities.Attachment;
 import com.ccteam.graphql.entities.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,7 +40,6 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select distinct m from Member m " +
-           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event " +
            "left join fetch m.likedNews ln " +
@@ -62,7 +62,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByIdCustom(long id);
 
     @Query("select m from Member m " +
-           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event e " +
            "left join fetch e.participants " +
@@ -75,7 +74,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmailCustom(String email);
 
     @Query("select distinct m from Member m " +
-           "left join fetch m.avatar " +
            "left join fetch m.eventMembers em " +
            "left join fetch em.event " +
            "left join fetch m.likedNews ln " +
@@ -88,6 +86,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "or m.email like %:text%" +
            ")")
     List<Member> findFilteredCustom(String text);
+
+    /**
+     * Fetch only the avatar attachment for the given member, with no
+     * Member graph load at all. Used by {@code AvatarController} to
+     * serve the avatar bytes over HTTP without pulling the rest of
+     * the member's data (eventMembers, bikes, fees, …) into memory.
+     *
+     * @param memberId id of the member
+     * @return the attachment, or empty when the member doesn't exist
+     * or has no avatar
+     */
+    @Query("select m.avatar from Member m where m.id = :memberId")
+    Optional<Attachment> findAvatarByMemberId(long memberId);
 
     boolean existsMemberByEmail(String email);
 

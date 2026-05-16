@@ -35,7 +35,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
-import java.util.Base64;
 import java.util.List;
 
 /**
@@ -326,27 +325,15 @@ public class MemberController {
     }
 
     /**
-     * Get the avatar file of the member.
-     *
-     * @param member The member
-     * @return The avatar file as base64 encoded string
+     * Get if this member has an avatar. Used by the client to decide whether
+     * to fetch the avatar bytes via the REST endpoint {@code /avatars/{id}} or
+     * render the default placeholder, without dragging the bytes through every
+     * GraphQL response.
      */
     @PreAuthorize("hasRole('USER')")
-    @SchemaMapping(typeName = "Member", field = "avatarFile")
-    public String getAvatarFile(Member member) {
-        return member.getAvatar() != null ? new String(Base64.getEncoder().encode(member.getAvatar().getFile())) : null;
-    }
-
-    /**
-     * Get the avatar file name of the member.
-     *
-     * @param member The member
-     * @return The avatar file name
-     */
-    @PreAuthorize("hasRole('USER')")
-    @SchemaMapping(typeName = "Member", field = "avatarFileName")
-    public String getAvatarFileName(Member member) {
-        return member.getAvatar() != null ? member.getAvatar().getFilename() : null;
+    @SchemaMapping(typeName = "Member", field = "hasAvatar")
+    public Boolean hasAvatar(Member member) {
+        return member.getAvatar() != null;
     }
 
     /**
