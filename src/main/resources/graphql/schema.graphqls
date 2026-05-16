@@ -47,6 +47,8 @@ type Query {
 
     getAllOrganizers: [Organizer]
 
+    getAllCountries: [Country]
+
     getAllTracks: [Track]
     getTrackById(id: Long!): Track
     getTracksFiltered(text: String): [Track]

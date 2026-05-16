@@ -28,6 +28,7 @@ import com.ccteam.graphql.repository.CountryRepository;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -124,6 +125,7 @@ public class TrackService {
      *                    track is located (optional)
      * @return A {@link Track} object representing the track just created
      */
+    @Transactional
     public Track createTrack(String name, int distance, int lapRecord, String website, BigDecimal latitude,
             BigDecimal longitude, String countryCode) {
         final Track track = new Track();
@@ -150,6 +152,7 @@ public class TrackService {
      *                    track is located (optional)
      * @return A {@link Track} object representing the track just updated
      */
+    @Transactional
     public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website,
             BigDecimal latitude, BigDecimal longitude, String countryCode) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
@@ -176,6 +179,7 @@ public class TrackService {
      * @param trackId The ID of the {@link Track} to delete
      * @return A {@link Track} object representing the track just deleted
      */
+    @Transactional
     public Track deleteTrack(long trackId) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
