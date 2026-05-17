@@ -124,11 +124,10 @@ public class MemberService {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param active         A boolean indicating if the member is active
      * @return A {@link Member} object representing the member just created
      */
     public Member createMember(String firstName, String lastName, String email, String phone, Integer riderNumber,
-                               String avatarFile, String avatarFileName, boolean active, Member.Role role) {
+                               String avatarFile, String avatarFileName, Member.Role role) {
 
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(email);
         if (memberOptional.isPresent()) {
@@ -143,7 +142,6 @@ public class MemberService {
         member.setEmail(email);
         member.setPhone(phone);
         member.setRiderNumber(riderNumber);
-        member.setActive(active);
         member.setRegistrationDate(LocalDateTime.now());
         member.setCreatedOn(LocalDateTime.now());
         member.setRole(role);
@@ -179,12 +177,11 @@ public class MemberService {
      * @param phone          The member phone number
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
-     * @param active         A boolean indicating if the member is active
      * @return An {@link Event} object representing the event just updated
      */
     @Transactional
     public Member updateMember(long memberId, String firstName, String lastName, String email, String phone,
-                               Integer riderNumber, String avatarFile, String avatarFileName, boolean active, Member.Role role) {
+                               Integer riderNumber, String avatarFile, String avatarFileName, Member.Role role) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
             log.error("Member with id {} not found in the database", memberId);
@@ -198,7 +195,6 @@ public class MemberService {
         member.setEmail(email);
         member.setPhone(phone);
         member.setRiderNumber(riderNumber);
-        member.setActive(active);
         member.setRole(role);
         member.setModifiedOn(LocalDateTime.now());
 

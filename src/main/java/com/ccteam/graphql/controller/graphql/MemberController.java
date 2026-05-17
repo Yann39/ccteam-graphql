@@ -127,7 +127,6 @@ public class MemberController {
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
      * @param riderNumber    The member rider number
-     * @param active         The member active status
      * @param role           The member role
      * @return A {@link Member} object representing the member just created
      */
@@ -140,12 +139,10 @@ public class MemberController {
                                @Argument String avatarFile,
                                @Argument String avatarFileName,
                                @Argument Integer riderNumber,
-                               @Argument boolean active,
                                @Argument Member.Role role) {
-        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, active = {}, role = {}",
-                firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, active, role);
-        return memberService.createMember(firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName,
-                active, role);
+        log.info("Received call to createMember with parameters firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFile = {}, avatarFileName = {}, role = {}",
+                firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, role);
+        return memberService.createMember(firstName, lastName, email, phone, riderNumber, avatarFile, avatarFileName, role);
     }
 
     /**
@@ -168,7 +165,6 @@ public class MemberController {
      * @param avatarFile     The member avatar file as base64 encoded string
      * @param avatarFileName The member avatar file name
      * @param riderNumber    The member rider number
-     * @param active         The member active status
      * @param role           The member role
      * @return An {@link Member} object representing the member just updated
      */
@@ -182,12 +178,11 @@ public class MemberController {
                                @Argument String avatarFile,
                                @Argument String avatarFileName,
                                @Argument Integer riderNumber,
-                               @Argument boolean active,
                                @Argument Member.Role role,
                                Authentication authentication) {
         // intentionally not logging the avatar file to keep the log readable
-        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFileName = {}, active = {}, role = {}",
-                memberId, firstName, lastName, email, phone, riderNumber, avatarFileName, active, role);
+        log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFileName = {}, role = {}",
+                memberId, firstName, lastName, email, phone, riderNumber, avatarFileName, role);
         final Member target = ensureCanEdit(memberId, authentication);
         // privilege-escalation guard: non-admins can't bump their own
         // role (or anyone else's, defensively). The form's role
@@ -200,7 +195,7 @@ public class MemberController {
                     "You cannot change your role");
         }
         return memberService.updateMember(memberId, firstName, lastName, email, phone, riderNumber, avatarFile,
-                avatarFileName, active, role);
+                avatarFileName, role);
     }
 
     /**

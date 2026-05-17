@@ -65,8 +65,8 @@ type Mutation {
     likeNews(newsId: Long!, memberId: Long!): News
     unlikeNews(newsId: Long!, memberId: Long!): News
 
-    createMember(firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, active: Boolean!, role: Role!): Member
-    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, active: Boolean!, role: Role!): Member
+    createMember(firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, role: Role!): Member
+    updateMember(memberId: Long!, firstName: String!, lastName: String!, email: String!, phone: String, riderNumber: Int, avatarFile: String, avatarFileName: String, role: Role!): Member
     deleteMember(memberId: Long!): Member
     setBoardRole(memberId: Long!, boardRole: BoardRole): Member
     setMemberPalette(memberId: Long!, headerPalette: Int): Member
@@ -193,7 +193,6 @@ type Member {
     hasAvatar: Boolean!
     bikes: [Bike]
     membershipFees: [MembershipFee]
-    active: Boolean!
     role: Role!
     boardRole: BoardRole
     eventMembers: [EventMember]

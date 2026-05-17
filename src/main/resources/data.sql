@@ -1,14 +1,14 @@
-INSERT INTO `ccteam`.`member` (`id`, `first_name`, `last_name`, `email`, `password`, `phone`, `active`, `verified`, `admin`, `otp`, `otp_date`, `registration_date`, `role`, `created_on`, `modified_on`) VALUES
-(1, 'Bob', 'Admin', 'bob.admin@example.com', '$2y$10$MuLwPiQkTlcKEbGX6ztzAOxGlqK7ddglgDXcYBRBFDwkM.AQy63EK', '+33 123456789', 1, 1, 1, null, null, '2016-07-11 00:00:00', 'ROLE_ADMIN', '2019-06-10 13:44:26', '2018-07-01 07:30:54'),
-(2, 'Stéphane', 'Verger', 'steph.verger@example.fr', null, '+72 777992834', 0, 0, 0, null, null, '2016-06-30 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:11:24', NULL),
-(3, 'Coralie', 'Archambault', 'coralie.ar@example.fr', null, '+56 856755465', 0, 0, 0, null, null, '2019-01-11 21:44:00', 'ROLE_MEMBER', '2019-02-11 21:07:37', NULL),
-(4, 'Etienne', 'Moquin', 'etienne.moquin@example.com', null, '+34 583683774', 0, 0, 0, null, null, '2019-01-31 23:27:00', 'ROLE_MEMBER', '2019-02-11 21:06:59', NULL),
-(5, 'Dylan', 'Gabriaux', 'dylangabriaux@example.net', null, '+03 381647281', 0, 0, 0, null, null, '2017-05-16 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:08:00', NULL),
-(6, 'André', 'De La Vergne', 'Andre.vergne@example.fr', null, '+77 373737377', 0, 0, 0, null, null, '2019-02-11 22:12:00', 'ROLE_MEMBER', '2019-02-11 21:12:34', NULL),
-(7, 'Gilles', 'Arpin', 'gillearpin@example.ch', null, '+02 883773736', 0, 0, 0, null, null, '2019-02-11 22:13:00', 'ROLE_MEMBER', '2019-02-11 21:13:47', NULL),
-(8, 'Frédéric', 'Dupond', 'Fred.dupond@example.fr', null, '+03 383747278', 0, 0, 0, null, null, '2019-02-11 22:15:00', 'ROLE_MEMBER', '2019-02-11 21:15:59', NULL),
-(9, 'John', 'Doe', 'john.doe@example.fr', null, '+33608080808', 0, 0, 0, null, null, '2018-01-30 00:00:00', 'ROLE_MEMBER', '2018-07-01 09:30:54', NULL),
-(10, 'Jenna', 'Jonhnson', 'jenna.jonhnson@example.com', null, NULL, 0, 0, 0, null, null, '2018-02-19 13:56:42', 'ROLE_MEMBER', '2018-07-01 09:37:12', NULL);
+INSERT INTO `ccteam`.`member` (`id`, `first_name`, `last_name`, `email`, `password`, `phone`, `verified`, `admin`, `otp`, `otp_date`, `registration_date`, `role`, `created_on`, `modified_on`) VALUES
+(1, 'Bob', 'Admin', 'bob.admin@example.com', '$2y$10$MuLwPiQkTlcKEbGX6ztzAOxGlqK7ddglgDXcYBRBFDwkM.AQy63EK', '+33 123456789', 1, 1, null, null, '2016-07-11 00:00:00', 'ROLE_ADMIN', '2019-06-10 13:44:26', '2018-07-01 07:30:54'),
+(2, 'Stéphane', 'Verger', 'steph.verger@example.fr', null, '+72 777992834', 0, 0, null, null, '2016-06-30 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:11:24', NULL),
+(3, 'Coralie', 'Archambault', 'coralie.ar@example.fr', null, '+56 856755465', 0, 0, null, null, '2019-01-11 21:44:00', 'ROLE_MEMBER', '2019-02-11 21:07:37', NULL),
+(4, 'Etienne', 'Moquin', 'etienne.moquin@example.com', null, '+34 583683774', 0, 0, null, null, '2019-01-31 23:27:00', 'ROLE_MEMBER', '2019-02-11 21:06:59', NULL),
+(5, 'Dylan', 'Gabriaux', 'dylangabriaux@example.net', null, '+03 381647281', 0, 0, null, null, '2017-05-16 00:00:00', 'ROLE_MEMBER', '2019-02-11 21:08:00', NULL),
+(6, 'André', 'De La Vergne', 'Andre.vergne@example.fr', null, '+77 373737377', 0, 0, null, null, '2019-02-11 22:12:00', 'ROLE_MEMBER', '2019-02-11 21:12:34', NULL),
+(7, 'Gilles', 'Arpin', 'gillearpin@example.ch', null, '+02 883773736', 0, 0, null, null, '2019-02-11 22:13:00', 'ROLE_MEMBER', '2019-02-11 21:13:47', NULL),
+(8, 'Frédéric', 'Dupond', 'Fred.dupond@example.fr', null, '+03 383747278', 0, 0, null, null, '2019-02-11 22:15:00', 'ROLE_MEMBER', '2019-02-11 21:15:59', NULL),
+(9, 'John', 'Doe', 'john.doe@example.fr', null, '+33608080808', 0, 0, null, null, '2018-01-30 00:00:00', 'ROLE_MEMBER', '2018-07-01 09:30:54', NULL),
+(10, 'Jenna', 'Jonhnson', 'jenna.jonhnson@example.com', null, NULL, 0, 0, null, null, '2018-02-19 13:56:42', 'ROLE_MEMBER', '2018-07-01 09:37:12', NULL);
 
 INSERT INTO `ccteam`.`bike` (`id`, `manufacturer`, `model_name`, `engine_size`, `year`, `member_id`) VALUES
 (1, 'Honda', 'CBR 600 RR', 600, 2007, 1),

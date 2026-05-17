@@ -53,14 +53,12 @@ public class CustomUserDetails implements UserDetails {
     private long id;
     private String username;
     private String password;
-    private boolean active;
     private List<GrantedAuthority> authorities;
 
     public CustomUserDetails(Member user) {
         this.id = user.getId();
         this.username = user.getEmail();
         this.password = user.getPassword();
-        this.active = user.isActive();
         this.authorities = Arrays.stream(new String[]{user.getRole().getAuthority()}).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 

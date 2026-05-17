@@ -76,9 +76,6 @@ public class Member {
     private Set<MembershipFee> membershipFees;
 
     @Column(nullable = false)
-    private boolean active = false;
-
-    @Column(nullable = false)
     private boolean verified = false;
 
     @Column

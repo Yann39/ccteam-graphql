@@ -250,7 +250,7 @@ public class AccountController {
             final long elapsedSeconds = Duration.between(lastOtpDate, now).getSeconds();
             if (elapsedSeconds < OTP_RESEND_COOLDOWN_SECONDS) {
                 final long secondsLeft = OTP_RESEND_COOLDOWN_SECONDS - elapsedSeconds;
-                log.info("Resend refused for {} — cooldown active, {} s left", resendOtpRequest.getEmail(), secondsLeft);
+                log.info("Resend refused for {}, cooldown active, {} s left", resendOtpRequest.getEmail(), secondsLeft);
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                         .body(Collections.singletonMap("secondsLeft", secondsLeft));
             }
@@ -380,7 +380,6 @@ public class AccountController {
         // encode and store password
         member.setPassword(passwordEncoder.encode(completeRegistrationRequest.getPassword()));
         member.setRole(Member.Role.ROLE_USER);
-        member.setActive(true);
         member.setRegistrationDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         memberRepository.save(member);
 
