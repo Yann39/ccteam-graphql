@@ -51,9 +51,9 @@ public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
 
     @Query("select lr from LapRecord lr " +
            "left join fetch lr.member m " +
-           "left join fetch lr.track " +
+           "left join fetch lr.track t " +
            "where m.id = :id " +
-           "order by lr.lapTime")
+           "order by t.name")
     List<LapRecord> findByMemberIdCustom(long id);
 
     @Query("select lr from LapRecord lr " +

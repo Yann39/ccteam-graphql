@@ -99,12 +99,12 @@ public class LapRecordController {
     @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public LapRecord createLapRecord(@Argument long memberId,
-            @Argument long trackId,
-            @Argument long bikeId,
-            @Argument String recordDate,
-            @Argument int lapTime,
-            @Argument String conditions,
-            @Argument String comments) {
+                                     @Argument long trackId,
+                                     @Argument long bikeId,
+                                     @Argument String recordDate,
+                                     @Argument int lapTime,
+                                     @Argument String conditions,
+                                     @Argument String comments) {
         log.info(
                 "Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
                 memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
@@ -126,12 +126,12 @@ public class LapRecordController {
     @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public LapRecord updateLapRecord(@Argument long lapRecordId,
-            @Argument long trackId,
-            @Argument long bikeId,
-            @Argument String recordDate,
-            @Argument int lapTime,
-            @Argument String conditions,
-            @Argument String comments) {
+                                     @Argument long trackId,
+                                     @Argument long bikeId,
+                                     @Argument String recordDate,
+                                     @Argument int lapTime,
+                                     @Argument String conditions,
+                                     @Argument String comments) {
         log.info(
                 "Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
                 lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);

@@ -104,12 +104,12 @@ public class TrackController {
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Track createTrack(@Argument String name,
-            @Argument int distance,
-            @Argument int lapRecord,
-            @Argument String website,
-            @Argument BigDecimal latitude,
-            @Argument BigDecimal longitude,
-            @Argument String countryCode) {
+                             @Argument int distance,
+                             @Argument int lapRecord,
+                             @Argument String website,
+                             @Argument BigDecimal latitude,
+                             @Argument BigDecimal longitude,
+                             @Argument String countryCode) {
         log.info(
                 "Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
                 name, distance, lapRecord, website, latitude, longitude, countryCode);
@@ -133,13 +133,13 @@ public class TrackController {
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Track updateTrack(@Argument long trackId,
-            @Argument String name,
-            @Argument int distance,
-            @Argument int lapRecord,
-            @Argument String website,
-            @Argument BigDecimal latitude,
-            @Argument BigDecimal longitude,
-            @Argument String countryCode) {
+                             @Argument String name,
+                             @Argument int distance,
+                             @Argument int lapRecord,
+                             @Argument String website,
+                             @Argument BigDecimal latitude,
+                             @Argument BigDecimal longitude,
+                             @Argument String countryCode) {
         log.info(
                 "Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
                 trackId, name, distance, lapRecord, website, latitude, longitude, countryCode);

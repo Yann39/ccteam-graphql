@@ -57,10 +57,10 @@ public class BikeController {
     @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Bike addBikeToMember(@Argument Long memberId,
-            @Argument String manufacturer,
-            @Argument String modelName,
-            @Argument Integer engineSize,
-            @Argument Integer year) {
+                                @Argument String manufacturer,
+                                @Argument String modelName,
+                                @Argument Integer engineSize,
+                                @Argument Integer year) {
         log.info("Received call to addBikeToMember with parameters memberId = {}, manufacturer = {}, modelName = {}",
                 memberId, manufacturer, modelName);
         return bikeService.addBikeToMember(memberId, manufacturer, modelName, engineSize, year);
@@ -82,11 +82,11 @@ public class BikeController {
     @PreAuthorize("hasRole('MEMBER')")
     @MutationMapping
     public Bike updateBike(@Argument Long bikeId,
-            @Argument String manufacturer,
-            @Argument String modelName,
-            @Argument Integer engineSize,
-            @Argument Integer year,
-            @Argument Boolean current) {
+                           @Argument String manufacturer,
+                           @Argument String modelName,
+                           @Argument Integer engineSize,
+                           @Argument Integer year,
+                           @Argument Boolean current) {
         log.info("Received call to updateBike with parameters bikeId = {}, manufacturer = {}, modelName = {}, current = {}",
                 bikeId, manufacturer, modelName, current);
         return bikeService.updateBike(bikeId, manufacturer, modelName, engineSize, year, current);
