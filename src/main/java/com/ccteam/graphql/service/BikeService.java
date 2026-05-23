@@ -117,8 +117,8 @@ public class BikeService {
         bike.setYear(year);
 
         if (current != null) {
-            // when marking this bike as current, unflag any other bike of
-            // the same member that was previously flagged as current
+            // when marking this bike as current, unflag any other bike of the same member that was previously
+            // flagged as current
             if (current && bike.getMember() != null) {
                 final List<Bike> previousCurrents = bikeRepository
                         .findByMemberIdAndCurrentTrueAndIdNot(bike.getMember().getId(), bike.getId());

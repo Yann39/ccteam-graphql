@@ -62,23 +62,4 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = Arrays.stream(new String[]{user.getRole().getAuthority()}).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

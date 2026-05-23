@@ -66,8 +66,9 @@ public class MemberController {
     }
 
     /**
-     * Lightweight count of all members in the database. Exposed at
-     * the USER level so it can be accessible to non-MEMBER users.
+     * Count all members in the database. Exposed at the USER level so it can be accessible to non-MEMBER users.
+     *
+     * @return The number of members found
      */
     @PreAuthorize("hasRole('USER')")
     @QueryMapping
@@ -103,8 +104,9 @@ public class MemberController {
     }
 
     /**
-     * Get all members according to the specified filter {@code text}.<br/>
-     * Search is done on first name, last name and e-mail address.<br/>
+     * Get all members according to the specified filter {@code text}.
+     * <p>
+     * Search is done on first name, last name and e-mail address.
      * If {@code text} filter is null, all records will be returned.
      *
      * @param text The text filter string
@@ -148,14 +150,7 @@ public class MemberController {
     /**
      * Update the member represented by the given member ID with the specified data.
      * <p>
-     * Authorization model: any authenticated user can call this
-     * endpoint, but only to edit their own profile — admins can edit
-     * anyone. We lowered the role gate from {@code MEMBER} to
-     * {@code USER} so a freshly-registered member (who is still
-     * {@code ROLE_USER} until promoted) can set up their avatar,
-     * palette and personal info without waiting for admin approval.
-     * The self-vs-other check is enforced at runtime via
-     * {@link #ensureCanEdit(long, Authentication)}.
+     * Any authenticated user can call this endpoint, but only to edit their own profile, admins can edit anyone.
      *
      * @param memberId       The ID of the {@link Member} to update
      * @param firstName      The member first name
@@ -180,19 +175,14 @@ public class MemberController {
                                @Argument Integer riderNumber,
                                @Argument Member.Role role,
                                Authentication authentication) {
-        // intentionally not logging the avatar file to keep the log readable
         log.info("Received call to updateMember with parameters memberId = {}, firstName = {}, lastName = {}, email = {}, phone = {}, riderNumber = {}, avatarFileName = {}, role = {}",
                 memberId, firstName, lastName, email, phone, riderNumber, avatarFileName, role);
         final Member target = ensureCanEdit(memberId, authentication);
-        // privilege-escalation guard: non-admins can't bump their own
-        // role (or anyone else's, defensively). The form's role
-        // dropdown is already gated to admins on the client, so this
-        // is purely a server-side guarantee against tampered requests.
+        // non-admins can't bump their own role
         if (!isAdmin(authentication) && target.getRole() != role) {
-            log.info("Caller {} tried to change role of member {} from {} to {} — refused",
+            log.info("Caller {} tried to change role of member {} from {} to {}, refused",
                     authentication.getName(), memberId, target.getRole(), role);
-            throw new CustomGraphQLException("forbidden",
-                    "You cannot change your role");
+            throw new CustomGraphQLException("forbidden", "You cannot change your role");
         }
         return memberService.updateMember(memberId, firstName, lastName, email, phone, riderNumber, avatarFile,
                 avatarFileName, role);
@@ -201,8 +191,8 @@ public class MemberController {
     /**
      * Delete the member represented by the given event ID.
      *
-     * @param memberId The ID of the {@link Event} to delete
-     * @return A {@link Event} object representing the member just deleted
+     * @param memberId The ID of the {@link Member} to delete
+     * @return A {@link Member} object representing the member just deleted
      */
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
@@ -227,18 +217,12 @@ public class MemberController {
     }
 
     /**
-     * Set the color palette the member has chosen for their
-     * detail-page header background.
+     * Set the color palette the member has chosen for their detail-page header background.
      * <p>
-     * Authorization model: any authenticated user can set their own
-     * palette; an admin can set anyone's. We lowered the role gate
-     * from {@code MEMBER} to {@code USER} so a freshly-registered
-     * member can customize their header without waiting for admin
-     * promotion. The self-vs-other check is enforced at runtime via
-     * {@link #ensureCanEdit(long, Authentication)}.
+     * Any authenticated user can set their own palette; an admin can set anyone's.
      *
      * @param memberId      ID of the member whose palette is being set
-     * @param headerPalette palette index, or {@code null} to clear
+     * @param headerPalette The palette index, or {@code null} to clear
      * @return the updated {@link Member}
      */
     @PreAuthorize("hasRole('USER')")
@@ -255,40 +239,28 @@ public class MemberController {
     /**
      * Authorization guard for "self-edit or admin" mutations.
      * <p>
-     * Allows the call when the caller is an admin, or when the target
-     * {@code memberId} resolves to a member whose e-mail matches the
-     * caller's authenticated principal. Throws a {@code forbidden}
-     * {@link CustomGraphQLException} otherwise so the client gets a
-     * stable error code (already mapped on the Flutter side as
-     * "permission denied").
-     * <p>
-     * Returns the fetched {@link Member} so callers that need to
-     * inspect the target (e.g. for additional privilege-escalation
-     * checks) can do so without a second DB read.
+     * Allows the call when the caller is an admin, or when the target {@code memberId} resolves to a member
+     * whose e-mail matches the caller's authenticated principal.
+     * Throws a {@code forbidden} {@link CustomGraphQLException} otherwise so the client gets a stable error code.
      *
-     * @param memberId       the id of the member being edited
-     * @param authentication the current Spring Security authentication
-     * @return the target {@link Member}
+     * @param memberId       The id of the member being edited
+     * @param authentication The current Spring Security authentication
+     * @return the fetched {@link Member}
      */
     private Member ensureCanEdit(long memberId, Authentication authentication) {
         final Member target = memberService.getMemberById(memberId);
         if (isAdmin(authentication)) return target;
         if (target.getEmail() == null
-            || !target.getEmail().equalsIgnoreCase(authentication.getName())) {
-            log.info("Caller {} tried to edit member {} ({}) — refused", authentication.getName(), memberId, target.getEmail());
-            throw new CustomGraphQLException("forbidden",
-                    "You can only modify your own profile");
+                || !target.getEmail().equalsIgnoreCase(authentication.getName())) {
+            log.info("Caller {} tried to edit member {} ({}), refused",
+                    authentication.getName(), memberId, target.getEmail());
+            throw new CustomGraphQLException("forbidden", "You can only modify your own profile");
         }
         return target;
     }
 
     /**
-     * Returns whether the given authentication carries the
-     * {@code ROLE_ADMIN} authority. Stays role-string based (rather
-     * than depending on the role hierarchy) to keep the check
-     * unambiguous: a {@code MEMBER} or {@code USER} is NOT admin for
-     * the purpose of cross-member edits, regardless of any future
-     * hierarchy tweaks.
+     * Returns whether the given authentication carries the {@code ROLE_ADMIN} authority.
      */
     private boolean isAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
@@ -298,11 +270,8 @@ public class MemberController {
     /**
      * Change the passcode of the currently authenticated member.
      * <p>
-     * The target member is taken from the {@link Principal} (the JWT subject)
-     * rather than passed as an argument, a member can only change their own
-     * passcode, never anyone else's. {@code currentPasscode} is verified
-     * against the stored hash to prove ownership; mismatch returns
-     * {@code bad_credentials}.
+     * The target member is taken from the {@link Principal} (the JWT subject) rather than passed as an argument,
+     * a member can only change their own  passcode, never anyone else's.
      *
      * @param currentPasscode the current 6-digit passcode (for verification)
      * @param newPasscode     the new 6-digit passcode
@@ -314,16 +283,14 @@ public class MemberController {
     public Boolean changePasscode(@Argument String currentPasscode,
                                   @Argument String newPasscode,
                                   Principal principal) {
-        // intentionally NOT logging the passcodes
         log.info("Received call to changePasscode for {}", principal.getName());
         return memberService.changePasscode(principal.getName(), currentPasscode, newPasscode);
     }
 
     /**
-     * Get if this member has an avatar. Used by the client to decide whether
-     * to fetch the avatar bytes via the REST endpoint {@code /avatars/{id}} or
-     * render the default placeholder, without dragging the bytes through every
-     * GraphQL response.
+     * Get if this member has an avatar. Used by the client to decide whether to fetch the avatar bytes via
+     * the REST endpoint {@code /avatars/{id}} or render the default placeholder, without dragging the bytes
+     * through every GraphQL response.
      */
     @PreAuthorize("hasRole('USER')")
     @SchemaMapping(typeName = "Member", field = "hasAvatar")
@@ -342,8 +309,10 @@ public class MemberController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
-    public MembershipFee addMembershipFee(@Argument Long memberId, @Argument Integer year, @Argument Float amount, @Argument boolean paid) {
-        log.info("Received call to addMembershipFee with parameters memberId = {}, year = {}, amount = {}, paid = {}", memberId, year, amount, paid);
+    public MembershipFee addMembershipFee(@Argument Long memberId, @Argument Integer year,
+                                          @Argument Float amount, @Argument boolean paid) {
+        log.info("Received call to addMembershipFee with parameters memberId = {}, year = {}, amount = {}, paid = {}",
+                memberId, year, amount, paid);
         return memberService.addMembershipFee(memberId, year, amount, paid);
     }
 
@@ -358,8 +327,10 @@ public class MemberController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
-    public MembershipFee updateMembershipFee(@Argument Long feeId, @Argument Integer year, @Argument Float amount, @Argument boolean paid) {
-        log.info("Received call to updateMembershipFee with parameters feeId = {}, year = {}, amount = {}, paid = {}", feeId, year, amount, paid);
+    public MembershipFee updateMembershipFee(@Argument Long feeId, @Argument Integer year,
+                                             @Argument Float amount, @Argument boolean paid) {
+        log.info("Received call to updateMembershipFee with parameters feeId = {}, year = {}, amount = {}, paid = {}",
+                feeId, year, amount, paid);
         return memberService.updateMembershipFee(feeId, year, amount, paid);
     }
 

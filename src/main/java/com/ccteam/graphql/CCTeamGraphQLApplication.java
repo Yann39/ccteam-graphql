@@ -33,7 +33,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties(JWTTokenProperties.class)
 public class CCTeamGraphQLApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(CCTeamGraphQLApplication.class, args);
     }
 

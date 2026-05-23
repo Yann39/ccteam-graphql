@@ -105,15 +105,13 @@ public class LapRecordController {
                                      @Argument int lapTime,
                                      @Argument String conditions,
                                      @Argument String comments) {
-        log.info(
-                "Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
+        log.info("Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
                 memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
         return lapRecordService.createLapRecord(memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
     }
 
     /**
-     * Update the lap record represented by the given lap record ID with the
-     * specified data.
+     * Update the lap record represented by the given lap record ID with the specified data.
      *
      * @param lapRecordId The lap record ID
      * @param trackId     The track ID
@@ -132,8 +130,7 @@ public class LapRecordController {
                                      @Argument int lapTime,
                                      @Argument String conditions,
                                      @Argument String comments) {
-        log.info(
-                "Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
+        log.info("Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
                 lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);
         return lapRecordService.updateLapRecord(lapRecordId, trackId, bikeId, recordDate, lapTime, conditions,
                 comments);

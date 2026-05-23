@@ -25,8 +25,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * {@link Country} repository. Primary key is the ISO 3166-1 alpha-2 code
- * (a {@link String}, not a numeric id).
+ * {@link Country} repository.
  *
  * @author yann39
  * @since 1.0.0

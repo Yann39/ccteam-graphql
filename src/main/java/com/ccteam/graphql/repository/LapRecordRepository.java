@@ -37,30 +37,54 @@ import java.util.Optional;
 @Repository
 public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
 
+    /**
+     * Retrieve all lap records with member and track fetched, ordered by lap time.
+     *
+     * @return The list of lap records with associations
+     */
     @Query("select distinct lr from LapRecord lr " +
-           "left join fetch lr.member " +
-           "left join fetch lr.track " +
-           "order by lr.lapTime")
+            "left join fetch lr.member " +
+            "left join fetch lr.track " +
+            "order by lr.lapTime")
     List<LapRecord> findAllCustom();
 
+    /**
+     * Find a lap record by id and fetch associated member and track.
+     *
+     * @param id The lap record id
+     * @return The optional lap record with associations fetched
+     */
     @Query("select lr from LapRecord lr " +
-           "left join fetch lr.member " +
-           "left join fetch lr.track " +
-           "where lr.id = :id")
+            "left join fetch lr.member " +
+            "left join fetch lr.track " +
+            "where lr.id = :id")
     Optional<LapRecord> findByIdCustom(long id);
 
+    /**
+     * Find lap records for a given member and fetch the related member and track entities.
+     * Results ordered by track name.
+     *
+     * @param id The member id
+     * @return The list of lap records for the member
+     */
     @Query("select lr from LapRecord lr " +
-           "left join fetch lr.member m " +
-           "left join fetch lr.track t " +
-           "where m.id = :id " +
-           "order by t.name")
+            "left join fetch lr.member m " +
+            "left join fetch lr.track t " +
+            "where m.id = :id " +
+            "order by t.name")
     List<LapRecord> findByMemberIdCustom(long id);
 
+    /**
+     * Find lap records for a given track and fetch member and track, ordered by lap time.
+     *
+     * @param id The track id
+     * @return The list of lap records on the track
+     */
     @Query("select lr from LapRecord lr " +
-           "left join fetch lr.member " +
-           "left join fetch lr.track t " +
-           "where t.id = :id " +
-           "order by lr.lapTime")
+            "left join fetch lr.member " +
+            "left join fetch lr.track t " +
+            "where t.id = :id " +
+            "order by lr.lapTime")
     List<LapRecord> findByTrackIdCustom(long id);
 
 }

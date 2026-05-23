@@ -61,8 +61,9 @@ public class TrackController {
     }
 
     /**
-     * Get all tracks according to the specified filter {@code text}.<br/>
-     * Search is done on track name.<br/>
+     * Get all tracks according to the specified filter {@code text}.
+     * <p>
+     * Search is done on track name.
      * If {@code text} filter is null, all records will be returned.
      *
      * @param text The text filter string
@@ -110,8 +111,7 @@ public class TrackController {
                              @Argument BigDecimal latitude,
                              @Argument BigDecimal longitude,
                              @Argument String countryCode) {
-        log.info(
-                "Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
+        log.info("Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
                 name, distance, lapRecord, website, latitude, longitude, countryCode);
         return trackService.createTrack(name, distance, lapRecord, website, latitude, longitude, countryCode);
     }
@@ -140,8 +140,7 @@ public class TrackController {
                              @Argument BigDecimal latitude,
                              @Argument BigDecimal longitude,
                              @Argument String countryCode) {
-        log.info(
-                "Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
+        log.info("Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
                 trackId, name, distance, lapRecord, website, latitude, longitude, countryCode);
         return trackService.updateTrack(trackId, name, distance, lapRecord, website, latitude, longitude, countryCode);
     }

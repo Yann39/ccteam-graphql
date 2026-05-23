@@ -39,65 +39,82 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    /**
+     * Get all members from the database, with required fetched relations.
+     *
+     * @return The list of all members
+     */
     @Query("select distinct m from Member m " +
-           "left join fetch m.eventMembers em " +
-           "left join fetch em.event e " +
-           "left join fetch e.organizer " +
-           "left join fetch m.likedNews ln " +
-           "left join fetch ln.news " +
-           "left join fetch m.bikes " +
-           "left join fetch m.membershipFees " +
-           "order by m.firstName, m.lastName")
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event e " +
+            "left join fetch e.organizer " +
+            "left join fetch m.likedNews ln " +
+            "left join fetch ln.news " +
+            "left join fetch m.bikes " +
+            "left join fetch m.membershipFees " +
+            "order by m.firstName, m.lastName")
     List<Member> findAllCustom();
 
+    /**
+     * Get a members given its ID, with required fetched relations.
+     *
+     * @return The optional member with the specified ID
+     */
     @Query("select m from Member m " +
-           "left join fetch m.avatar " +
-           "left join fetch m.eventMembers em " +
-           "left join fetch em.event e " +
-           "left join fetch e.participants " +
-           "left join fetch e.organizer " +
-           "left join fetch em.bike " +
-           "left join fetch m.likedNews ln " +
-           "left join fetch ln.news " +
-           "left join fetch m.bikes " +
-           "left join fetch m.membershipFees " +
-           "where m.id = :id")
+            "left join fetch m.avatar " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event e " +
+            "left join fetch e.participants " +
+            "left join fetch e.organizer " +
+            "left join fetch em.bike " +
+            "left join fetch m.likedNews ln " +
+            "left join fetch ln.news " +
+            "left join fetch m.bikes " +
+            "left join fetch m.membershipFees " +
+            "where m.id = :id")
     Optional<Member> findByIdCustom(long id);
 
+    /**
+     * Get a members given its email address, with required fetched relations.
+     *
+     * @return The optional member with the specified email address
+     */
     @Query("select m from Member m " +
-           "left join fetch m.eventMembers em " +
-           "left join fetch em.event e " +
-           "left join fetch e.participants " +
-           "left join fetch e.organizer " +
-           "left join fetch em.bike " +
-           "left join fetch m.likedNews ln " +
-           "left join fetch ln.news " +
-           "left join fetch m.bikes " +
-           "left join fetch m.membershipFees " +
-           "where m.email = :email")
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event e " +
+            "left join fetch e.participants " +
+            "left join fetch e.organizer " +
+            "left join fetch em.bike " +
+            "left join fetch m.likedNews ln " +
+            "left join fetch ln.news " +
+            "left join fetch m.bikes " +
+            "left join fetch m.membershipFees " +
+            "where m.email = :email")
     Optional<Member> findByEmailCustom(String email);
 
+    /**
+     * Get all members from the database corresponding to the specified text filter, with required fetched relations.
+     *
+     * @return The list of all members corresponding to the specified text filter
+     */
     @Query("select distinct m from Member m " +
-           "left join fetch m.eventMembers em " +
-           "left join fetch em.event e " +
-           "left join fetch e.organizer " +
-           "left join fetch m.likedNews ln " +
-           "left join fetch ln.news " +
-           "left join fetch m.bikes " +
-           "left join fetch m.membershipFees " +
-           "where :text is null or ( " +
-           "m.firstName like %:text% " +
-           "or m.lastName like %:text% " +
-           "or m.email like %:text%" +
-           ") " +
-           "order by m.firstName, m.lastName")
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event e " +
+            "left join fetch e.organizer " +
+            "left join fetch m.likedNews ln " +
+            "left join fetch ln.news " +
+            "left join fetch m.bikes " +
+            "left join fetch m.membershipFees " +
+            "where :text is null or ( " +
+            "m.firstName like %:text% " +
+            "or m.lastName like %:text% " +
+            "or m.email like %:text%" +
+            ") " +
+            "order by m.firstName, m.lastName")
     List<Member> findFilteredCustom(String text);
 
     /**
-     * Fetch only the avatar attachment for the given member, with no
-     * Member graph load at all. Used by {@code AvatarController} to
-     * serve the avatar bytes over HTTP without pulling the rest of
-     * the member's data (eventMembers, bikes, fees, …) into memory.
+     * Fetch only the avatar attachment for the given member, with no Member graph load at all.
      *
      * @param memberId id of the member
      * @return the attachment, or empty when the member doesn't exist
@@ -106,12 +123,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m.avatar from Member m where m.id = :memberId")
     Optional<Attachment> findAvatarByMemberId(long memberId);
 
+    /**
+     * Check whether a member exists with the given email address.
+     *
+     * @param email The email to check
+     * @return {@code true} when a member with this email exists, {@code false} otherwise
+     */
     boolean existsMemberByEmail(String email);
 
     /**
-     * Find all members currently holding the given board role,
-     * excluding the member with id {@code excludedId} (typically the
-     * one being assigned the role).
+     * Find all members currently holding the given board role, excluding the member with id {@code excludedId}
+     * (typically the one being assigned the role).
+     *
+     * @return The list of members holding the given board role
      */
     List<Member> findByBoardRoleAndIdNot(BoardRole boardRole, Long excludedId);
 }

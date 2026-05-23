@@ -20,28 +20,34 @@
 
 package com.ccteam.graphql.config.graphql;
 
+import graphql.GraphQLContext;
+import graphql.execution.CoercedVariables;
 import graphql.language.StringValue;
+import graphql.language.Value;
 import graphql.schema.*;
 import graphql.schema.idl.RuntimeWiring;
+import jakarta.annotation.Nonnull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 /**
  * Custom GraphQL scalar implementation of the {@link LocalDateTime} Java type.
  * <p>
  * It can parse a GraphQL {@link StringValue} object to a Java {@link LocalDateTime} object,
- * and serialize a {@link LocalDateTime} object as {@link String} in the format
- * <i>yyyy-MM-dd HH:mm:ss</i>
+ * and serialize a {@link LocalDateTime} object as {@link String} in the format <i>yyyy-MM-dd HH:mm:ss</i>
  *
  * @author yann39
  * @since 1.0.0
  */
 @Configuration
 public class LocalDateTimeScalar implements RuntimeWiringConfigurer {
+
+    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void configure(RuntimeWiring.Builder builder) {
@@ -51,16 +57,20 @@ public class LocalDateTimeScalar implements RuntimeWiringConfigurer {
                 .coercing(new Coercing<LocalDateTime, String>() {
 
                     @Override
-                    public String serialize(final Object dataFetcherResult) {
+                    public String serialize(@Nonnull final Object dataFetcherResult,
+                                            @Nonnull final GraphQLContext graphQLContext,
+                                            @Nonnull final Locale locale) throws CoercingSerializeException {
                         if (dataFetcherResult instanceof LocalDateTime localDateTime) {
-                            return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(localDateTime);
+                            return FORMATTER.format(localDateTime);
                         } else {
                             throw new CoercingSerializeException("Expected a LocalDateTime object");
                         }
                     }
 
                     @Override
-                    public LocalDateTime parseValue(final Object input) {
+                    public LocalDateTime parseValue(@Nonnull final Object input,
+                                                    @Nonnull final GraphQLContext graphQLContext,
+                                                    @Nonnull final Locale locale) throws CoercingParseValueException {
                         try {
                             if (input instanceof String string) {
                                 return LocalDateTime.parse(string);
@@ -73,10 +83,17 @@ public class LocalDateTimeScalar implements RuntimeWiringConfigurer {
                     }
 
                     @Override
-                    public LocalDateTime parseLiteral(final Object input) {
+                    public LocalDateTime parseLiteral(@Nonnull final Value<?> input,
+                                                      @Nonnull final CoercedVariables variables,
+                                                      @Nonnull final GraphQLContext graphQLContext,
+                                                      @Nonnull final Locale locale) throws CoercingParseLiteralException {
                         if (input instanceof StringValue stringValue) {
                             try {
-                                return LocalDateTime.parse((stringValue).getValue());
+                                final String value = stringValue.getValue();
+                                if (value == null) {
+                                    throw new CoercingParseLiteralException("Expected a non-null String literal");
+                                }
+                                return LocalDateTime.parse(value);
                             } catch (DateTimeParseException e) {
                                 throw new CoercingParseLiteralException(e);
                             }

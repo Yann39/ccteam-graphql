@@ -44,6 +44,12 @@ import java.util.Optional;
 @Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
 
+    /**
+     * Retrieve all news items with related likes and authors fetched.
+     * Results are ordered by newsDate descending (newest first).
+     *
+     * @return The list of news items with related associations fetched
+     */
     @Query("select distinct n from News n " +
            "left join fetch n.likedNews ln " +
            "left join fetch n.createdBy " +
@@ -52,11 +58,26 @@ public interface NewsRepository extends JpaRepository<News, Long> {
            "order by n.newsDate desc")
     List<News> findAllCustom();
 
+    /**
+     * Find news items matching the example, returning a paginated result.
+     * The entity graph ensures likes and author/modifier are fetched.
+     *
+     * @param example  The example probe used for filtering
+     * @param pageable The pagination information
+     * @return The paged news items matching the example
+     */
     @EntityGraph(attributePaths = {"likedNews", "createdBy", "modifiedBy", "likedNews.member"})
     @Query("select distinct n from News n " +
            "order by n.newsDate desc")
     Page<News> findFilteredCustom(Example<News> example, Pageable pageable);
 
+    /**
+     * Find a news item by id and eagerly fetch likes and related member references to provide a complete object
+     * graph for display.
+     *
+     * @param id The news id
+     * @return The optional news with associations fetched
+     */
     @Query("select n from News n " +
            "left join fetch n.likedNews ln " +
            "left join fetch n.createdBy " +
@@ -66,11 +87,21 @@ public interface NewsRepository extends JpaRepository<News, Long> {
            "where n.id = :id")
     Optional<News> findByIdCustom(long id);
 
+    /**
+     * Create a like relation for the given member and news using a native insert for performance.
+     *
+     * @return The number of rows inserted (should be 1 when successful)
+     */
     @Modifying
     @Transactional
     @Query(value = "insert into liked_news(member_id, news_id, created_on) values (:memberId, :newsId, :createdOn)", nativeQuery = true)
     int likeNews(long memberId, long newsId, LocalDateTime createdOn);
 
+    /**
+     * Remove the like relation for the given member and news.
+     *
+     * @return The number of rows deleted (0 or 1)
+     */
     @Modifying
     @Transactional
     @Query(value = "delete from liked_news where member_id = :memberId and news_id = :newsId", nativeQuery = true)

@@ -46,7 +46,9 @@ public class CountryController {
     }
 
     /**
-     * List every country sorted by name.
+     * Get the list of every country sorted by name.
+     *
+     * @return The list of countries sorted by name
      */
     @PreAuthorize("hasRole('ADMIN')")
     @QueryMapping

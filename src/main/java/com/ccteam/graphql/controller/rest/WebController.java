@@ -121,10 +121,10 @@ public class WebController {
      * @param request The request data containing the user's e-mail address
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address is missing from the request</li>
-     * <li>404 Not Found if no account has been found for the specified e-mail address</li>
-     * <li>207 Multi-status if the OTP has been successfully updated but the mail failed to be sent</li>
-     * <li>200 Ok if OTP has been sent successfully</li>
+     *   <li>400 Bad request if e-mail address is missing from the request</li>
+     *   <li>404 Not Found if no account has been found for the specified e-mail address</li>
+     *   <li>207 Multi-status if the OTP has been successfully updated but the mail failed to be sent</li>
+     *   <li>200 Ok if OTP has been sent successfully</li>
      * </ul>
      */
     @PostMapping("/requestDeleteAccountOtp")

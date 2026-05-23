@@ -58,7 +58,8 @@ public class JWTTokenUtils {
      */
     public JWTTokenPayload decodeToken(String authorizationHeader) {
         log.info("Calling JWTTokenUtils decodeToken");
-        final DecodedJWT decodedToken = JWT.require(Algorithm.HMAC512(jwtTokenProperties.getSecret().getBytes())).build().verify(authorizationHeader.replace("Bearer ", ""));
+        final DecodedJWT decodedToken = JWT.require(Algorithm.HMAC512(jwtTokenProperties.getSecret().getBytes()))
+                .build().verify(authorizationHeader.replace("Bearer ", ""));
         return new JWTTokenPayload(decodedToken.getSubject(), decodedToken.getClaim("role").as(Member.Role.class));
     }
 
@@ -72,7 +73,8 @@ public class JWTTokenUtils {
     public String generateToken(String subject, String role) {
         log.info("Calling JWTTokenUtils generateToken");
         final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
-        final Instant instant = now.plusSeconds(jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of(ZONE_ID_EUROPE_PARIS)).toInstant();
+        final Instant instant = now.plusSeconds(
+                jwtTokenProperties.getExpirationTime() / 1000).atZone(ZoneId.of(ZONE_ID_EUROPE_PARIS)).toInstant();
 
         log.info("Building JWT... it will expire on {}", instant.atZone(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
 

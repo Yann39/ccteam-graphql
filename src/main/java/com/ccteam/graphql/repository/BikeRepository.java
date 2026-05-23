@@ -36,14 +36,12 @@ import java.util.List;
 public interface BikeRepository extends JpaRepository<Bike, Long> {
 
     /**
-     * Find all bikes of the given member that are flagged as
-     * {@code current}, excluding the bike with the given id.
+     * Find all bikes of the given member that are flagged as {@code current}, excluding the bike with the given id.
      *
-     * @param memberId   the owner member id
-     * @param excludedId the id of the bike to exclude (e.g. the one
+     * @param memberId   The owner member id
+     * @param excludedId The id of the bike to exclude (e.g. the one
      *                   being marked as current)
-     * @return the list of other bikes of the member that still hold the
-     * current flag
+     * @return The list of other bikes of the member that still hold the current flag
      */
     List<Bike> findByMemberIdAndCurrentTrueAndIdNot(Long memberId, Long excludedId);
 

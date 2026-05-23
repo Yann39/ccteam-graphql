@@ -24,10 +24,9 @@ import com.ccteam.graphql.entities.Member;
 
 /**
  * Position held by a member in the club's executive board.
- *
- * <p>Distinct from {@link Member.Role} (which is a security/access-level
- * concept). At most one member may hold each board role at a given time;
- * uniqueness is enforced at the service layer.</p>
+ * <p>
+ * Distinct from {@link Member.Role} (which is a security/access-level concept).
+ * At most one member may hold each board role at a given time, uniqueness is enforced at the service layer.
  *
  * @author yann39
  * @since 1.0.0

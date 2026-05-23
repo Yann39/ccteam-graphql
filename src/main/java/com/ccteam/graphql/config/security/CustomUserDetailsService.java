@@ -21,6 +21,7 @@
 package com.ccteam.graphql.config.security;
 
 import com.ccteam.graphql.repository.MemberRepository;
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -47,7 +48,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    @Nonnull
+    public UserDetails loadUserByUsername(@Nonnull String userName) throws UsernameNotFoundException {
         log.info("Calling CustomUserDetailsService loadUserByUsername");
         return memberRepository.findByEmailCustom(userName)
                 .map(CustomUserDetails::new)

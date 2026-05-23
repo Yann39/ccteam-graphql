@@ -36,16 +36,14 @@ import org.springframework.stereotype.Repository;
 public interface EventMemberRepository extends JpaRepository<EventMember, Long> {
 
     /**
-     * Null out the {@code bike} reference on every {@link EventMember}
-     * row pointing to the given bike id. Called by
-     * {@code BikeService.deleteBike} to honor the "deleting a bike
-     * keeps your participations, just clears the bike info" contract,
-     * we can't rely on a database-level {@code ON DELETE SET NULL}
-     * because the FK was added via Hibernate auto-DDL without that
-     * clause, and adding it retroactively would require a migration.
+     * Null out the {@code bike} reference on every {@link EventMember} row pointing to the given bike id.
+     * Called by {@code BikeService.deleteBike} to honor the "deleting a bike keeps your participation,
+     * just clears the bike info" contract, we can't rely on a database-level {@code ON DELETE SET NULL}
+     * because the FK was added via Hibernate auto-DDL without that clause, and adding it retroactively
+     * would require a migration.
      *
-     * @param bikeId id of the bike being deleted
-     * @return number of rows updated
+     * @param bikeId ID of the bike being deleted
+     * @return The number of rows updated
      */
     @Modifying
     @Query("update EventMember em set em.bike = null where em.bike.id = :bikeId")

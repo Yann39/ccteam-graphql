@@ -22,6 +22,7 @@ package com.ccteam.graphql.config.security;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,7 +60,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest req,
+                                    @Nonnull HttpServletResponse res,
+                                    @Nonnull FilterChain chain) throws IOException, ServletException {
 
         log.info("Calling JWTAuthorizationFilter doFilterInternal with URL = {}", req.getRequestURL());
 
@@ -80,7 +83,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     // if user is not already authenticated
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         // authenticate user
-                        final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jwtTokenPayload.getEmail(), null, Collections.singletonList(jwtTokenPayload.getRole()));
+                        final UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(jwtTokenPayload.getEmail(),
+                                        null, Collections.singletonList(jwtTokenPayload.getRole()));
 
                         // set authentication in security context holder
                         SecurityContextHolder.getContext().setAuthentication(authentication);

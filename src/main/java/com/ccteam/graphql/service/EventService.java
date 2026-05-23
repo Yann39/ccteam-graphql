@@ -22,11 +22,7 @@ package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.*;
-import com.ccteam.graphql.repository.BikeRepository;
-import com.ccteam.graphql.repository.EventRepository;
-import com.ccteam.graphql.repository.MemberRepository;
-import com.ccteam.graphql.repository.OrganizerRepository;
-import com.ccteam.graphql.repository.TrackRepository;
+import com.ccteam.graphql.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,8 +88,7 @@ public class EventService {
     /**
      * Get all events in the specified month and year, based on event start date.
      *
-     * @param month The month of the events to retrieve as integer from 1 to 12
-     *              (January to December)
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
@@ -102,12 +97,10 @@ public class EventService {
     }
 
     /**
-     * Get all events in the specified day, month and year, based on event start
-     * date.
+     * Get all events in the specified day, month and year, based on event start date.
      *
      * @param day   The day of the events to retrieve
-     * @param month The month of the events to retrieve as integer from 1 to 12
-     *              (January to December)
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
@@ -148,7 +141,7 @@ public class EventService {
      * @param startDate   The start date of the event as ISO {@link String}
      * @param endDate     The end date of the event as ISO {@link String}
      * @param trackId     The ID of the {@link Track} where the event takes place
-     * @param organizer   The organizer of the event
+     * @param organizerId The ID of the organizer of the event
      * @param price       The event price
      * @param memberId    The ID of the {@link Member} who created that event
      * @return An {@link Event} object representing the event just created
@@ -273,11 +266,9 @@ public class EventService {
      *
      * @param eventId  The event ID
      * @param memberId The member ID
-     * @param bikeId   Optional bike id to pin to the participation; pass
-     *                 {@code null} to register without committing to a
-     *                 bike (the member can pick later via
-     *                 {@link #setEventMemberBike}). When non-null, the
-     *                 bike must belong to {@code memberId}.
+     * @param bikeId   Optional bike id to pin to the participation, pass {@code null} to register without committing
+     *                 to a bike (the member can pick later via {@link #setEventMemberBike}).
+     *                 When non-null, the bike must belong to {@code memberId}.
      * @return An {@link Event} object representing the event just registered
      */
     @Transactional
@@ -306,11 +297,10 @@ public class EventService {
                     "Specified member is already registered to specified event");
         }
 
-        // resolve and validate the optional bike — must belong to the same member
+        // resolve and validate the optional bike, must belong to the same member
         final Bike bike = bikeId != null ? resolveOwnedBike(bikeId, memberId) : null;
 
-        // create new participation and add it to the event (JPA will handle the rest
-        // via cascade)
+        // create new participation and add it to the event (JPA will handle the rest via cascade)
         final EventMember participation = new EventMember();
         participation.setEvent(event);
         participation.setMember(memberOptional.get());
@@ -323,15 +313,14 @@ public class EventService {
     }
 
     /**
-     * Change (or clear, by passing {@code null}) the bike pinned to the
-     * participation of {@code memberId} in event {@code eventId}. The
-     * member must already be registered to the event, and the bike (if
-     * any) must belong to {@code memberId}.
+     * Change (or clear, by passing {@code null}) the bike pinned to the participation of {@code memberId}
+     * in event {@code eventId}. The member must already be registered to the event, and the bike (if any)
+     * must belong to {@code memberId}.
      *
-     * @param eventId  the event id
-     * @param memberId the member id
-     * @param bikeId   the bike id to pin, or {@code null} to clear
-     * @return the updated {@link Event}
+     * @param eventId  The event id
+     * @param memberId The member id
+     * @param bikeId   The bike id to pin, or {@code null} to clear
+     * @return The updated {@link Event}
      */
     @Transactional
     public Event setEventMemberBike(long eventId, long memberId, Long bikeId) throws CustomGraphQLException {
@@ -359,11 +348,11 @@ public class EventService {
     }
 
     /**
-     * Load the bike with the given id and verify it belongs to the
-     * specified member. Throws {@code bike_not_found} when the bike
-     * doesn't exist, and {@code bike_not_owned} when it belongs to
-     * someone else — the latter is the kind of cross-member tampering
-     * we explicitly want to forbid here.
+     * Load the bike with the given id and verify it belongs to the specified member.
+     * Throws {@code bike_not_found} when the bike doesn't exist, and {@code bike_not_owned} when it belongs to
+     * someone else, the latter is the kind of cross-member tampering we explicitly want to forbid here.
+     *
+     * @return The bike corresponding to the specified id, if it exists and belongs to the specified member
      */
     private Bike resolveOwnedBike(long bikeId, long memberId) {
         final Optional<Bike> bikeOptional = bikeRepository.findById(bikeId);
@@ -373,7 +362,7 @@ public class EventService {
         }
         final Bike bike = bikeOptional.get();
         if (bike.getMember() == null || !bike.getMember().getId().equals(memberId)) {
-            log.error("Bike id {} does not belong to member id {} — refusing", bikeId, memberId);
+            log.error("Bike id {} does not belong to member id {}, refusing", bikeId, memberId);
             throw new CustomGraphQLException("bike_not_owned", "Specified bike does not belong to the specified member");
         }
         return bike;

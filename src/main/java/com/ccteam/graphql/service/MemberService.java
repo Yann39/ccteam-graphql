@@ -104,9 +104,10 @@ public class MemberService {
     }
 
     /**
-     * Get all members according to the specified filter {@code text}.<br>
-     * Search is done on first name, last name and e-mail address.<br>
-     * If {@code text} filter is null, all records will be returned.
+     * Get all members according to the specified filter {@code text}.
+     * <p>
+     * Search is done on first name, last name and e-mail address. If {@code text} filter is null,
+     * all records will be returned.
      *
      * @param text The text filter string
      * @return A list of {@link Member} objects representing the members
@@ -161,14 +162,10 @@ public class MemberService {
     /**
      * Update the member represented by the given member ID with the specified data.
      * <p>
-     * Annotated {@code @Transactional} so the {@code findByIdCustom} (which
-     * eagerly join-fetches {@code likedNews → news}, {@code bikes}, etc.)
-     * and the subsequent {@code save} share a single Hibernate session.
-     * Without it, and with {@code spring.jpa.open-in-view=false}, the
-     * detached entity returned by {@code save} carries uninitialised
-     * lazy proxies (e.g. {@code likedNews[].news}) that blow up with
-     * {@code LazyInitializationException} during GraphQL response
-     * serialization.
+     * Annotated {@code @Transactional} so the {@code findByIdCustom} (which eagerly join-fetches
+     * {@code likedNews → news}, {@code bikes}, etc.) and the subsequent {@code save} share a single Hibernate session.
+     * Without it, the detached entity returned by {@code save} carries uninitialised lazy proxies during GraphQL
+     * response serialization.
      *
      * @param memberId       The ID of the {@link Member} to update
      * @param firstName      The member first name
@@ -247,13 +244,13 @@ public class MemberService {
 
     /**
      * Assign (or clear) the executive board role of the given member.
-     * <p>If a non-null {@code boardRole} is provided, any other member
-     * previously holding that role is automatically demoted (their
-     * {@code boardRole} is set to {@code null}) so that only one member at
-     * a time holds each board position.</p>
+     * <p>
+     * If a non-null {@code boardRole} is provided, any other member previously holding that role is automatically
+     * demoted (their {@code boardRole} is set to {@code null}) so that only one member at a time holds each board
+     * position.
      *
-     * @param memberId  the id of the member whose role is being set
-     * @param boardRole the role to assign, or {@code null} to clear
+     * @param memberId  The id of the member whose role is being set
+     * @param boardRole The role to assign, or {@code null} to clear
      * @return the updated {@link Member}
      */
     @Transactional
@@ -282,13 +279,11 @@ public class MemberService {
     }
 
     /**
-     * Set the color palette index the member has chosen for their
-     * detail-page header background. Passing {@code null} resets the
-     * choice (the client will fall back to the id-based default).
+     * Set the color palette index the member has chosen for their detail-page header background.
+     * Passing {@code null} resets the choice (the client will fall back to the id-based default).
      *
      * @param memberId      ID of the member
-     * @param headerPalette index in the client-side palette list, or
-     *                      {@code null} to clear the choice
+     * @param headerPalette The index in the client-side palette list, or {@code null} to clear the choice
      * @return the updated {@link Member}
      */
     @Transactional
@@ -304,20 +299,17 @@ public class MemberService {
     }
 
     /**
-     * Change the passcode (BCrypt-hashed "password") of the member identified by
-     * the given e-mail address.
+     * Change the passcode (BCrypt-hashed "password") of the member identified by the given e-mail address.
      * <p>
-     * The {@code currentPasscode} is verified against the stored hash; on mismatch
-     * a {@code bad_credentials} error is thrown so the client can display an
-     * inline error and keep the user on the form. The new passcode must be
+     * The {@code currentPasscode} is verified against the stored hash, on mismatch  a {@code bad_credentials} error
+     * is thrown so the client can display an inline error and keep the user on the form. The new passcode must be
      * exactly 6 digits and different from the current one.
      * <p>
-     * The JWT is intentionally NOT invalidated, only the credential changes,
-     * the session continues seamlessly.
+     * The JWT is intentionally NOT invalidated, only the credential changes, the session continues seamlessly.
      *
-     * @param email           the e-mail of the member changing their passcode (from the JWT principal)
-     * @param currentPasscode the current passcode, to verify ownership
-     * @param newPasscode     the new passcode (6 digits)
+     * @param email           The e-mail of the member changing their passcode (from the JWT principal)
+     * @param currentPasscode The current passcode, to verify ownership
+     * @param newPasscode     The new passcode (6 digits)
      * @return {@code true} on success
      */
     @Transactional

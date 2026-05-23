@@ -25,8 +25,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -67,19 +65,6 @@ public class SecurityConfig {
     }
 
     /**
-     * Define a new method security expression handler with the new defined role hierarchy, to be used instead
-     * of the default one.
-     *
-     * @return A {@link MethodSecurityExpressionHandler} object representing the new configured expression handler
-     */
-    @Bean
-    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
-        final DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy());
-        return expressionHandler;
-    }
-
-    /**
      * Define a password encoder that uses the BCrypt strong hashing function.
      *
      * @return A {@link PasswordEncoder} object representing the {@link BCryptPasswordEncoder} implementation
@@ -90,32 +75,34 @@ public class SecurityConfig {
     }
 
     /**
-     * Needed to prevent the {@link JWTAuthorizationFilter} filter from being called twice.<br/>
-     * Indeed, Spring Boot automatically registers any bean that is a Filter with the servlet container.<br/>
+     * Needed to prevent the {@link JWTAuthorizationFilter} filter from being called twice.
+     * <p>
+     * Indeed, Spring Boot automatically registers any bean that is a Filter with the servlet container.
+     * <p>
      * In our case we still need the filter to be a bean/component to be able to auto-wire dependencies in it,
      * this is why we use this registration bean, to tell Spring Boot not to register the filter again.
-     * <p>
      *
      * @param filter The filter to disable
      * @return A {@link FilterRegistrationBean} bean with the passed filter disabled
      */
     @Bean
     public FilterRegistrationBean<JWTAuthorizationFilter> disableJWTAuthorizationFilter(final JWTAuthorizationFilter filter) {
-        final FilterRegistrationBean<JWTAuthorizationFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        final FilterRegistrationBean<JWTAuthorizationFilter> filterRegistrationBean = new FilterRegistrationBean<>(filter);
         filterRegistrationBean.setFilter(filter);
         filterRegistrationBean.setEnabled(false);
         return filterRegistrationBean;
     }
 
     /**
-     * Define the authentication manager for the current authentication request, according to the current authentication configuration.
+     * Define the authentication manager for the current authentication request,
+     * according to the current authentication configuration.
      *
-     * @param authenticationConfiguration The {@link AuthenticationConfiguration} that exports the current authentication configuration.
+     * @param authenticationConfiguration The {@link AuthenticationConfiguration} that exports the current
+     *                                    authentication configuration.
      * @return The {@link AuthenticationManager} for the current authentication request
-     * @throws Exception An exception occurred while getting authentication manager from authentication configuration
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -124,22 +111,26 @@ public class SecurityConfig {
      *
      * @param http The {@link HttpSecurity}
      * @return A {@link SecurityFilterChain} object representing the new configured filter chain
-     * @throws Exception An exception occurred while configuring the HTTP security
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         return http
                 // disable CSRF as we do not serve browser clients
                 .csrf(AbstractHttpConfigurer::disable)
+                // match only following requests
+                .securityMatcher("/graphql", "/avatars/**")
                 // add JWT authorization filter
                 .addFilter(
-                        new JWTAuthorizationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), jwtTokenUtils)
+                        new JWTAuthorizationFilter(authenticationManager(
+                                http.getSharedObject(AuthenticationConfiguration.class)), jwtTokenUtils)
                 )
                 // allow restricting access to certain URL based on the HTTP servlet request
                 .authorizeHttpRequests(a -> a
-                        // by default, the AuthorizationFilter applies to all dispatcher types, so grant all access only on requests with dispatcher type ASYNC or FORWARD
-                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+                        // by default, the AuthorizationFilter applies to all dispatcher types,
+                        // so grant all access only on requests with dispatcher type ASYNC or FORWARD
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR)
+                        .permitAll()
                         // authenticate requests to GraphQL endpoint
                         .requestMatchers("/graphql").authenticated()
                         // avatar binary endpoint
@@ -166,14 +157,15 @@ public class SecurityConfig {
      *
      * @param http The {@link HttpSecurity}
      * @return A {@link SecurityFilterChain} object representing the new configured filter chain
-     * @throws Exception An exception occurred while configuring the HTTP security
      */
     @Bean
     @Order(2)
-    public SecurityFilterChain filterChainNotAuthenticated(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChainNotAuthenticated(HttpSecurity http) {
         return http
                 // disable CSRF as we do not serve browser clients
                 .csrf(AbstractHttpConfigurer::disable)
+                // match only following requests
+                .securityMatcher("/requestDeleteAccount", "/rest/**", "/actuator/health")
                 // allow restricting access to certain URL based on the HTTP servlet request
                 .authorizeHttpRequests(a -> a
                         // allow any request to REST endpoint

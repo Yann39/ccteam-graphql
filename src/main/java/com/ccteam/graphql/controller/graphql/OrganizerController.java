@@ -48,9 +48,10 @@ public class OrganizerController {
     }
 
     /**
-     * List every organizer, sorted by name. USER-level so the event
-     * picker can fetch them even before the caller is a fully-vetted
-     * member.
+     * Get the list of every organizer, sorted by name.
+     * USER-level so the event picker can fetch them even before the caller is a fully-vetted member.
+     *
+     * @return The list of every organizer, sorted by name
      */
     @PreAuthorize("hasRole('USER')")
     @QueryMapping
@@ -60,7 +61,7 @@ public class OrganizerController {
     }
 
     /**
-     * Create a new organizer. ADMIN-only.
+     * Create a new organizer.
      */
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping

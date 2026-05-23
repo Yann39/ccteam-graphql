@@ -5,8 +5,8 @@
 ![Version](https://img.shields.io/badge/Version-0.9.9-2AAB92.svg)
 ![Static Badge](https://img.shields.io/badge/Last_update-16_May_2026-blue)
 
-![Version](https://img.shields.io/badge/JDK-21-red.svg)
-![Version](https://img.shields.io/badge/Spring_Boot-3.3.5-green.svg)
+![Version](https://img.shields.io/badge/Open_JDK-25-red.svg)
+![Version](https://img.shields.io/badge/Spring_Boot-4.0.6-green.svg)
 ![Version](https://img.shields.io/badge/MariaDB-10.5-teal.svg)
 
 ---
@@ -16,6 +16,7 @@
 * [About](#about)
 * [Installation](#installation)
 * [Usage](#usage)
+* [Documentation](#documentation)
 * [License](#license)
 
 # About
@@ -122,16 +123,15 @@ This will also generate an HTML coverage reports thanks to the **Jacoco** Maven 
 You will find it under _target\site\jacoco\index.html_
 
 The authentication/registration related endpoints are exposed via **REST**.
-You can test either the GraphQL or the REST endpoints using command line (i.e. using **cURL**),
-or we provide a ready-to-use **Insomnia** export in the _src/main/resources_ directory.
+You can test either the GraphQL or the REST endpoints using command line (i.e. using **cURL**).
 
 # Documentation
 
 User roles :
 
-- NORMAL : default user role, not member of the team
-- MEMBER : members that have been accepted in the team
-- ADMIN : administrator users
+- **NORMAL** : default user role, not member of the team
+- **MEMBER** : members that have been accepted in the team
+- **ADMIN** : administrator users
 
 # License
 

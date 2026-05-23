@@ -68,8 +68,9 @@ public class EventController {
     }
 
     /**
-     * Lightweight count of all events in the database. USER-accessible
-     * even when the caller is not yet a fully-validated MEMBER.
+     * Count all events in the database. USER-accessible even when the caller is not yet a fully-validated MEMBER.
+     *
+     * @return The number of events
      */
     @PreAuthorize("hasRole('USER')")
     @QueryMapping
@@ -94,8 +95,7 @@ public class EventController {
     /**
      * Get all events in the specified month and year, based on event start date.
      *
-     * @param month The month of the events to retrieve as integer from 1 to 12
-     *              (January to December)
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
@@ -112,8 +112,7 @@ public class EventController {
      * date.
      *
      * @param day   The day of the events to retrieve
-     * @param month The month of the events to retrieve as integer from 1 to 12
-     *              (January to December)
+     * @param month The month of the events to retrieve as integer from 1 to 12 (January to December)
      * @param year  The year of the events to retrieve
      * @return A list of {@link Event} objects representing the events
      */
@@ -232,9 +231,8 @@ public class EventController {
      *
      * @param eventId  The event ID
      * @param memberId The member ID
-     * @param bikeId   Optional bike id to pin to the participation (may
-     *                 be {@code null}). When non-null, the bike must
-     *                 belong to {@code memberId}.
+     * @param bikeId   Optional bike id to pin to the participation (may be {@code null}).
+     *                 When non-null, the bike must belong to {@code memberId}.
      * @return An {@link Event} object representing the event just registered
      */
     @PreAuthorize("hasRole('MEMBER')")
@@ -262,15 +260,11 @@ public class EventController {
     }
 
     /**
-     * Change (or clear, by passing a {@code null} bike) the bike pinned
-     * to the caller's own participation in event {@code eventId}.
+     * Change (or clear, by passing a {@code null} bike) the bike pinned to the caller's own participation
+     * in event {@code eventId}.
      * <p>
-     * The acting member is derived from {@link Authentication} (JWT
-     * subject) rather than taken as a separate argument — a member can
-     * only edit their own participation, not anyone else's, so there's
-     * no need to surface a {@code memberId} parameter that an admin
-     * dashboard would otherwise be tempted to spoof. Keeps the mutation
-     * intent unambiguous on the wire.
+     * The acting member is derived from {@link Authentication} (JWT subject) rather than taken as a separate argument,
+     * a member can only edit their own participation, not anyone else's.
      *
      * @param eventId        the event id
      * @param bikeId         the bike id to pin, or {@code null} to clear

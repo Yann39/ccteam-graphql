@@ -76,12 +76,12 @@ public class AccountController {
      * @param checkAccountRequest The request data containing the account e-mail address
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address is missing from the request</li>
-     * <li>404 Not Found if no account has been found for the specified e-mail address</li>
-     * <li>302 Found if account exists, OTP has been sent and is still valid</li>
-     * <li>417 Expectation Failed if account exists, OTP has been sent but is not valid anymore</li>
-     * <li>403 Forbidden if account exists but is not verified</li>
-     * <li>200 Ok if account has been found and is verified</li>
+     *   <li>400 Bad request if e-mail address is missing from the request</li>
+     *   <li>404 Not Found if no account has been found for the specified e-mail address</li>
+     *   <li>302 Found if account exists, OTP has been sent and is still valid</li>
+     *   <li>417 Expectation Failed if account exists, OTP has been sent but is not valid anymore</li>
+     *   <li>403 Forbidden if account exists but is not verified</li>
+     *   <li>200 Ok if account has been found and is verified</li>
      * </ul>
      */
     @PostMapping("/rest/checkAccount")
@@ -108,14 +108,14 @@ public class AccountController {
         final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
         final LocalDateTime expiryThreshold = now.minusMinutes(OTP_VALIDITY_MINUTES);
         if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate() != null
-            && member.get().getOtpDate().isAfter(expiryThreshold)) {
+                && member.get().getOtpDate().isAfter(expiryThreshold)) {
             log.info("Account with e-mail address {} exist, OTP has been sent and is still valid", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.FOUND).build();
         }
 
         // account exist, OTP has been sent but is not valid anymore (OTP was generated more than OTP_VALIDITY_MINUTES ago)
         if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate() != null
-            && member.get().getOtpDate().isBefore(expiryThreshold)) {
+                && member.get().getOtpDate().isBefore(expiryThreshold)) {
             log.info("Account with e-mail address {} exist, OTP has been sent but is not valid anymore", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
@@ -140,10 +140,10 @@ public class AccountController {
      * @param preRegisterRequest The request data containing the user's e-mail address, first name and last name
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address, first name, or last name is missing from the request</li>
-     * <li>409 Conflict if a user already exist with the same e-mail address</li>
-     * <li>207 Multi-status if the user is successfully created but the confirmation e-mail failed to be sent</li>
-     * <li>201 Created if succeeded</li>
+     *   <li>400 Bad request if e-mail address, first name, or last name is missing from the request</li>
+     *   <li>409 Conflict if a user already exist with the same e-mail address</li>
+     *   <li>207 Multi-status if the user is successfully created but the confirmation e-mail failed to be sent</li>
+     *   <li>201 Created if succeeded</li>
      * </ul>
      */
 
@@ -204,23 +204,20 @@ public class AccountController {
     /**
      * Send a new one-time password to the specified e-mail address.
      * <p>
-     * Used when the user didn't receive the first OTP or didn't enter
-     * it in time. Rate-limited to {@value OTP_RESEND_COOLDOWN_SECONDS}
-     * seconds between two resends per account, enforced by comparing
-     * {@code member.otpDate} (which is updated by both {@code preRegister}
-     * and this endpoint) to {@code now}. The cooldown therefore also
-     * applies between the initial registration and the first resend,
+     * Used when the user didn't receive the first OTP or didn't enter it in time.
+     * Rate-limited to {@value OTP_RESEND_COOLDOWN_SECONDS} seconds between two resends per account,
+     * enforced by comparing {@code member.otpDate} (which is updated by both {@code preRegister} and this endpoint)
+     * to {@code now}. The cooldown therefore also applies between the initial registration and the first resend,
      * not just between two consecutive resends.
      *
      * @param resendOtpRequest The request data containing the user's e-mail address
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address is missing from the request</li>
-     * <li>404 Not Found if no account has been found for the specified e-mail address</li>
-     * <li>429 Too Many Requests if the cooldown hasn't elapsed yet — body
-     *     carries {@code {"secondsLeft": N}}</li>
-     * <li>207 Multi-status if the OTP has been successfully updated but the mail failed to be sent</li>
-     * <li>200 Ok if OTP has been resent successfully</li>
+     *   <li>400 Bad request if e-mail address is missing from the request</li>
+     *   <li>404 Not Found if no account has been found for the specified e-mail address</li>
+     *   <li>429 Too Many Requests if the cooldown hasn't elapsed yet, body carries {@code {"secondsLeft": N}}</li>
+     *   <li>207 Multi-status if the OTP has been successfully updated but the mail failed to be sent</li>
+     *   <li>200 Ok if OTP has been resent successfully</li>
      * </ul>
      */
     @PostMapping("/rest/resendOtp")
@@ -281,11 +278,11 @@ public class AccountController {
      * @param confirmEmailRequest The request data containing the user's e-mail address and the OTP to be confirmed
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address or OTP is missing from the request</li>
-     * <li>404 Not found if the specified user's e-mail address has not been found in the database</li>
-     * <li>406 Not acceptable if the specified OTP has expired</li>
-     * <li>401 Unauthorized if the specified OTP does not match the one from the database</li>
-     * <li>202 Accepted if e-mail has been verified successfully</li>
+     *   <li>400 Bad request if e-mail address or OTP is missing from the request</li>
+     *   <li>404 Not found if the specified user's e-mail address has not been found in the database</li>
+     *   <li>406 Not acceptable if the specified OTP has expired</li>
+     *   <li>401 Unauthorized if the specified OTP does not match the one from the database</li>
+     *   <li>202 Accepted if e-mail has been verified successfully</li>
      * </ul>
      */
     @PostMapping("/rest/confirmEmail")
@@ -346,9 +343,9 @@ public class AccountController {
      * @param completeRegistrationRequest The request data containing the user's e-mail address and the password to be defined
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address or password is missing</li>
-     * <li>404 Not found if the specified user's e-mail address is not found in the database</li>
-     * <li>200 Ok if succeeded</li>
+     *   <li>400 Bad request if e-mail address or password is missing</li>
+     *   <li>404 Not found if the specified user's e-mail address is not found in the database</li>
+     *   <li>200 Ok if succeeded</li>
      * </ul>
      */
     @PostMapping("/rest/completeRegistration")
@@ -394,10 +391,10 @@ public class AccountController {
      * @param forgotPasswordRequest The request data containing the user's e-mail address
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if e-mail address is missing</li>
-     * <li>404 Not found if the specified user's e-mail address is not found in the database</li>
-     * <li>207 Multi-status if the user has been found but the confirmation e-mail failed to be sent</li>
-     * <li>200 Ok if succeeded</li>
+     *   <li>400 Bad request if e-mail address is missing</li>
+     *   <li>404 Not found if the specified user's e-mail address is not found in the database</li>
+     *   <li>207 Multi-status if the user has been found but the confirmation e-mail failed to be sent</li>
+     *   <li>200 Ok if succeeded</li>
      * </ul>
      */
     @PostMapping("/rest/forgotPassword")

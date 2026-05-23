@@ -116,13 +116,6 @@ public class NewsService {
      */
     public News createNews(String title, String catchLine, String content, String newsDate, long memberId) throws CustomGraphQLException {
 
-        // get the current logged user
-        /*final Object loggedUserPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(loggedUserPrincipal instanceof String loggedUserMail) || loggedUserMail.isEmpty()) {
-            log.error("Cannot get user principal from security context");
-            throw new CustomGraphQLException("user_not_logged", "Cannot get user principal from security context");
-        }*/
-
         // check if specified member exists
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
@@ -165,13 +158,6 @@ public class NewsService {
             log.error("News with id {} not found in the database", newsId);
             throw new CustomGraphQLException("news_not_found", "Specified news ID has not been found in the database");
         }
-
-        // get the current logged user
-        /*final Object loggedUserPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(loggedUserPrincipal instanceof String loggedUserMail) || loggedUserMail.isEmpty()) {
-            log.error("Cannot get user principal from security context");
-            throw new CustomGraphQLException("user_not_logged", "Cannot get user principal from security context");
-        }*/
 
         // check if specified member exists
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);

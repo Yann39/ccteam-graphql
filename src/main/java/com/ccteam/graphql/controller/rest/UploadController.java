@@ -62,15 +62,16 @@ public class UploadController {
      * @param file     The file representing the avatar
      * @return An empty body response with one of the following HTTP status :
      * <ul>
-     * <li>400 Bad request if member ID is missing from the request</li>
-     * <li>400 Bad request if file is missing from the request</li>
-     * <li>404 Not Found if no member has been found for the specified member ID</li>
-     * <li>500 Internal Server Error if file bytes from the specified avatar file failed to be read</li>
-     * <li>200 Ok if the avatar file has been successfully associated to the member</li>
+     *   <li>400 Bad request if member ID is missing from the request</li>
+     *   <li>400 Bad request if file is missing from the request</li>
+     *   <li>404 Not Found if no member has been found for the specified member ID</li>
+     *   <li>500 Internal Server Error if file bytes from the specified avatar file failed to be read</li>
+     *   <li>200 Ok if the avatar file has been successfully associated to the member</li>
      * </ul>
      */
     @PostMapping("/rest/uploadAvatar")
-    public ResponseEntity<HttpStatus> uploadAvatar(@RequestParam("memberId") Long memberId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<HttpStatus> uploadAvatar(@RequestParam("memberId") Long memberId,
+                                                   @RequestParam("file") MultipartFile file) {
 
         log.info("Call to checkAccount REST endpoint");
 

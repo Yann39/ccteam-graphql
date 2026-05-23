@@ -53,26 +53,22 @@ public class TrackService {
     }
 
     /**
-     * Resolve a {@link Country} from its ISO 3166-1 alpha-2 code. The
-     * country is mandatory on tracks, so a {@code null} or blank code is
-     * rejected.
+     * Resolve a {@link Country} from its ISO 3166-1 alpha-2 code. The country is mandatory on tracks,
+     * so a {@code null} or blank code is rejected.
      *
-     * @param countryCode the country code (mandatory)
-     * @return the matching {@link Country}
-     * @throws CustomGraphQLException if the code is missing or does not
-     *         match any known country
+     * @param countryCode The country code (mandatory)
+     * @return The matching {@link Country}
+     * @throws CustomGraphQLException Tf the code is missing or does not match any known country
      */
     private Country resolveCountry(String countryCode) {
         if (countryCode == null || countryCode.isBlank()) {
             log.error("Country code is required for track creation/update");
-            throw new CustomGraphQLException("country_required",
-                    "A country code is required");
+            throw new CustomGraphQLException("country_required", "A country code is required");
         }
         return countryRepository.findById(countryCode.toUpperCase())
                 .orElseThrow(() -> {
                     log.error("Country with code {} not found", countryCode);
-                    return new CustomGraphQLException("country_not_found",
-                            "Specified country code has not been found");
+                    return new CustomGraphQLException("country_not_found", "Specified country code has not been found");
                 });
     }
 
@@ -127,7 +123,7 @@ public class TrackService {
      */
     @Transactional
     public Track createTrack(String name, int distance, int lapRecord, String website, BigDecimal latitude,
-            BigDecimal longitude, String countryCode) {
+                             BigDecimal longitude, String countryCode) {
         final Track track = new Track();
         track.setName(name);
         track.setDistance(distance);
@@ -154,7 +150,7 @@ public class TrackService {
      */
     @Transactional
     public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website,
-            BigDecimal latitude, BigDecimal longitude, String countryCode) {
+                             BigDecimal latitude, BigDecimal longitude, String countryCode) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);

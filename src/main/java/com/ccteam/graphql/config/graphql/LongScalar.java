@@ -20,11 +20,17 @@
 
 package com.ccteam.graphql.config.graphql;
 
+import graphql.GraphQLContext;
+import graphql.execution.CoercedVariables;
 import graphql.language.IntValue;
+import graphql.language.Value;
 import graphql.schema.*;
 import graphql.schema.idl.RuntimeWiring;
+import jakarta.annotation.Nonnull;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
 
 /**
  * Custom GraphQL scalar implementation of the {@link Long} type.
@@ -46,12 +52,16 @@ public class LongScalar implements RuntimeWiringConfigurer {
                 .coercing(new Coercing<Long, Object>() {
 
                     @Override
-                    public Object serialize(final Object dataFetcherResult) {
+                    public Object serialize(@Nonnull final Object dataFetcherResult,
+                                            @Nonnull final GraphQLContext graphQLContext,
+                                            @Nonnull final Locale locale) throws CoercingSerializeException {
                         return dataFetcherResult instanceof Long value ? value : dataFetcherResult.toString();
                     }
 
                     @Override
-                    public Long parseValue(final Object input) {
+                    public Long parseValue(@Nonnull final Object input,
+                                           @Nonnull final GraphQLContext graphQLContext,
+                                           @Nonnull final Locale locale) throws CoercingParseValueException {
                         if (input instanceof Number number) {
                             return number.longValue();
                         } else if (input instanceof String string) {
@@ -62,16 +72,23 @@ public class LongScalar implements RuntimeWiringConfigurer {
                             }
                         }
                         throw new CoercingParseValueException("Expected a Number or String value, but got: "
-                                + (input == null ? "null" : input.getClass().getName()));
+                                + input.getClass().getName());
                     }
 
                     @Override
-                    public Long parseLiteral(final Object input) {
+                    public Long parseLiteral(@Nonnull final Value<?> input,
+                                             @Nonnull final CoercedVariables variables,
+                                             @Nonnull final GraphQLContext graphQLContext,
+                                             @Nonnull final Locale locale) throws CoercingParseLiteralException {
                         if (input instanceof IntValue value) {
                             return value.getValue().longValue();
                         } else if (input instanceof graphql.language.StringValue value) {
                             try {
-                                return Long.parseLong(value.getValue());
+                                final String valueString = value.getValue();
+                                if (valueString == null) {
+                                    throw new CoercingParseLiteralException("Expected a non-null String literal");
+                                }
+                                return Long.parseLong(valueString);
                             } catch (NumberFormatException e) {
                                 throw new CoercingParseLiteralException(
                                         "Value is not a valid Long: " + value.getValue());

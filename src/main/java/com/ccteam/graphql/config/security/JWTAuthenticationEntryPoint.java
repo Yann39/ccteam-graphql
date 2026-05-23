@@ -21,14 +21,15 @@
 package com.ccteam.graphql.config.security;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 
 import java.io.IOException;
 
@@ -39,8 +40,9 @@ import java.io.IOException;
  * If the user requests a secure resource without being authenticated, an {@link AuthenticationException} is thrown.
  * Then {@link AuthenticationEntryPoint} is called, and the {@code commence()} method is triggered.
  * <p>
- * We use this to customize the server response when a problem occurs while verifying the JWT token in our {@link JWTAuthorizationFilter},
- * so that we can return a response in a GraphQL standard response format needed on Flutter side.
+ * We use this to customize the server response when a problem occurs while verifying the JWT token in
+ * our {@link JWTAuthorizationFilter}, so that we can return a response in a GraphQL standard response format
+ * needed on Flutter side.
  *
  * @author yann39
  * @since 1.0.0
@@ -50,7 +52,8 @@ import java.io.IOException;
 public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException authException) throws IOException {
+    public void commence(HttpServletRequest req, HttpServletResponse res,
+                         @Nonnull AuthenticationException authException) throws IOException {
         log.info("Calling JWTAuthenticationEntryPoint commence");
 
         res.setContentType("application/json;charset=UTF-8");

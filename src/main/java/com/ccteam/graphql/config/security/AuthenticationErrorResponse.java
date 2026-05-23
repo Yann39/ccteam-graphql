@@ -25,19 +25,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Body returned by {@code /rest/authenticate} when authentication
- * fails with either bad credentials (HTTP 401) or because the account
- * is currently locked (HTTP 423).
+ * Body returned by {@code /rest/authenticate} when authentication fails with either
+ * bad credentials (HTTP 401) or because the account is currently locked (HTTP 423).
  * <p>
  * Both fields are nullable and only the relevant one is populated:
  * <ul>
- *   <li>{@code attemptsLeft} — set on 401 responses: number of
- *       attempts the user has left before the next lockout kicks in.</li>
- *   <li>{@code lockedUntilSeconds} — set on 423 responses: number of
- *       seconds remaining before the account unlocks. Sent as a
- *       relative value (rather than an absolute timestamp) so the
- *       client doesn't have to worry about clock skew between
- *       server and device.</li>
+ *   <li>{@code attemptsLeft}, set on 401 responses: number of attempts the user has left before
+ *       the next lockout kicks in.</li>
+ *   <li>{@code lockedUntilSeconds}, set on 423 responses: number of seconds remaining before the account unlocks.
+ *       Sent as a relative value (rather than an absolute timestamp) so the client doesn't have to worry about clock
+ *       skew between server and device.</li>
  * </ul>
  *
  * @author yann39

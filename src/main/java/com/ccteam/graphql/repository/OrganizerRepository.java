@@ -36,7 +36,9 @@ import java.util.Optional;
 public interface OrganizerRepository extends JpaRepository<Organizer, Long> {
 
     /**
-     * Case-insensitive lookup by name.
+     * Find an organizer by its name.
+     *
+     * @return The optional organizer with the specified name
      */
     Optional<Organizer> findByNameIgnoreCaseOrderByName(String name);
 

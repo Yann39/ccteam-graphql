@@ -34,5 +34,13 @@ import java.util.Optional;
  */
 @Repository
 public interface MembershipFeeRepository extends CrudRepository<MembershipFee, Long> {
+
+    /**
+     * Find the membership fee record for the given member and year.
+     *
+     * @param memberId The member id
+     * @param year     The year of the fee
+     * @return The optional membership fee record
+     */
     Optional<MembershipFee> findByMemberIdAndYear(Long memberId, Integer year);
 }

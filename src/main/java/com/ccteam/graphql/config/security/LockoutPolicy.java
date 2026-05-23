@@ -25,12 +25,10 @@ import java.time.Duration;
 /**
  * Progressive lockout policy for failed login attempts.
  * <p>
- * Single source of truth for the rate-limiting curve so the controller
- * and any future caller (Flutter UI sanity-checks, admin tooling,
- * tests) agree on the numbers.
+ * Single source of truth for the rate-limiting curve so the controller and any future caller
+ * (Flutter UI sanity-checks, admin tooling, tests) agree on the numbers.
  * <p>
- * Mapping (consecutive failed attempts ⇒ lockout duration after the
- * failure is recorded):
+ * Mapping (consecutive failed attempts ⇒ lockout duration after the failure is recorded):
  * <ul>
  *   <li>1, 2          → no lockout (regular bad-credentials response)</li>
  *   <li>3, 4          → 1 minute</li>
@@ -51,13 +49,14 @@ public final class LockoutPolicy {
     public static final int FREE_ATTEMPTS = 3;
 
     private LockoutPolicy() {
-        // utility class — no instances
+        throw new IllegalStateException("Utility class");
     }
 
     /**
-     * Lockout duration after recording {@code failedAttempts} consecutive
-     * failures. {@code Duration.ZERO} means "no lockout, just a regular
-     * bad-credentials response".
+     * Lockout duration after recording {@code failedAttempts} consecutive failures.
+     * {@code Duration.ZERO} means "no lockout, just a regular bad-credentials response".
+     *
+     * @return The lockout duration
      */
     public static Duration durationFor(int failedAttempts) {
         if (failedAttempts < 3) return Duration.ZERO;
@@ -68,10 +67,10 @@ public final class LockoutPolicy {
     }
 
     /**
-     * Number of attempts the caller has left before the next lockout
-     * kicks in, given {@code failedAttempts} already-recorded
-     * failures. Returns 0 once the next attempt would itself trigger
-     * a lockout (i.e. once we're already at or past
+     * Number of attempts the caller has left before the next lockout kicks in, given {@code failedAttempts}
+     * already-recorded failures.
+     *
+     * @return 0 once the next attempt would itself trigger a lockout (i.e. once we're already at or past
      * {@link #FREE_ATTEMPTS}).
      */
     public static int attemptsLeftBeforeLockout(int failedAttempts) {

@@ -38,9 +38,7 @@ import lombok.Setter;
 public class DeleteAccountRequest {
 
     private String email;
-
     private String reason;
-
     private String otp;
 
 }

@@ -32,16 +32,14 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 
 /**
- * Serves member avatar binaries over HTTP, with proper caching headers
- * so clients can avoid re-downloading the bytes on every render.
+ * Serves member avatar binaries over HTTP, with proper caching headers so clients can avoid re-downloading
+ * the bytes on every render.
  * <p>
- * Lives outside GraphQL on purpose: avatars are large opaque blobs
- * (up to ~500 KB each) and were previously dragged through every
- * GraphQL response that projected {@code avatarFile}, base64-encoded
- * (+33 % wire overhead), with no possibility for HTTP-level caching.
- * The HTTP endpoint route lets us emit a stable {@code ETag} and
- * honour {@code If-None-Match} for a {@code 304 Not Modified}, plus
- * sit behind a CDN later if scale ever demands it.
+ * Lives outside GraphQL on purpose: avatars are large opaque blobs that are not useful to GraphQL clients,
+ * and we want to be able to serve them with long-term caching headers.
+ * <p>
+ * The HTTP endpoint route lets us emit a stable {@code ETag} and honour {@code If-None-Match} for
+ * a {@code 304 Not Modified}, plus sit behind a CDN later if scale ever demands it.
  *
  * @author yann39
  * @since 1.0.0
@@ -52,11 +50,9 @@ import java.util.Optional;
 public class AvatarController {
 
     /**
-     * Browser/client may reuse the cached body for an hour before
-     * re-validating with the server. With {@code must-revalidate},
-     * past that TTL the client must check freshness (sends
-     * {@code If-None-Match}) before reusing — server then answers
-     * 304 with empty body when the ETag still matches.
+     * Browser/client may reuse the cached body for an hour before re-validating with the server.
+     * With {@code must-revalidate}, past that TTL the client must check freshness (sends {@code If-None-Match})
+     * before reusing, server then answers 304 with empty body when the ETag still matches.
      */
     private static final Duration CACHE_MAX_AGE = Duration.ofHours(1);
 
@@ -69,13 +65,10 @@ public class AvatarController {
     /**
      * Serve the avatar for the given member id.
      * <ul>
-     *   <li>{@code 200 OK} with the raw bytes + {@code ETag} and
-     *       {@code Cache-Control} when the avatar exists.</li>
-     *   <li>{@code 304 Not Modified} (empty body) when the client
-     *       sends a matching {@code If-None-Match} header — the only
-     *       round-trip cost is a few HTTP headers.</li>
-     *   <li>{@code 404 Not Found} when the member doesn't exist or
-     *       hasn't uploaded an avatar.</li>
+     *   <li>{@code 200 OK} with the raw bytes + {@code ETag} and {@code Cache-Control} when the avatar exists.</li>
+     *   <li>{@code 304 Not Modified} (empty body) when the client sends a matching {@code If-None-Match} header,
+     *       the only round-trip cost is a few HTTP headers.</li>
+     *   <li>{@code 404 Not Found} when the member doesn't exist or hasn't uploaded an avatar.</li>
      * </ul>
      *
      * @param memberId    the member whose avatar to fetch
@@ -114,9 +107,7 @@ public class AvatarController {
 
     /**
      * Best-effort Content-Type from the stored filename extension.
-     * Defaults to {@code application/octet-stream} when nothing
-     * matches, the client image library handles the bytes either
-     * way, the Content-Type is a hint not a contract.
+     * Defaults to {@code application/octet-stream} when nothing matches.
      */
     private MediaType mediaTypeFromFilename(String filename) {
         if (filename == null) return MediaType.APPLICATION_OCTET_STREAM;
