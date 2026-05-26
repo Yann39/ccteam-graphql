@@ -24,6 +24,7 @@ import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import jakarta.annotation.Nonnull;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,8 @@ import java.util.Map;
 public class CustomDataFetchingExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
     @Override
-    public GraphQLError resolveToSingleError(Throwable throwable, DataFetchingEnvironment dataFetchingEnvironment) {
+    public GraphQLError resolveToSingleError(@Nonnull Throwable throwable,
+                                             @Nonnull DataFetchingEnvironment dataFetchingEnvironment) {
         if (throwable instanceof CustomGraphQLException customGraphQLException) {
             return GraphqlErrorBuilder.newError(dataFetchingEnvironment)
                     .message(throwable.getMessage())

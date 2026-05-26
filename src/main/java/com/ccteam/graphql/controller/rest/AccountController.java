@@ -182,7 +182,8 @@ public class AccountController {
         member.setLastName(preRegisterRequest.getLastName());
         member.setEmail(preRegisterRequest.getEmail());
         member.setCreatedOn(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
-        member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
+        // generate 4-digits OTP
+        member.setOtp(String.format("%04d", ThreadLocalRandom.current().nextInt(10000)));
         member.setOtpDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         member.setRole(Member.Role.ROLE_USER);
         memberRepository.save(member);
@@ -253,8 +254,9 @@ public class AccountController {
             }
         }
 
-        // generate a new OTP and save the user
-        member.get().setOtp(ThreadLocalRandom.current().nextInt(1000, 10000) + "");
+        // generate a new OTP and save the user — see comment on preRegister
+        // for why we use nextInt(10000) + %04d instead of nextInt(1000, 10000)
+        member.get().setOtp(String.format("%04d", ThreadLocalRandom.current().nextInt(10000)));
         member.get().setOtpDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         memberRepository.save(member.get());
         log.info("New OTP has been generated and saved for e-mail address {}", resendOtpRequest.getEmail());
@@ -417,8 +419,9 @@ public class AccountController {
 
         final Member member = optMember.get();
 
-        // set new OTP
-        member.setOtp(String.valueOf(ThreadLocalRandom.current().nextInt(9999)));
+        // set new OTP — see comment on preRegister for why we use
+        // nextInt(10000) + %04d instead of nextInt(9999)
+        member.setOtp(String.format("%04d", ThreadLocalRandom.current().nextInt(10000)));
         member.setOtpDate(LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS)));
         memberRepository.save(member);
 
