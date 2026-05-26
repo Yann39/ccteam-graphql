@@ -20,11 +20,7 @@
 
 package com.ccteam.graphql.controller.graphql;
 
-import com.ccteam.graphql.entities.Event;
-import com.ccteam.graphql.entities.EventMember;
-import com.ccteam.graphql.entities.Member;
-import com.ccteam.graphql.entities.Organizer;
-import com.ccteam.graphql.entities.Track;
+import com.ccteam.graphql.entities.*;
 import com.ccteam.graphql.service.EventService;
 import com.ccteam.graphql.service.MemberService;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,12 +28,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.GraphQlTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.graphql.test.tester.HttpGraphQlTester;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -48,18 +46,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@GraphQlTest(EventController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(OutputCaptureExtension.class)
 class EventControllerTest {
 
-    @Autowired
+    @LocalServerPort
+    private int port;
+
     private GraphQlTester graphQlTester;
 
-    @MockBean
+    @MockitoBean
     private EventService eventService;
 
-    @MockBean
+    @MockitoBean
     private MemberService memberService;
 
     private Event eventBresse;
@@ -68,6 +68,13 @@ class EventControllerTest {
 
     @BeforeAll
     void setup() {
+
+        // Build a GraphQlTester that will call the running test server's /graphql endpoint.
+        final WebTestClient client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:" + port + "/graphql")
+                .build();
+        this.graphQlTester = HttpGraphQlTester.create(client);
+
 
         final Track trackBresse = new Track();
         trackBresse.setId(1L);
@@ -175,92 +182,92 @@ class EventControllerTest {
                 .execute()
                 .path("getAllEvents")
                 .matchesJsonStrictly("""
-            [
-              {
-                "id": "1",
-                "title": "Event Bresse",
-                "description": "Event Bresse description",
-                "startDate": "2018-07-13 08:00:00",
-                "endDate": "2018-07-13 16:30:00",
-                "track": {
-                  "name": "Bresse",
-                  "distance": 3000,
-                  "lapRecord": 84330,
-                  "website": "https://www.circuitdebresse.com",
-                  "latitude": 46.551756882687776,
-                  "longitude": 5.3285273408879394
-                },
-                "participants": [
-                  {
-                    "member": {
-                      "firstName": "Jane",
-                      "lastName": "Doe",
-                      "email": "Jane.Doe@example.com"
-                    }
-                  }
-                ],
-                "organizer": {
-                  "name": "Organizer A"
-                },
-                "price": 180,
-                "createdOn": "2018-04-11 20:41:05",
-                "createdBy": {
-                  "id": "1",
-                  "firstName": "Bob",
-                  "lastName": "Douglas"
-                },
-                "modifiedOn": "2018-04-11 20:46:17",
-                "modifiedBy": {
-                  "id": "2",
-                  "firstName": "John",
-                  "lastName": "Doe"
-                }
-              },
-              {
-                "id": "2",
-                "title": "Event Magny-Cours",
-                "description": "Event Magny-Cours description",
-                "startDate": "2019-05-24 09:00:00",
-                "endDate": "2019-05-24 18:00:00",
-                "track": {
-                  "name": "Magny-cours",
-                  "distance": 4411,
-                  "lapRecord": 96950,
-                  "website": "https://www.circuitmagnycours.com/",
-                  "latitude": 46.86390367017831,
-                  "longitude": 3.162750730649732
-                },
-                "participants": [
-                  {
-                    "member": {
-                      "firstName": "John",
-                      "lastName": "Doe",
-                      "email": "John.Doe@example.com"
-                    }
-                  },
-                  {
-                    "member": {
-                      "firstName": "John",
-                      "lastName": "Doe",
-                      "email": "John.Doe@example.com"
-                    }
-                  }
-                ],
-                "organizer": {
-                  "name": "Organizer B"
-                },
-                "price": 240,
-                "createdOn": "2019-01-29 22:15:14",
-                "createdBy": {
-                  "id": "1",
-                  "firstName": "Bob",
-                  "lastName": "Douglas"
-                },
-                "modifiedOn": null,
-                "modifiedBy": null
-              }
-            ]
-            """);
+                        [
+                          {
+                            "id": "1",
+                            "title": "Event Bresse",
+                            "description": "Event Bresse description",
+                            "startDate": "2018-07-13 08:00:00",
+                            "endDate": "2018-07-13 16:30:00",
+                            "track": {
+                              "name": "Bresse",
+                              "distance": 3000,
+                              "lapRecord": 84330,
+                              "website": "https://www.circuitdebresse.com",
+                              "latitude": 46.551756882687776,
+                              "longitude": 5.3285273408879394
+                            },
+                            "participants": [
+                              {
+                                "member": {
+                                  "firstName": "Jane",
+                                  "lastName": "Doe",
+                                  "email": "Jane.Doe@example.com"
+                                }
+                              }
+                            ],
+                            "organizer": {
+                              "name": "Organizer A"
+                            },
+                            "price": 180,
+                            "createdOn": "2018-04-11 20:41:05",
+                            "createdBy": {
+                              "id": "1",
+                              "firstName": "Bob",
+                              "lastName": "Douglas"
+                            },
+                            "modifiedOn": "2018-04-11 20:46:17",
+                            "modifiedBy": {
+                              "id": "2",
+                              "firstName": "John",
+                              "lastName": "Doe"
+                            }
+                          },
+                          {
+                            "id": "2",
+                            "title": "Event Magny-Cours",
+                            "description": "Event Magny-Cours description",
+                            "startDate": "2019-05-24 09:00:00",
+                            "endDate": "2019-05-24 18:00:00",
+                            "track": {
+                              "name": "Magny-cours",
+                              "distance": 4411,
+                              "lapRecord": 96950,
+                              "website": "https://www.circuitmagnycours.com/",
+                              "latitude": 46.86390367017831,
+                              "longitude": 3.162750730649732
+                            },
+                            "participants": [
+                              {
+                                "member": {
+                                  "firstName": "John",
+                                  "lastName": "Doe",
+                                  "email": "John.Doe@example.com"
+                                }
+                              },
+                              {
+                                "member": {
+                                  "firstName": "John",
+                                  "lastName": "Doe",
+                                  "email": "John.Doe@example.com"
+                                }
+                              }
+                            ],
+                            "organizer": {
+                              "name": "Organizer B"
+                            },
+                            "price": 240,
+                            "createdOn": "2019-01-29 22:15:14",
+                            "createdBy": {
+                              "id": "1",
+                              "firstName": "Bob",
+                              "lastName": "Douglas"
+                            },
+                            "modifiedOn": null,
+                            "modifiedBy": null
+                          }
+                        ]
+                        """);
 
         verify(eventService, times(1)).getAllEvents();
         assertThat(output).contains("Received call to getAllEvents");
@@ -276,49 +283,49 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByYear")
                 .matchesJsonStrictly("""
-            [
-              {
-                "id": "1",
-                "title": "Event Bresse",
-                "description": "Event Bresse description",
-                "startDate": "2018-07-13 08:00:00",
-                "endDate": "2018-07-13 16:30:00",
-                "track": {
-                  "name": "Bresse",
-                  "distance": 3000,
-                  "lapRecord": 84330,
-                  "website": "https://www.circuitdebresse.com",
-                  "latitude": 46.551756882687776,
-                  "longitude": 5.3285273408879394
-                },
-                "participants": [
-                  {
-                    "member": {
-                      "firstName": "Jane",
-                      "lastName": "Doe",
-                      "email": "Jane.Doe@example.com"
-                    }
-                  }
-                ],
-                "organizer": {
-                  "name": "Organizer A"
-                },
-                "price": 180,
-                "createdOn": "2018-04-11 20:41:05",
-                "createdBy": {
-                  "id": "1",
-                  "firstName": "Bob",
-                  "lastName": "Douglas"
-                },
-                "modifiedOn": "2018-04-11 20:46:17",
-                "modifiedBy": {
-                  "id": "2",
-                  "firstName": "John",
-                  "lastName": "Doe"
-                }
-              }
-            ]
-            """);
+                        [
+                          {
+                            "id": "1",
+                            "title": "Event Bresse",
+                            "description": "Event Bresse description",
+                            "startDate": "2018-07-13 08:00:00",
+                            "endDate": "2018-07-13 16:30:00",
+                            "track": {
+                              "name": "Bresse",
+                              "distance": 3000,
+                              "lapRecord": 84330,
+                              "website": "https://www.circuitdebresse.com",
+                              "latitude": 46.551756882687776,
+                              "longitude": 5.3285273408879394
+                            },
+                            "participants": [
+                              {
+                                "member": {
+                                  "firstName": "Jane",
+                                  "lastName": "Doe",
+                                  "email": "Jane.Doe@example.com"
+                                }
+                              }
+                            ],
+                            "organizer": {
+                              "name": "Organizer A"
+                            },
+                            "price": 180,
+                            "createdOn": "2018-04-11 20:41:05",
+                            "createdBy": {
+                              "id": "1",
+                              "firstName": "Bob",
+                              "lastName": "Douglas"
+                            },
+                            "modifiedOn": "2018-04-11 20:46:17",
+                            "modifiedBy": {
+                              "id": "2",
+                              "firstName": "John",
+                              "lastName": "Doe"
+                            }
+                          }
+                        ]
+                        """);
 
         verify(eventService, times(1)).getEventsByYear(2018);
         assertThat(output).contains("Received call to getEventsByYear with parameter year = 2018");
@@ -350,49 +357,49 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByMonthAndYear")
                 .matchesJsonStrictly("""
-            [
-              {
-                "id": "1",
-                "title": "Event Bresse",
-                "description": "Event Bresse description",
-                "startDate": "2018-07-13 08:00:00",
-                "endDate": "2018-07-13 16:30:00",
-                "track": {
-                  "name": "Bresse",
-                  "distance": 3000,
-                  "lapRecord": 84330,
-                  "website": "https://www.circuitdebresse.com",
-                  "latitude": 46.551756882687776,
-                  "longitude": 5.3285273408879394
-                },
-                "participants": [
-                  {
-                    "member": {
-                      "firstName": "Jane",
-                      "lastName": "Doe",
-                      "email": "Jane.Doe@example.com"
-                    }
-                  }
-                ],
-                "organizer": {
-                  "name": "Organizer A"
-                },
-                "price": 180,
-                "createdOn": "2018-04-11 20:41:05",
-                "createdBy": {
-                  "id": "1",
-                  "firstName": "Bob",
-                  "lastName": "Douglas"
-                },
-                "modifiedOn": "2018-04-11 20:46:17",
-                "modifiedBy": {
-                  "id": "2",
-                  "firstName": "John",
-                  "lastName": "Doe"
-                }
-              }
-            ]
-            """);
+                        [
+                          {
+                            "id": "1",
+                            "title": "Event Bresse",
+                            "description": "Event Bresse description",
+                            "startDate": "2018-07-13 08:00:00",
+                            "endDate": "2018-07-13 16:30:00",
+                            "track": {
+                              "name": "Bresse",
+                              "distance": 3000,
+                              "lapRecord": 84330,
+                              "website": "https://www.circuitdebresse.com",
+                              "latitude": 46.551756882687776,
+                              "longitude": 5.3285273408879394
+                            },
+                            "participants": [
+                              {
+                                "member": {
+                                  "firstName": "Jane",
+                                  "lastName": "Doe",
+                                  "email": "Jane.Doe@example.com"
+                                }
+                              }
+                            ],
+                            "organizer": {
+                              "name": "Organizer A"
+                            },
+                            "price": 180,
+                            "createdOn": "2018-04-11 20:41:05",
+                            "createdBy": {
+                              "id": "1",
+                              "firstName": "Bob",
+                              "lastName": "Douglas"
+                            },
+                            "modifiedOn": "2018-04-11 20:46:17",
+                            "modifiedBy": {
+                              "id": "2",
+                              "firstName": "John",
+                              "lastName": "Doe"
+                            }
+                          }
+                        ]
+                        """);
 
         verify(eventService, times(1)).getEventsByMonthAndYear(7, 2018);
         assertThat(output).contains("Received call to getEventsByMonthAndYear with parameters month = 7, year = 2018");
@@ -426,49 +433,49 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByDayAndMonthAndYear")
                 .matchesJsonStrictly("""
-            [
-              {
-                "id": "1",
-                "title": "Event Bresse",
-                "description": "Event Bresse description",
-                "startDate": "2018-07-13 08:00:00",
-                "endDate": "2018-07-13 16:30:00",
-                "track": {
-                  "name": "Bresse",
-                  "distance": 3000,
-                  "lapRecord": 84330,
-                  "website": "https://www.circuitdebresse.com",
-                  "latitude": 46.551756882687776,
-                  "longitude": 5.3285273408879394
-                },
-                "participants": [
-                  {
-                    "member": {
-                      "firstName": "Jane",
-                      "lastName": "Doe",
-                      "email": "Jane.Doe@example.com"
-                    }
-                  }
-                ],
-                "organizer": {
-                  "name": "Organizer A"
-                },
-                "price": 180,
-                "createdOn": "2018-04-11 20:41:05",
-                "createdBy": {
-                  "id": "1",
-                  "firstName": "Bob",
-                  "lastName": "Douglas"
-                },
-                "modifiedOn": "2018-04-11 20:46:17",
-                "modifiedBy": {
-                  "id": "2",
-                  "firstName": "John",
-                  "lastName": "Doe"
-                }
-              }
-            ]
-            """);
+                        [
+                          {
+                            "id": "1",
+                            "title": "Event Bresse",
+                            "description": "Event Bresse description",
+                            "startDate": "2018-07-13 08:00:00",
+                            "endDate": "2018-07-13 16:30:00",
+                            "track": {
+                              "name": "Bresse",
+                              "distance": 3000,
+                              "lapRecord": 84330,
+                              "website": "https://www.circuitdebresse.com",
+                              "latitude": 46.551756882687776,
+                              "longitude": 5.3285273408879394
+                            },
+                            "participants": [
+                              {
+                                "member": {
+                                  "firstName": "Jane",
+                                  "lastName": "Doe",
+                                  "email": "Jane.Doe@example.com"
+                                }
+                              }
+                            ],
+                            "organizer": {
+                              "name": "Organizer A"
+                            },
+                            "price": 180,
+                            "createdOn": "2018-04-11 20:41:05",
+                            "createdBy": {
+                              "id": "1",
+                              "firstName": "Bob",
+                              "lastName": "Douglas"
+                            },
+                            "modifiedOn": "2018-04-11 20:46:17",
+                            "modifiedBy": {
+                              "id": "2",
+                              "firstName": "John",
+                              "lastName": "Doe"
+                            }
+                          }
+                        ]
+                        """);
 
         verify(eventService, times(1)).getEventsByDayAndMonthAndYear(13, 7, 2018);
         assertThat(output).contains("Received call to getEventsByDayAndMonthAndYear with parameters day = 13, month = 7, year = 2018");
@@ -501,50 +508,50 @@ class EventControllerTest {
                 .execute()
                 .path("getEventById")
                 .matchesJsonStrictly("""
-            {
-              "id": "2",
-              "title": "Event Magny-Cours",
-              "description": "Event Magny-Cours description",
-              "startDate": "2019-05-24 09:00:00",
-              "endDate": "2019-05-24 18:00:00",
-              "track": {
-                "name": "Magny-cours",
-                "distance": 4411,
-                "lapRecord": 96950,
-                "website": "https://www.circuitmagnycours.com/",
-                "latitude": 46.86390367017831,
-                "longitude": 3.162750730649732
-              },
-              "participants": [
-                {
-                  "member": {
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "email": "John.Doe@example.com"
-                  }
-                },
-                {
-                  "member": {
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "email": "John.Doe@example.com"
-                  }
-                }
-              ],
-              "organizer": {
-                "name": "Organizer B"
-              },
-              "price": 240,
-              "createdOn": "2019-01-29 22:15:14",
-              "createdBy": {
-                "id": "1",
-                "firstName": "Bob",
-                "lastName": "Douglas"
-              },
-              "modifiedOn": null,
-              "modifiedBy": null
-            }
-            """);
+                        {
+                          "id": "2",
+                          "title": "Event Magny-Cours",
+                          "description": "Event Magny-Cours description",
+                          "startDate": "2019-05-24 09:00:00",
+                          "endDate": "2019-05-24 18:00:00",
+                          "track": {
+                            "name": "Magny-cours",
+                            "distance": 4411,
+                            "lapRecord": 96950,
+                            "website": "https://www.circuitmagnycours.com/",
+                            "latitude": 46.86390367017831,
+                            "longitude": 3.162750730649732
+                          },
+                          "participants": [
+                            {
+                              "member": {
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "email": "John.Doe@example.com"
+                              }
+                            },
+                            {
+                              "member": {
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "email": "John.Doe@example.com"
+                              }
+                            }
+                          ],
+                          "organizer": {
+                            "name": "Organizer B"
+                          },
+                          "price": 240,
+                          "createdOn": "2019-01-29 22:15:14",
+                          "createdBy": {
+                            "id": "1",
+                            "firstName": "Bob",
+                            "lastName": "Douglas"
+                          },
+                          "modifiedOn": null,
+                          "modifiedBy": null
+                        }
+                        """);
 
         verify(eventService, times(1)).getEventById(2L);
         assertThat(output).contains("Received call to getEventById with parameter ID = 2");
@@ -575,49 +582,49 @@ class EventControllerTest {
                 .execute()
                 .path("getEventsByTitle")
                 .matchesJsonStrictly("""
-            [
-              {
-                "id": "1",
-                "title": "Event Bresse",
-                "description": "Event Bresse description",
-                "startDate": "2018-07-13 08:00:00",
-                "endDate": "2018-07-13 16:30:00",
-                "track": {
-                  "name": "Bresse",
-                  "distance": 3000,
-                  "lapRecord": 84330,
-                  "website": "https://www.circuitdebresse.com",
-                  "latitude": 46.551756882687776,
-                  "longitude": 5.3285273408879394
-                },
-                "participants": [
-                  {
-                    "member": {
-                      "firstName": "Jane",
-                      "lastName": "Doe",
-                      "email": "Jane.Doe@example.com"
-                    }
-                  }
-                ],
-                "organizer": {
-                  "name": "Organizer A"
-                },
-                "price": 180,
-                "createdOn": "2018-04-11 20:41:05",
-                "createdBy": {
-                  "id": "1",
-                  "firstName": "Bob",
-                  "lastName": "Douglas"
-                },
-                "modifiedOn": "2018-04-11 20:46:17",
-                "modifiedBy": {
-                  "id": "2",
-                  "firstName": "John",
-                  "lastName": "Doe"
-                }
-              }
-            ]
-            """);
+                        [
+                          {
+                            "id": "1",
+                            "title": "Event Bresse",
+                            "description": "Event Bresse description",
+                            "startDate": "2018-07-13 08:00:00",
+                            "endDate": "2018-07-13 16:30:00",
+                            "track": {
+                              "name": "Bresse",
+                              "distance": 3000,
+                              "lapRecord": 84330,
+                              "website": "https://www.circuitdebresse.com",
+                              "latitude": 46.551756882687776,
+                              "longitude": 5.3285273408879394
+                            },
+                            "participants": [
+                              {
+                                "member": {
+                                  "firstName": "Jane",
+                                  "lastName": "Doe",
+                                  "email": "Jane.Doe@example.com"
+                                }
+                              }
+                            ],
+                            "organizer": {
+                              "name": "Organizer A"
+                            },
+                            "price": 180,
+                            "createdOn": "2018-04-11 20:41:05",
+                            "createdBy": {
+                              "id": "1",
+                              "firstName": "Bob",
+                              "lastName": "Douglas"
+                            },
+                            "modifiedOn": "2018-04-11 20:46:17",
+                            "modifiedBy": {
+                              "id": "2",
+                              "firstName": "John",
+                              "lastName": "Doe"
+                            }
+                          }
+                        ]
+                        """);
 
         verify(eventService, times(1)).getEventsByTitle("Bres");
         assertThat(output).contains("Received call to getEventsByTitle with parameter title = Bres");

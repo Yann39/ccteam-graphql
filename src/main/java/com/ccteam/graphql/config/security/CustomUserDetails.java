@@ -21,6 +21,7 @@
 package com.ccteam.graphql.config.security;
 
 import com.ccteam.graphql.entities.Member;
+import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -60,6 +61,23 @@ public class CustomUserDetails implements UserDetails {
         this.username = user.getEmail();
         this.password = user.getPassword();
         this.authorities = Arrays.stream(new String[]{user.getRole().getAuthority()}).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    @Override
+    @Nonnull
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    @Nonnull
+    public List<GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 
 }
