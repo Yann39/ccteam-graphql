@@ -146,8 +146,8 @@ public class WebController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        // generate a new OTP and save the user
-        member.get().setOtp(ThreadLocalRandom.current().nextInt(1000, 10000) + "");
+        // generate a new 4-digits OTP and save the user
+        member.get().setOtp(String.format("%04d", ThreadLocalRandom.current().nextInt(10000)));
         member.get().setOtpDate(LocalDateTime.now(ZoneId.of("Europe/Paris")));
         memberRepository.save(member.get());
         log.info("Delete account OTP request has been generated and saved for e-mail address {}", request.get("email"));

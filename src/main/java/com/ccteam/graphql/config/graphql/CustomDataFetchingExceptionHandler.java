@@ -20,12 +20,16 @@
 
 package com.ccteam.graphql.config.graphql;
 
+import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.annotation.Nonnull;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * Custom GraphQL exception handler, for all post-filter requests handled by GraphQL.
@@ -47,6 +51,15 @@ public class CustomDataFetchingExceptionHandler extends DataFetcherExceptionReso
                     .message(throwable.getMessage())
                     .extensions((customGraphQLException).getExtensions())
                     .errorType((customGraphQLException).getErrorType())
+                    .build();
+        }
+        // when @PreAuthorize denies access, Spring Security throws AccessDeniedException,
+        // we throw an error with a dedicated error code so we can identify this on client side
+        if (throwable instanceof AccessDeniedException) {
+            return GraphqlErrorBuilder.newError(dataFetchingEnvironment)
+                    .message(throwable.getMessage() != null ? throwable.getMessage() : "Access denied")
+                    .extensions(Map.of("errorCode", "access_denied"))
+                    .errorType(ErrorType.DataFetchingException)
                     .build();
         }
         return null;
