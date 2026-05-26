@@ -2,8 +2,8 @@
 
 **Spring Boot** application to expose **GraphQL** endpoint for **CCTeam** mobile application.
 
-![Version](https://img.shields.io/badge/Version-1.0.0-2AAB92.svg)
-![Static Badge](https://img.shields.io/badge/Last_update-25_May_2026-blue)
+![Version](https://img.shields.io/badge/Version-1.0.1-2AAB92.svg)
+![Static Badge](https://img.shields.io/badge/Last_update-26_May_2026-blue)
 
 ![Version](https://img.shields.io/badge/Open_JDK-25-red.svg)
 ![Version](https://img.shields.io/badge/Spring_Boot-4.0.6-green.svg)

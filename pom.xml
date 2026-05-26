@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ccteam</groupId>
     <artifactId>ccteam-graphql</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>ccteam-graphql</name>
     <description>Spring Boot application to expose GraphQL endpoint for CCTeam mobile application</description>
 
@@ -82,6 +82,13 @@
         <dependency>
             <groupId>org.springframework.graphql</groupId>
             <artifactId>spring-graphql-test</artifactId>
+        </dependency>
+
+        <!-- Provide WebTestClient for tests that use WebTestClient/HttpGraphQlTester -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <scope>test</scope>
         </dependency>
 	</dependencies>
 
