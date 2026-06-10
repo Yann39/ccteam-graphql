@@ -91,6 +91,12 @@ public class LapRecord {
     private String comments;
 
     /**
+     * Whether the lap record is visible to other members.
+     */
+    @Column(nullable = false)
+    private Boolean isPublic = true;
+
+    /**
      * Creation timestamp for the lap record.
      */
     @Column(nullable = false)

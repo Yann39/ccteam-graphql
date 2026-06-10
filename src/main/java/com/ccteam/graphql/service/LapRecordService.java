@@ -59,7 +59,7 @@ public class LapRecordService {
     }
 
     /**
-     * Get all lap records.
+     * Get all public lap records.
      *
      * @return A list of {@link LapRecord} objects representing the members
      */
@@ -68,17 +68,30 @@ public class LapRecordService {
     }
 
     /**
-     * Get all lap records for the specified member.
+     * Get the public lap records for the specified member. Private records are never returned here,
+     * whoever the caller is (owner and admins included).
      *
      * @param memberId The ID of the member for which to retrieve the lap records
      * @return A list of {@link LapRecord} objects representing the lap records
      */
     public List<LapRecord> getLapRecordsByMember(long memberId) {
-        return lapRecordRepository.findByMemberIdCustom(memberId);
+        return lapRecordRepository.findPublicByMemberIdCustom(memberId);
     }
 
     /**
-     * Get all lap records for the specified track.
+     * Get all lap records (public and private) owned by the member with the  specified email.
+     * Only meant to be called with the email of the authenticated user, so members only ever see their own
+     * private records.
+     *
+     * @param email The email of the authenticated member
+     * @return A list of {@link LapRecord} objects representing the lap records
+     */
+    public List<LapRecord> getOwnLapRecords(String email) {
+        return lapRecordRepository.findByMemberEmailCustom(email);
+    }
+
+    /**
+     * Get the public lap records for the specified track.
      *
      * @param trackId The ID of the track for which to retrieve the lap records
      * @return A list of {@link LapRecord} objects representing the lap records
@@ -97,9 +110,10 @@ public class LapRecordService {
      * @param lapTime    The lap time in milliseconds
      * @param conditions The track conditions
      * @param comments   Some comment about the lap record
+     * @param isPublic   Whether the lap record is visible to other members ({@code null} defaults to public)
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    public LapRecord createLapRecord(long memberId, long trackId, long bikeId, String recordDate, int lapTime, String conditions, String comments) {
+    public LapRecord createLapRecord(long memberId, long trackId, long bikeId, String recordDate, int lapTime, String conditions, String comments, Boolean isPublic) {
 
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
@@ -127,6 +141,7 @@ public class LapRecordService {
         lapRecord.setLapTime(lapTime);
         lapRecord.setConditions(conditions);
         lapRecord.setComments(comments);
+        lapRecord.setIsPublic(isPublic == null || isPublic);
         lapRecord.setCreatedOn(LocalDateTime.now());
 
         return lapRecordRepository.save(lapRecord);
@@ -142,9 +157,10 @@ public class LapRecordService {
      * @param lapTime     The lap time in milliseconds
      * @param conditions  The track conditions
      * @param comments    Some comment about the lap record
+     * @param isPublic    Whether the lap record is visible to other members ({@code null} keeps the current visibility)
      * @return A {@link LapRecord} object representing the lap record just created
      */
-    public LapRecord updateLapRecord(long lapRecordId, long trackId, long bikeId, String recordDate, int lapTime, String conditions, String comments) {
+    public LapRecord updateLapRecord(long lapRecordId, long trackId, long bikeId, String recordDate, int lapTime, String conditions, String comments, Boolean isPublic) {
 
         final Optional<LapRecord> lapRecordOptional = lapRecordRepository.findByIdCustom(lapRecordId);
         if (lapRecordOptional.isEmpty()) {
@@ -172,6 +188,9 @@ public class LapRecordService {
         lapRecord.setLapTime(lapTime);
         lapRecord.setConditions(conditions);
         lapRecord.setComments(comments);
+        if (isPublic != null) {
+            lapRecord.setIsPublic(isPublic);
+        }
         lapRecord.setModifiedOn(LocalDateTime.now());
 
         return lapRecordRepository.save(lapRecord);
