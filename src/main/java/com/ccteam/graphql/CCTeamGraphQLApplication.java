@@ -24,6 +24,7 @@ import com.ccteam.graphql.config.security.JWTTokenProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author yann39
@@ -31,6 +32,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  */
 @SpringBootApplication
 @EnableConfigurationProperties(JWTTokenProperties.class)
+@EnableScheduling
 public class CCTeamGraphQLApplication {
 
     static void main(String[] args) {

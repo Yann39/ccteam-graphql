@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,13 +45,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return The list of events with associations
      */
     @Query("select e from Event e " +
-            "left join fetch e.track t " +
-            "left join fetch e.participants p " +
-            "left join fetch p.member " +
-            "left join fetch e.organizer " +
-            "left join fetch e.createdBy " +
-            "left join fetch e.modifiedBy " +
-            "order by e.startDate desc")
+           "left join fetch e.track t " +
+           "left join fetch e.participants p " +
+           "left join fetch p.member " +
+           "left join fetch e.organizer " +
+           "left join fetch e.createdBy " +
+           "left join fetch e.modifiedBy " +
+           "order by e.startDate desc")
     List<Event> findAllCustom();
 
     /**
@@ -60,13 +61,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return The list of events in the year
      */
     @Query("select e from Event e " +
-            "left join fetch e.track t " +
-            "left join fetch e.participants p " +
-            "left join fetch e.organizer " +
-            "left join fetch e.createdBy " +
-            "left join fetch e.modifiedBy " +
-            "where year(e.startDate) = :year " +
-            "order by e.startDate desc")
+           "left join fetch e.track t " +
+           "left join fetch e.participants p " +
+           "left join fetch e.organizer " +
+           "left join fetch e.createdBy " +
+           "left join fetch e.modifiedBy " +
+           "where year(e.startDate) = :year " +
+           "order by e.startDate desc")
     List<Event> findByYearCustom(int year);
 
     /**
@@ -77,14 +78,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return The list of events matching the month and year
      */
     @Query("select e from Event e " +
-            "left join fetch e.track t " +
-            "left join fetch e.participants p " +
-            "left join fetch e.organizer " +
-            "left join fetch e.createdBy " +
-            "left join fetch e.modifiedBy " +
-            "where month(e.startDate) = :month " +
-            "and year(e.startDate) = :year " +
-            "order by e.startDate desc")
+           "left join fetch e.track t " +
+           "left join fetch e.participants p " +
+           "left join fetch e.organizer " +
+           "left join fetch e.createdBy " +
+           "left join fetch e.modifiedBy " +
+           "where month(e.startDate) = :month " +
+           "and year(e.startDate) = :year " +
+           "order by e.startDate desc")
     List<Event> findByMonthAndYearCustom(int month, int year);
 
     /**
@@ -96,15 +97,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return The list of events on that date
      */
     @Query("select e from Event e " +
-            "left join fetch e.track t " +
-            "left join fetch e.participants p " +
-            "left join fetch e.organizer " +
-            "left join fetch e.createdBy " +
-            "left join fetch e.modifiedBy " +
-            "where day(e.startDate) = :day " +
-            "and month(e.startDate) = :month " +
-            "and year(e.startDate) = :year " +
-            "order by e.startDate desc")
+           "left join fetch e.track t " +
+           "left join fetch e.participants p " +
+           "left join fetch e.organizer " +
+           "left join fetch e.createdBy " +
+           "left join fetch e.modifiedBy " +
+           "where day(e.startDate) = :day " +
+           "and month(e.startDate) = :month " +
+           "and year(e.startDate) = :year " +
+           "order by e.startDate desc")
     List<Event> findByDayAndMonthAndYearCustom(int day, int month, int year);
 
     /**
@@ -114,14 +115,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return The optional event with associations fetched
      */
     @Query("select e from Event e " +
-            "left join fetch e.track t " +
-            "left join fetch e.participants p " +
-            "left join fetch p.member " +
-            "left join fetch p.bike " +
-            "left join fetch e.organizer " +
-            "left join fetch e.createdBy " +
-            "left join fetch e.modifiedBy " +
-            "where e.id = :id")
+           "left join fetch e.track t " +
+           "left join fetch e.participants p " +
+           "left join fetch p.member " +
+           "left join fetch p.bike " +
+           "left join fetch e.organizer " +
+           "left join fetch e.createdBy " +
+           "left join fetch e.modifiedBy " +
+           "where e.id = :id")
     Optional<Event> findByIdCustom(long id);
 
     /**
@@ -132,14 +133,29 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return The list of matching events
      */
     @Query("select e from Event e " +
-            "left join fetch e.track t " +
-            "left join fetch e.participants p " +
-            "left join fetch p.member " +
-            "left join fetch e.organizer " +
-            "left join fetch e.createdBy " +
-            "left join fetch e.modifiedBy " +
-            "where :title is null or e.title like %:title% " +
-            "order by e.startDate desc")
+           "left join fetch e.track t " +
+           "left join fetch e.participants p " +
+           "left join fetch p.member " +
+           "left join fetch e.organizer " +
+           "left join fetch e.createdBy " +
+           "left join fetch e.modifiedBy " +
+           "where :title is null or e.title like %:title% " +
+           "order by e.startDate desc")
     List<Event> findByTitleCustom(String title);
+
+    /**
+     * Find the events starting in the given time window for which the upcoming-event reminder notification
+     * has not been sent yet. Used by the scheduled reminder job.
+     *
+     * @param from  Window start (exclusive), typically now
+     * @param until Window end (inclusive), typically now + 24h
+     * @return The list of events needing a reminder
+     */
+    @Query("select e from Event e " +
+           "left join fetch e.track " +
+           "where e.startDate > :from " +
+           "and e.startDate <= :until " +
+           "and e.reminderSentOn is null")
+    List<Event> findEventsNeedingReminder(LocalDateTime from, LocalDateTime until);
 
 }

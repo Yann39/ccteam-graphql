@@ -103,6 +103,15 @@ public class Event {
     private Set<EventMember> participants;
 
     /**
+     * Timestamp when the reminder push notification was sent for this event.
+     * <p>
+     * Null as long as the reminder has not been sent, the scheduled reminder job uses it to guarantee the reminder
+     * is sent exactly once per event.
+     */
+    @Column
+    private LocalDateTime reminderSentOn;
+
+    /**
      * Timestamp when the event was created.
      */
     @Column(nullable = false)
