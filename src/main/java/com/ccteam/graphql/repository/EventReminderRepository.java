@@ -23,6 +23,7 @@ package com.ccteam.graphql.repository;
 import com.ccteam.graphql.entities.EventReminder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@link EventReminder} repository.
@@ -41,5 +42,14 @@ public interface EventReminderRepository extends JpaRepository<EventReminder, Lo
      * @return {@code true} when the reminder was already sent, {@code false} otherwise
      */
     boolean existsByEventIdAndOffsetKey(long eventId, String offsetKey);
+
+    /**
+     * Delete all the sent-reminder stamps of the given event. Used when an event is rescheduled,
+     * so its reminders fire again for the new date, and when an event is deleted.
+     *
+     * @param eventId The event id
+     */
+    @Transactional
+    void deleteByEventId(long eventId);
 
 }

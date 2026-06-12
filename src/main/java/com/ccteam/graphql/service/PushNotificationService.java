@@ -87,7 +87,7 @@ public class PushNotificationService {
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(credentials))
-                        // bounded timeouts so a FCM outage can't stall the calling operation (e.g. news creation) for long
+                        // bounded timeouts so an FCM outage can't stall the calling operation (e.g. news creation) for long
                         .setConnectTimeout(5000)
                         .setReadTimeout(5000)
                         .build());

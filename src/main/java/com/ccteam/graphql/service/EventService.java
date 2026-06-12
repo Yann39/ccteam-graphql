@@ -47,15 +47,17 @@ public class EventService {
     private final MemberRepository memberRepository;
     private final BikeRepository bikeRepository;
     private final OrganizerRepository organizerRepository;
+    private final EventReminderRepository eventReminderRepository;
 
     public EventService(EventRepository eventRepository, TrackRepository trackRepository,
                         MemberRepository memberRepository, BikeRepository bikeRepository,
-                        OrganizerRepository organizerRepository) {
+                        OrganizerRepository organizerRepository, EventReminderRepository eventReminderRepository) {
         this.eventRepository = eventRepository;
         this.trackRepository = trackRepository;
         this.memberRepository = memberRepository;
         this.bikeRepository = bikeRepository;
         this.organizerRepository = organizerRepository;
+        this.eventReminderRepository = eventReminderRepository;
     }
 
     /**
@@ -229,9 +231,16 @@ public class EventService {
         }
 
         final Event event = eventOptional.get();
+
+        // a rescheduled event must have its reminder notifications sent again for the new date, so drop its sent-reminder stamps
+        final LocalDateTime newStartDate = LocalDateTime.parse(startDate);
+        if (!newStartDate.equals(event.getStartDate())) {
+            eventReminderRepository.deleteByEventId(eventId);
+        }
+
         event.setTitle(title);
         event.setDescription(description);
-        event.setStartDate(LocalDateTime.parse(startDate));
+        event.setStartDate(newStartDate);
         event.setEndDate(LocalDateTime.parse(endDate));
         event.setTrack(trackOptional.get());
         event.setOrganizer(organizerOptional.get());
@@ -257,6 +266,8 @@ public class EventService {
         }
 
         final Event event = eventOptional.get();
+        // the sent-reminder stamps are useless once the event is gone
+        eventReminderRepository.deleteByEventId(eventId);
         eventRepository.delete(event);
         return event;
     }
