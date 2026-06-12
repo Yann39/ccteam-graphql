@@ -144,18 +144,18 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByTitleCustom(String title);
 
     /**
-     * Find the events starting in the given time window for which the upcoming-event reminder notification
-     * has not been sent yet. Used by the scheduled reminder job.
+     * Find the events starting in the given time window, with their track fetched. Used by the scheduled
+     * reminder job, which then checks the {@code event_reminder} table to know which reminders are still
+     * to be sent for each event.
      *
      * @param from  Window start (exclusive), typically now
-     * @param until Window end (inclusive), typically now + 24h
-     * @return The list of events needing a reminder
+     * @param until Window end (inclusive), typically now + the reminder offset
+     * @return The list of events starting in the window
      */
     @Query("select e from Event e " +
            "left join fetch e.track " +
            "where e.startDate > :from " +
-           "and e.startDate <= :until " +
-           "and e.reminderSentOn is null")
-    List<Event> findEventsNeedingReminder(LocalDateTime from, LocalDateTime until);
+           "and e.startDate <= :until")
+    List<Event> findEventsStartingBetween(LocalDateTime from, LocalDateTime until);
 
 }

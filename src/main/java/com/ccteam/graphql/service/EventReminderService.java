@@ -21,6 +21,9 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.entities.Event;
+import com.ccteam.graphql.entities.EventReminder;
+import com.ccteam.graphql.enums.ReminderOffset;
+import com.ccteam.graphql.repository.EventReminderRepository;
 import com.ccteam.graphql.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,15 +36,16 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Scheduled job sending a push notification reminder for upcoming events.
+ * Scheduled job sending push notification reminders for upcoming events.
  * <p>
- * Every run looks for events starting within the next 24 hours whose
- * reminder has not been sent yet, notifies the per-event FCM topic
- * ({@code event-{id}}, subscribed only by the devices of the members
- * registered to the event) and stamps {@link Event#getReminderSentOn()} so
- * each event is reminded exactly once. An event whose notification failed
- * (FCM unreachable, etc.) is not stamped and is therefore retried on the
- * next run, as long as it has not started yet.
+ * Every run goes through the {@link ReminderOffset} catalog: for each offset, the events starting within that
+ * delay whose (event, offset) reminder has not been sent yet are notified on their per-offset FCM topic
+ * ({@code event-{id}-{offsetKey}}). Devices only receive the reminders whose offset the user selected in the
+ * notification settings, since the mobile application only subscribes to those topics.
+ * <p>
+ * Each sent reminder is stamped in the {@code event_reminder} table so it is sent exactly once. A reminder whose
+ * notification failed (FCM unreachable, etc.) is not stamped and is therefore retried on the next run, as long as
+ * the event has not started yet.
  *
  * @author yann39
  * @since 1.0.3
@@ -53,21 +57,22 @@ public class EventReminderService {
     private static final DateTimeFormatter REMINDER_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy 'à' HH:mm");
 
     private final EventRepository eventRepository;
+    private final EventReminderRepository eventReminderRepository;
     private final PushNotificationService pushNotificationService;
 
-    public EventReminderService(EventRepository eventRepository, PushNotificationService pushNotificationService) {
+    public EventReminderService(EventRepository eventRepository,
+                                EventReminderRepository eventReminderRepository,
+                                PushNotificationService pushNotificationService) {
         this.eventRepository = eventRepository;
+        this.eventReminderRepository = eventReminderRepository;
         this.pushNotificationService = pushNotificationService;
     }
 
     /**
-     * Send the reminder notification for every event starting in less than
-     * 24 hours that has not been reminded yet, to the members registered to
-     * that event (through the per-event topic). Runs every 10 minutes (the
-     * reminder therefore fires at most 10 minutes after the event enters
-     * its last 24 hours, which is plenty accurate for this use case).
+     * Send the due reminder notifications for every event and every reminder offset of the catalog.
+     * Runs every minute, so a reminder fires at most one minute after the event enters the offset's window.
      */
-    @Scheduled(initialDelay = 1, fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(initialDelay = 1, fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     public void sendUpcomingEventReminders() {
         // when notifications are disabled, don't stamp anything so the
         // reminders still within their window fire once they get enabled
@@ -76,26 +81,36 @@ public class EventReminderService {
         }
 
         final LocalDateTime now = LocalDateTime.now();
-        final List<Event> events = eventRepository.findEventsNeedingReminder(now, now.plusHours(24));
 
-        for (final Event event : events) {
-            log.info("Sending 24h reminder for event {} ({})", event.getId(), event.getTitle());
+        for (final ReminderOffset offset : ReminderOffset.values()) {
+            final List<Event> events = eventRepository.findEventsStartingBetween(now, now.plus(offset.getDuration()));
 
-            final String when = REMINDER_DATE_FORMAT.format(event.getStartDate());
-            final String body = event.getTrack() != null && event.getTrack().getName() != null
-                    ? "C'est bientôt ! Rendez-vous le " + when + " sur le circuit de " + event.getTrack().getName() + "."
-                    : "C'est bientôt ! Rendez-vous le " + when + ".";
+            for (final Event event : events) {
+                if (eventReminderRepository.existsByEventIdAndOffsetKey(event.getId(), offset.getKey())) {
+                    continue;
+                }
 
-            final boolean sent = pushNotificationService.sendToTopic(
-                    PushNotificationService.TOPIC_EVENT_PREFIX + event.getId(),
-                    "Rappel : " + event.getTitle(),
-                    body,
-                    Map.of("type", "event", "id", String.valueOf(event.getId())));
+                log.info("Sending {} reminder for event {} ({})", offset.getKey(), event.getId(), event.getTitle());
 
-            // only stamp on success so failed sends are retried on the next run
-            if (sent) {
-                event.setReminderSentOn(LocalDateTime.now());
-                eventRepository.save(event);
+                final String when = REMINDER_DATE_FORMAT.format(event.getStartDate());
+                final String body = event.getTrack() != null && event.getTrack().getName() != null
+                        ? "C'est bientôt ! Rendez-vous le " + when + " sur le circuit " + event.getTrack().getName() + "."
+                        : "C'est bientôt ! Rendez-vous le " + when + ".";
+
+                final boolean sent = pushNotificationService.sendToTopic(
+                        PushNotificationService.TOPIC_EVENT_PREFIX + event.getId() + "-" + offset.getKey(),
+                        "Rappel : " + event.getTitle(),
+                        body,
+                        Map.of("type", "event", "id", String.valueOf(event.getId())));
+
+                // only stamp on success so failed sends are retried on the next run
+                if (sent) {
+                    final EventReminder reminder = new EventReminder();
+                    reminder.setEventId(event.getId());
+                    reminder.setOffsetKey(offset.getKey());
+                    reminder.setSentOn(LocalDateTime.now());
+                    eventReminderRepository.save(reminder);
+                }
             }
         }
     }

@@ -59,9 +59,11 @@ public class PushNotificationService {
     public static final String TOPIC_NEWS = "news";
 
     /**
-     * Prefix of the per-event topics ({@code event-{id}}), notified when the event is about to start. The mobile
-     * application only subscribes the device to the topics of the upcoming events the logged member is registered to,
-     * so only participants receive the reminder. Must match the prefix used by the mobile application.
+     * Prefix of the per-event reminder topics ({@code event-{id}-{offsetKey}}, e.g. {@code event-74-1d}), notified
+     * when the event start is the given offset away. The mobile application only subscribes the device to the topics
+     * of the upcoming events the logged member is registered to, and only for the reminder offsets selected in the
+     * notification settings — so only interested participants receive each reminder. Must match the prefix and the
+     * offset keys used by the mobile application.
      */
     public static final String TOPIC_EVENT_PREFIX = "event-";
 
