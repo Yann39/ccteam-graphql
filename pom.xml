@@ -17,6 +17,7 @@
         <java.version>25</java.version>
         <mariadb-client.version>3.5.8</mariadb-client.version>
         <java-jwt.version>4.5.2</java-jwt.version>
+        <firebase-admin.version>9.9.0</firebase-admin.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.5.5</maven-failsafe-plugin.version>
@@ -76,6 +77,13 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>${java-jwt.version}</version>
+        </dependency>
+
+        <!-- Firebase Admin SDK (push notifications via FCM) -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>${firebase-admin.version}</version>
         </dependency>
 
         <!-- GraphQL tests -->

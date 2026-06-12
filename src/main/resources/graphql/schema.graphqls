@@ -56,6 +56,7 @@ type Query {
     getAllLapRecords: [LapRecord]
     getMemberLapRecords(memberId: Long!): [LapRecord]
     getTrackLapRecords(trackId: Long!): [LapRecord]
+    getMyLapRecords: [LapRecord]
 }
 
 type Mutation {
@@ -85,8 +86,8 @@ type Mutation {
     updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
     deleteTrack(trackId: Long!): Track
 
-    createLapRecord(memberId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
-    updateLapRecord(lapRecordId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String): LapRecord
+    createLapRecord(memberId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String, isPublic: Boolean): LapRecord
+    updateLapRecord(lapRecordId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String, isPublic: Boolean): LapRecord
     deleteLapRecord(lapRecordId: Long!): LapRecord
 
     addBikeToMember(memberId: Long!, manufacturer: String!, modelName: String!, engineSize: Int, year: Int): Bike
@@ -170,6 +171,7 @@ type LapRecord {
     recordDate: LocalDateTime!
     conditions: String!
     comments: String
+    isPublic: Boolean!
     createdOn: LocalDateTime!
     modifiedOn: LocalDateTime
 }

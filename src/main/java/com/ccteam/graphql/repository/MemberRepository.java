@@ -108,7 +108,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "where :text is null or ( " +
             "m.firstName like %:text% " +
             "or m.lastName like %:text% " +
-            "or m.email like %:text%" +
             ") " +
             "order by m.firstName, m.lastName")
     List<Member> findFilteredCustom(String text);

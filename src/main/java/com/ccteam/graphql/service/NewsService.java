@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -46,10 +47,12 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final MemberRepository memberRepository;
+    private final PushNotificationService pushNotificationService;
 
-    public NewsService(NewsRepository newsRepository, MemberRepository memberRepository) {
+    public NewsService(NewsRepository newsRepository, MemberRepository memberRepository, PushNotificationService pushNotificationService) {
         this.newsRepository = newsRepository;
         this.memberRepository = memberRepository;
+        this.pushNotificationService = pushNotificationService;
     }
 
     /**
@@ -134,6 +137,13 @@ public class NewsService {
 
         // save to database
         final News savedNews = newsRepository.save(news);
+
+        // notify the devices subscribed to the news topic
+        pushNotificationService.sendToTopic(
+                PushNotificationService.TOPIC_NEWS,
+                "Nouvelle actualité",
+                title,
+                Map.of("type", "news", "id", String.valueOf(savedNews.getId())));
 
         // fetch again from database using our custom query so that lazy data is loaded
         return newsRepository.findByIdCustom(savedNews.getId()).orElseThrow();

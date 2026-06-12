@@ -38,13 +38,16 @@ import java.util.Optional;
 public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
 
     /**
-     * Retrieve all lap records with member and track fetched, ordered by lap time.
+     * Retrieve all public lap records with member and track fetched, ordered by lap time.
+     * Private records are deliberately excluded, they are only visible through
+     * {@link #findByMemberEmailCustom(String)}.
      *
-     * @return The list of lap records with associations
+     * @return The list of public lap records with associations
      */
     @Query("select distinct lr from LapRecord lr " +
             "left join fetch lr.member " +
             "left join fetch lr.track " +
+            "where lr.isPublic = true " +
             "order by lr.lapTime")
     List<LapRecord> findAllCustom();
 
@@ -61,30 +64,47 @@ public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
     Optional<LapRecord> findByIdCustom(long id);
 
     /**
-     * Find lap records for a given member and fetch the related member and track entities.
-     * Results ordered by track name.
+     * Find the public lap records for a given member and fetch the related member and track entities.
+     * Results ordered by track name. Used by the member detail page, which must
+     * never expose private records, even to their owner or to an admin.
      *
      * @param id The member id
-     * @return The list of lap records for the member
+     * @return The list of public lap records for the member
      */
     @Query("select lr from LapRecord lr " +
             "left join fetch lr.member m " +
             "left join fetch lr.track t " +
             "where m.id = :id " +
+            "and lr.isPublic = true " +
             "order by t.name")
-    List<LapRecord> findByMemberIdCustom(long id);
+    List<LapRecord> findPublicByMemberIdCustom(long id);
 
     /**
-     * Find lap records for a given track and fetch member and track, ordered by lap time.
+     * Find all lap records (public and private) owned by the member with the given email,
+     * with member and track fetched, ordered by track name.
      *
-     * @param id The track id
-     * @return The list of lap records on the track
+     * @param email The member email (case-insensitive)
+     * @return The list of lap records owned by the member
      */
     @Query("select lr from LapRecord lr " +
-            "left join fetch lr.member " +
+            "left join fetch lr.member m " +
             "left join fetch lr.track t " +
-            "where t.id = :id " +
-            "order by lr.lapTime")
+            "where lower(m.email) = lower(:email) " +
+            "order by t.name")
+    List<LapRecord> findByMemberEmailCustom(String email);
+
+    /**
+     * Find the public lap records for a given track and fetch member and track, ordered by lap time.
+     *
+     * @param id The track id
+     * @return The list of public lap records on the track
+     */
+    @Query("select lr from LapRecord lr " +
+           "left join fetch lr.member " +
+           "left join fetch lr.track t " +
+           "where t.id = :id " +
+           "and lr.isPublic = true " +
+           "order by lr.lapTime")
     List<LapRecord> findByTrackIdCustom(long id);
 
 }

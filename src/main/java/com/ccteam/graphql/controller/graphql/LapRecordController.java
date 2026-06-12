@@ -27,6 +27,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -60,7 +61,9 @@ public class LapRecordController {
     }
 
     /**
-     * Get all lap records for the specified member given its ID.
+     * Get the public lap records for the specified member given its ID.
+     * Private records are never returned here, even when the member asks
+     * about themselves, they are only visible through {@link #getMyLapRecords}.
      *
      * @param memberId The ID of the member for which to retrieve lap records
      * @return A list of {@link LapRecord} objects representing the lap records
@@ -70,6 +73,19 @@ public class LapRecordController {
     public List<LapRecord> getMemberLapRecords(@Argument Long memberId) {
         log.info("Received call to getMemberLapRecords with parameters memberId = {}", memberId);
         return lapRecordService.getLapRecordsByMember(memberId);
+    }
+
+    /**
+     * Get all lap records (public and private) of the authenticated member.
+     *
+     * @param authentication The current Spring Security authentication
+     * @return A list of {@link LapRecord} objects representing the lap records
+     */
+    @PreAuthorize("hasRole('MEMBER')")
+    @QueryMapping
+    public List<LapRecord> getMyLapRecords(Authentication authentication) {
+        log.info("Received call to getMyLapRecords for user {}", authentication.getName());
+        return lapRecordService.getOwnLapRecords(authentication.getName());
     }
 
     /**
@@ -94,6 +110,7 @@ public class LapRecordController {
      * @param lapTime    The lap time in milliseconds
      * @param conditions The track conditions
      * @param comments   Some comment about the lap record
+     * @param isPublic   Whether the lap record is visible to other members ({@code null} defaults to public)
      * @return A {@link LapRecord} object representing the lap record just created
      */
     @PreAuthorize("hasRole('MEMBER')")
@@ -104,10 +121,11 @@ public class LapRecordController {
                                      @Argument String recordDate,
                                      @Argument int lapTime,
                                      @Argument String conditions,
-                                     @Argument String comments) {
-        log.info("Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
-                memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
-        return lapRecordService.createLapRecord(memberId, trackId, bikeId, recordDate, lapTime, conditions, comments);
+                                     @Argument String comments,
+                                     @Argument Boolean isPublic) {
+        log.info("Received call to createLapRecord with parameters memberId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}, isPublic = {}",
+                memberId, trackId, bikeId, recordDate, lapTime, conditions, comments, isPublic);
+        return lapRecordService.createLapRecord(memberId, trackId, bikeId, recordDate, lapTime, conditions, comments, isPublic);
     }
 
     /**
@@ -119,6 +137,7 @@ public class LapRecordController {
      * @param lapTime     The lap time in milliseconds
      * @param conditions  The track conditions
      * @param comments    Some comment about the lap record
+     * @param isPublic    Whether the lap record is visible to other members ({@code null} keeps the current visibility)
      * @return A {@link LapRecord} object representing the lap record just created
      */
     @PreAuthorize("hasRole('MEMBER')")
@@ -129,11 +148,12 @@ public class LapRecordController {
                                      @Argument String recordDate,
                                      @Argument int lapTime,
                                      @Argument String conditions,
-                                     @Argument String comments) {
-        log.info("Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}",
-                lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments);
+                                     @Argument String comments,
+                                     @Argument Boolean isPublic) {
+        log.info("Received call to updateLapRecord with parameters lapRecordId = {}, trackId = {}, bikeId = {}, recordDate = {}, lapTime = {}, conditions = {}, comments = {}, isPublic = {}",
+                lapRecordId, trackId, bikeId, recordDate, lapTime, conditions, comments, isPublic);
         return lapRecordService.updateLapRecord(lapRecordId, trackId, bikeId, recordDate, lapTime, conditions,
-                comments);
+                comments, isPublic);
     }
 
     /**
