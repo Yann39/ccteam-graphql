@@ -18,31 +18,29 @@
  *
  */
 
-package com.ccteam.graphql.config.security;
+package com.ccteam.graphql.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
- * Represent a JWT authentication request.
+ * Request to enroll a new device as trusted, by proving possession of the
+ * account e-mail through a one-time password.
  *
  * @author yann39
- * @since 1.0.0
+ * @since 1.0.3
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class JWTRequest implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 5926468583005150707L;
+public class VerifyDeviceRequest {
 
     private String email;
-    private String password;
+    private String otp;
     private String deviceSecret;
+    private String deviceLabel;
 
 }

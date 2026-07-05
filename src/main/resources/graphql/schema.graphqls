@@ -72,6 +72,7 @@ type Mutation {
     setBoardRole(memberId: Long!, boardRole: BoardRole): Member
     setMemberPalette(memberId: Long!, headerPalette: Int): Member
     changePasscode(currentPasscode: String!, newPasscode: String!): Boolean
+    trustCurrentDevice(deviceSecret: String!, deviceLabel: String): Boolean
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizerId: Long!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizerId: Long!, price: Float!, memberId: Long!): Event

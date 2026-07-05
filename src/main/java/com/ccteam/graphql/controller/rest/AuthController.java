@@ -23,6 +23,7 @@ package com.ccteam.graphql.controller.rest;
 import com.ccteam.graphql.config.security.*;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.repository.MemberRepository;
+import com.ccteam.graphql.service.TrustedDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -62,13 +64,16 @@ public class AuthController {
     private final JWTTokenUtils jwtTokenUtils;
     private final AuthenticationManager authenticationManager;
     private final MemberRepository memberRepository;
+    private final TrustedDeviceService trustedDeviceService;
 
     public AuthController(JWTTokenUtils jwtTokenUtils,
                           AuthenticationManager authenticationManager,
-                          MemberRepository memberRepository) {
+                          MemberRepository memberRepository,
+                          TrustedDeviceService trustedDeviceService) {
         this.jwtTokenUtils = jwtTokenUtils;
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
+        this.trustedDeviceService = trustedDeviceService;
     }
 
     /**
@@ -162,6 +167,22 @@ public class AuthController {
                     member.setFailedLoginAttempts(0);
                     member.setLockedUntil(null);
                     memberRepository.save(member);
+                }
+            }
+
+            // device binding: the passcode is correct, but if the member already trusts at least one device,
+            // this device must be one of them. An unknown device gets a 428 so the client runs the e-mail OTP
+            // step (see /rest/verifyDevice) before it can obtain a token. Members with no trusted device yet
+            // (legacy installs, brand-new accounts) are allowed through so nothing breaks before enrollment.
+            if (memberOptional.isPresent()) {
+                final long memberId = memberOptional.get().getId();
+                if (trustedDeviceService.memberHasAnyDevice(memberId)) {
+                    if (!trustedDeviceService.isTrusted(memberId, userRequest.getDeviceSecret())) {
+                        log.info("Passcode OK for {} but device not trusted, e-mail verification required", username);
+                        return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
+                                .body(Collections.singletonMap("code", "device_verification_required"));
+                    }
+                    trustedDeviceService.touch(memberId, userRequest.getDeviceSecret());
                 }
             }
 

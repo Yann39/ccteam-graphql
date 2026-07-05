@@ -24,6 +24,7 @@ import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.model.*;
 import com.ccteam.graphql.repository.MemberRepository;
 import com.ccteam.graphql.service.MailService;
+import com.ccteam.graphql.service.TrustedDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,11 +61,16 @@ public class AccountController {
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
+    private final TrustedDeviceService trustedDeviceService;
 
-    public AccountController(MemberRepository memberRepository, MailService mailService, PasswordEncoder passwordEncoder) {
+    public AccountController(MemberRepository memberRepository,
+                             MailService mailService,
+                             PasswordEncoder passwordEncoder,
+                             TrustedDeviceService trustedDeviceService) {
         this.memberRepository = memberRepository;
         this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
+        this.trustedDeviceService = trustedDeviceService;
     }
 
     /**
@@ -108,14 +114,14 @@ public class AccountController {
         final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
         final LocalDateTime expiryThreshold = now.minusMinutes(OTP_VALIDITY_MINUTES);
         if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate() != null
-                && member.get().getOtpDate().isAfter(expiryThreshold)) {
+            && member.get().getOtpDate().isAfter(expiryThreshold)) {
             log.info("Account with e-mail address {} exist, OTP has been sent and is still valid", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.FOUND).build();
         }
 
         // account exist, OTP has been sent but is not valid anymore (OTP was generated more than OTP_VALIDITY_MINUTES ago)
         if (!member.get().isVerified() && member.get().getOtp() != null && member.get().getOtpDate() != null
-                && member.get().getOtpDate().isBefore(expiryThreshold)) {
+            && member.get().getOtpDate().isBefore(expiryThreshold)) {
             log.info("Account with e-mail address {} exist, OTP has been sent but is not valid anymore", checkAccountRequest.getEmail());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
@@ -336,6 +342,73 @@ public class AccountController {
 
         log.info("E-mail address confirmed for user {}", member.getEmail());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+
+    }
+
+    /**
+     * Enroll a new device as trusted, by validating the one-time password sent to the account e-mail.
+     * <p>
+     * Used by the device-binding flow: when a member authenticates with a correct passcode from an
+     * unrecognized device, {@code /rest/authenticate} returns 428 and the client obtains an OTP
+     * (via {@code /rest/resendOtp}) then calls this endpoint. On success the device becomes trusted and the
+     * client can authenticate again. This endpoint never issues a token, so possession of the e-mail alone
+     * (without the passcode) does not grant access.
+     *
+     * @param request The request data containing the e-mail address, the OTP and the device secret to trust
+     * @return An empty body response with one of the following HTTP status :
+     * <ul>
+     *   <li>400 Bad request if e-mail address, OTP or device secret is missing</li>
+     *   <li>404 Not found if the specified user's e-mail address has not been found in the database</li>
+     *   <li>406 Not acceptable if the specified OTP has expired</li>
+     *   <li>401 Unauthorized if the specified OTP does not match the one from the database</li>
+     *   <li>200 Ok if the device has been trusted successfully</li>
+     * </ul>
+     */
+    @PostMapping("/rest/verifyDevice")
+    public ResponseEntity<HttpStatus> verifyDevice(@RequestBody VerifyDeviceRequest request) {
+
+        log.info("Call to verifyDevice REST endpoint");
+
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            log.info("No e-mail address specified");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        if (request.getOtp() == null || request.getOtp().isEmpty()) {
+            log.info("No OTP code specified");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        if (request.getDeviceSecret() == null || request.getDeviceSecret().isEmpty()) {
+            log.info("No device secret specified");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        final Optional<Member> optMember = memberRepository.findByEmailCustom(request.getEmail());
+        if (optMember.isEmpty()) {
+            log.info("No member found in the database with e-mail address {}", request.getEmail());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        final Member member = optMember.get();
+
+        // same OTP validation as confirmEmail (expiry then match)
+        final LocalDateTime now = LocalDateTime.now(ZoneId.of(ZONE_ID_EUROPE_PARIS));
+        if (member.getOtpDate() == null || member.getOtpDate().isBefore(now.minusMinutes(OTP_VALIDITY_MINUTES))) {
+            log.info("Specified OTP has expired (otpDate = {}, now = {})", member.getOtpDate(), now);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        if (member.getOtp() == null || !member.getOtp().equalsIgnoreCase(request.getOtp())) {
+            log.info("Specified OTP {} does not match the one from the database", request.getOtp());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // consume the OTP and trust the device
+        member.setOtp(null);
+        member.setOtpDate(null);
+        memberRepository.save(member);
+        trustedDeviceService.trustDevice(member.getId(), request.getDeviceSecret(), request.getDeviceLabel());
+
+        log.info("Device trusted for user {}", member.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 

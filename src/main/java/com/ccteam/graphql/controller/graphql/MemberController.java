@@ -25,6 +25,7 @@ import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.MembershipFee;
 import com.ccteam.graphql.enums.BoardRole;
 import com.ccteam.graphql.service.MemberService;
+import com.ccteam.graphql.service.TrustedDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -48,9 +49,11 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final TrustedDeviceService trustedDeviceService;
 
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, TrustedDeviceService trustedDeviceService) {
         this.memberService = memberService;
+        this.trustedDeviceService = trustedDeviceService;
     }
 
     /**
@@ -234,6 +237,29 @@ public class MemberController {
                 memberId, headerPalette);
         ensureCanEdit(memberId, authentication);
         return memberService.setMemberPalette(memberId, headerPalette);
+    }
+
+    /**
+     * Trust the calling device for the authenticated member (device binding).
+     * <p>
+     * Used to enroll the device the member is already logged in on ("grandfathering" existing installs after the
+     * device-binding feature ships), so it keeps working without an e-mail re-verification. The member is derived
+     * from the authentication token, so a caller can only ever enroll a device for themselves. Idempotent.
+     *
+     * @param deviceSecret   The high-entropy device secret held by the client
+     * @param deviceLabel    Optional human-readable device label
+     * @param authentication The current Spring Security authentication
+     * @return {@code true} once the device is trusted
+     */
+    @PreAuthorize("hasRole('USER')")
+    @MutationMapping
+    public Boolean trustCurrentDevice(@Argument String deviceSecret,
+                                      @Argument String deviceLabel,
+                                      Authentication authentication) {
+        log.info("Received call to trustCurrentDevice for user {}", authentication.getName());
+        final Member member = memberService.getMemberByEmail(authentication.getName());
+        trustedDeviceService.trustDevice(member.getId(), deviceSecret, deviceLabel);
+        return true;
     }
 
     /**
