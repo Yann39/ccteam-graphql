@@ -53,7 +53,7 @@ public class LapRecordController {
      *
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public List<LapRecord> getAllLapRecords() {
         log.info("Received call to getAllLapRecords");
@@ -68,7 +68,7 @@ public class LapRecordController {
      * @param memberId The ID of the member for which to retrieve lap records
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public List<LapRecord> getMemberLapRecords(@Argument Long memberId) {
         log.info("Received call to getMemberLapRecords with parameters memberId = {}", memberId);
@@ -81,7 +81,7 @@ public class LapRecordController {
      * @param authentication The current Spring Security authentication
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public List<LapRecord> getMyLapRecords(Authentication authentication) {
         log.info("Received call to getMyLapRecords for user {}", authentication.getName());
@@ -94,7 +94,7 @@ public class LapRecordController {
      * @param trackId The ID of the track for which to retrieve lap records
      * @return A list of {@link LapRecord} objects representing the lap records
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public List<LapRecord> getTrackLapRecords(@Argument Long trackId) {
         log.info("Received call to getTrackLapRecords with parameters trackId = {}", trackId);

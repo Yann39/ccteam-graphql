@@ -186,6 +186,7 @@ public class Member {
 
     public enum Role implements GrantedAuthority {
         ROLE_USER,
+        ROLE_GUEST,
         ROLE_MEMBER,
         ROLE_ADMIN;
 

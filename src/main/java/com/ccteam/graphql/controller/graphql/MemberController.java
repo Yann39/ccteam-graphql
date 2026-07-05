@@ -58,7 +58,7 @@ public class MemberController {
      *
      * @return A list of {@link Member} objects representing the members
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public List<Member> getAllMembers() {
         log.info("Received call to getAllMembers");
@@ -83,7 +83,7 @@ public class MemberController {
      * @param id The ID of the member to retrieve
      * @return A {@link Member} object representing the member
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public Member getMemberById(@Argument Long id) {
         log.info("Received call to getMemberById with parameters ID = {}", id);
@@ -112,7 +112,7 @@ public class MemberController {
      * @param text The text filter string
      * @return A list of {@link Member} objects representing the members
      */
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasRole('GUEST')")
     @QueryMapping
     public List<Member> getMembersFiltered(@Argument String text) {
         log.info("Received call to getMembersFiltered with parameters text = {}", text);

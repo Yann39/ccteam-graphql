@@ -206,6 +206,7 @@ type Member {
 
 enum Role {
     ROLE_USER
+    ROLE_GUEST
     ROLE_MEMBER
     ROLE_ADMIN
 }
