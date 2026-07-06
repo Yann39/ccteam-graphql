@@ -19,3 +19,10 @@
 - Handle visibility settings for lap records
 - Do not consider e-mail address when searching for members
 - Upgraded Spring Boot to version 4.0.7
+
+# 1.1.1
+
+2026-07-06
+
+- Handle guest accounts (can view all content like members but in read-only)
+- Upgraded Spring Boot to version 4.1.0

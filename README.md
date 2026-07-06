@@ -2,11 +2,11 @@
 
 **Spring Boot** application to expose **GraphQL** endpoint for **CCTeam** mobile application.
 
-![Version](https://img.shields.io/badge/Version-1.1.0-2AAB92.svg)
-![Static Badge](https://img.shields.io/badge/Last_update-12_June_2026-blue)
+![Version](https://img.shields.io/badge/Version-1.1.1-2AAB92.svg)
+![Static Badge](https://img.shields.io/badge/Last_update-06_July_2026-blue)
 
 ![Version](https://img.shields.io/badge/Open_JDK-25-red.svg)
-![Version](https://img.shields.io/badge/Spring_Boot-4.0.6-green.svg)
+![Version](https://img.shields.io/badge/Spring_Boot-4.1.0-green.svg)
 ![Version](https://img.shields.io/badge/MariaDB-10.5-teal.svg)
 
 ---
@@ -129,9 +129,12 @@ You can test either the GraphQL or the REST endpoints using command line (i.e. u
 
 User roles :
 
-- **NORMAL** : default user role, not member of the team
-- **MEMBER** : members that have been accepted in the team
-- **ADMIN** : administrator users
+- **USER** : default user role after first registration, not member of the team yet, basically cannot do anything except
+  update their own profile
+- **MEMBER** : members that have been accepted in the team, can view all content, create bikes, register to events, etc.
+- **GUEST** : guest users that can view all content like members but in a read-only basis, cannot create bikes or
+  register to events
+- **ADMIN** : administrator users, can manage members, events, tracks, etc.
 
 # License
 
