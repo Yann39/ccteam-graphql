@@ -24,7 +24,9 @@ import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.MembershipFee;
 import com.ccteam.graphql.enums.BoardRole;
+import com.ccteam.graphql.model.TrustedDeviceView;
 import com.ccteam.graphql.service.MemberService;
+import com.ccteam.graphql.service.TrustedDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -48,9 +50,11 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final TrustedDeviceService trustedDeviceService;
 
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, TrustedDeviceService trustedDeviceService) {
         this.memberService = memberService;
+        this.trustedDeviceService = trustedDeviceService;
     }
 
     /**
@@ -234,6 +238,60 @@ public class MemberController {
                 memberId, headerPalette);
         ensureCanEdit(memberId, authentication);
         return memberService.setMemberPalette(memberId, headerPalette);
+    }
+
+    /**
+     * Trust the calling device for the authenticated member (device binding).
+     * <p>
+     * Used to enroll the device the member is already logged in on ("grandfathering" existing installs after the
+     * device-binding feature ships), so it keeps working without an e-mail re-verification. The member is derived
+     * from the authentication token, so a caller can only ever enroll a device for themselves. Idempotent.
+     *
+     * @param deviceSecret   The high-entropy device secret held by the client
+     * @param deviceLabel    Optional human-readable device label
+     * @param authentication The current Spring Security authentication
+     * @return {@code true} once the device is trusted
+     */
+    @PreAuthorize("hasRole('USER')")
+    @MutationMapping
+    public Boolean trustCurrentDevice(@Argument String deviceSecret,
+                                      @Argument String deviceLabel,
+                                      Authentication authentication) {
+        log.info("Received call to trustCurrentDevice for user {}", authentication.getName());
+        final Member member = memberService.getMemberByEmail(authentication.getName());
+        trustedDeviceService.trustDevice(member.getId(), deviceSecret, deviceLabel);
+        return true;
+    }
+
+    /**
+     * List the authenticated member's trusted devices (device-binding management screen).
+     *
+     * @param deviceSecret   The calling device's secret, so the current device can be flagged (optional)
+     * @param authentication The current Spring Security authentication
+     * @return The member's trusted devices
+     */
+    @PreAuthorize("hasRole('USER')")
+    @QueryMapping
+    public List<TrustedDeviceView> getMyTrustedDevices(@Argument String deviceSecret, Authentication authentication) {
+        log.info("Received call to getMyTrustedDevices for user {}", authentication.getName());
+        final Member member = memberService.getMemberByEmail(authentication.getName());
+        return trustedDeviceService.listForMember(member.getId(), deviceSecret);
+    }
+
+    /**
+     * Revoke one of the authenticated member's trusted devices. Ownership is enforced server-side, so a member
+     * can only ever revoke their own devices.
+     *
+     * @param deviceId       The id of the trusted device to revoke
+     * @param authentication The current Spring Security authentication
+     * @return {@code true} when the device was revoked
+     */
+    @PreAuthorize("hasRole('USER')")
+    @MutationMapping
+    public Boolean revokeTrustedDevice(@Argument Long deviceId, Authentication authentication) {
+        log.info("Received call to revokeTrustedDevice {} for user {}", deviceId, authentication.getName());
+        final Member member = memberService.getMemberByEmail(authentication.getName());
+        return trustedDeviceService.revoke(member.getId(), deviceId);
     }
 
     /**

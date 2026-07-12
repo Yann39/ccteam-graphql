@@ -18,31 +18,23 @@
  *
  */
 
-package com.ccteam.graphql.config.security;
+package com.ccteam.graphql.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * Represent a JWT authentication request.
+ * Read-only view of a trusted device, exposed over GraphQL. Deliberately
+ * omits the token hash (never leaves the server) and adds a {@code current}
+ * flag telling whether it is the device making the request.
  *
  * @author yann39
- * @since 1.0.0
+ * @since 1.0.3
  */
-@Getter
-@Setter
-@AllArgsConstructor
-public class JWTRequest implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 5926468583005150707L;
-
-    private String email;
-    private String password;
-    private String deviceSecret;
-
+public record TrustedDeviceView(
+        Long id,
+        String label,
+        LocalDateTime createdOn,
+        LocalDateTime lastUsedOn,
+        boolean current
+) {
 }
