@@ -24,6 +24,7 @@ import com.ccteam.graphql.entities.TrustedDevice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -52,5 +53,13 @@ public interface TrustedDeviceRepository extends JpaRepository<TrustedDevice, Lo
      * @return The matching trusted device, or empty
      */
     Optional<TrustedDevice> findByMemberIdAndTokenHash(long memberId, String tokenHash);
+
+    /**
+     * List the member's trusted devices, most recently used first.
+     *
+     * @param memberId The member id
+     * @return The member's trusted devices
+     */
+    List<TrustedDevice> findByMemberIdOrderByLastUsedOnDesc(long memberId);
 
 }

@@ -21,6 +21,7 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.entities.TrustedDevice;
+import com.ccteam.graphql.model.TrustedDeviceView;
 import com.ccteam.graphql.repository.TrustedDeviceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -121,6 +123,45 @@ public class TrustedDeviceService {
             device.setLastUsedOn(LocalDateTime.now());
             trustedDeviceRepository.save(device);
         });
+    }
+
+    /**
+     * List the member's trusted devices for the management screen, flagging
+     * the one that made the request (matched via the current device secret).
+     *
+     * @param memberId      The member id
+     * @param currentSecret The raw device secret of the calling device (may be null)
+     * @return The member's trusted devices as views (no token hash exposed)
+     */
+    public List<TrustedDeviceView> listForMember(long memberId, String currentSecret) {
+        final String currentHash = (currentSecret == null || currentSecret.isBlank()) ? null : hash(currentSecret);
+        return trustedDeviceRepository.findByMemberIdOrderByLastUsedOnDesc(memberId).stream()
+                .map(d -> new TrustedDeviceView(
+                        d.getId(),
+                        d.getLabel(),
+                        d.getCreatedOn(),
+                        d.getLastUsedOn(),
+                        currentHash != null && currentHash.equals(d.getTokenHash())))
+                .toList();
+    }
+
+    /**
+     * Revoke (delete) one of the member's trusted devices. Ownership is
+     * enforced: a device that doesn't belong to the member is left untouched.
+     *
+     * @param memberId The member id (from the auth token)
+     * @param deviceId The id of the trusted device to revoke
+     * @return {@code true} when a device was revoked, {@code false} otherwise
+     */
+    public boolean revoke(long memberId, long deviceId) {
+        final Optional<TrustedDevice> device = trustedDeviceRepository.findById(deviceId);
+        if (device.isEmpty() || !device.get().getMemberId().equals(memberId)) {
+            log.info("Revoke refused: device {} not found or not owned by member {}", deviceId, memberId);
+            return false;
+        }
+        trustedDeviceRepository.delete(device.get());
+        log.info("Trusted device {} revoked for member {}", deviceId, memberId);
+        return true;
     }
 
     /**

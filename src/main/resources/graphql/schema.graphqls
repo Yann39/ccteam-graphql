@@ -57,6 +57,8 @@ type Query {
     getMemberLapRecords(memberId: Long!): [LapRecord]
     getTrackLapRecords(trackId: Long!): [LapRecord]
     getMyLapRecords: [LapRecord]
+
+    getMyTrustedDevices(deviceSecret: String): [TrustedDevice]
 }
 
 type Mutation {
@@ -73,6 +75,7 @@ type Mutation {
     setMemberPalette(memberId: Long!, headerPalette: Int): Member
     changePasscode(currentPasscode: String!, newPasscode: String!): Boolean
     trustCurrentDevice(deviceSecret: String!, deviceLabel: String): Boolean
+    revokeTrustedDevice(deviceId: Long!): Boolean
 
     createEvent(title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizerId: Long!, price: Float!, memberId: Long!): Event
     updateEvent(eventId: Long!, title: String!, description: String!, startDate: String!, endDate: String!, trackId: Long!, organizerId: Long!, price: Float!, memberId: Long!): Event
@@ -175,6 +178,14 @@ type LapRecord {
     isPublic: Boolean!
     createdOn: LocalDateTime!
     modifiedOn: LocalDateTime
+}
+
+type TrustedDevice {
+    id: ID!
+    label: String
+    createdOn: LocalDateTime!
+    lastUsedOn: LocalDateTime
+    current: Boolean!
 }
 
 type LikedNews {
