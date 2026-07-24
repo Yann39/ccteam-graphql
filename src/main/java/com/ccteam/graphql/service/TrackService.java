@@ -111,23 +111,25 @@ public class TrackService {
     /**
      * Create a new track.
      *
-     * @param name        The official name of the track
-     * @param distance    The track distance (in meters)
-     * @param lapRecord   The lap record (in milliseconds)
-     * @param website     The official website of the track
-     * @param latitude    The track latitude coordinate
-     * @param longitude   The track longitude coordinate
-     * @param countryCode ISO 3166-1 alpha-2 code of the country where the
-     *                    track is located (optional)
+     * @param name          The official name of the track
+     * @param distance      The track distance (in meters)
+     * @param lapRecord     The lap record (in milliseconds)
+     * @param lapRecordInfo Additional information about the lap record (rider, bike, year, ...), optional
+     * @param website       The official website of the track
+     * @param latitude      The track latitude coordinate
+     * @param longitude     The track longitude coordinate
+     * @param countryCode   ISO 3166-1 alpha-2 code of the country where the
+     *                      track is located (optional)
      * @return A {@link Track} object representing the track just created
      */
     @Transactional
-    public Track createTrack(String name, int distance, int lapRecord, String website, BigDecimal latitude,
-                             BigDecimal longitude, String countryCode) {
+    public Track createTrack(String name, int distance, int lapRecord, String lapRecordInfo, String website,
+                             BigDecimal latitude, BigDecimal longitude, String countryCode) {
         final Track track = new Track();
         track.setName(name);
         track.setDistance(distance);
         track.setLapRecord(lapRecord);
+        track.setLapRecordInfo(lapRecordInfo);
         track.setWebsite(website);
         track.setLatitude(latitude);
         track.setLongitude(longitude);
@@ -138,19 +140,20 @@ public class TrackService {
     /**
      * Update the track represented by the given track ID with the specified data.
      *
-     * @param name        The official name of the track
-     * @param distance    The track distance (in meters)
-     * @param lapRecord   The lap record (in milliseconds)
-     * @param website     The official website of the track
-     * @param latitude    The track latitude coordinate
-     * @param longitude   The track longitude coordinate
-     * @param countryCode ISO 3166-1 alpha-2 code of the country where the
-     *                    track is located (optional)
+     * @param name          The official name of the track
+     * @param distance      The track distance (in meters)
+     * @param lapRecord     The lap record (in milliseconds)
+     * @param lapRecordInfo Additional information about the lap record (rider, bike, year, ...), optional
+     * @param website       The official website of the track
+     * @param latitude      The track latitude coordinate
+     * @param longitude     The track longitude coordinate
+     * @param countryCode   ISO 3166-1 alpha-2 code of the country where the
+     *                      track is located (optional)
      * @return A {@link Track} object representing the track just updated
      */
     @Transactional
-    public Track updateTrack(long trackId, String name, int distance, int lapRecord, String website,
-                             BigDecimal latitude, BigDecimal longitude, String countryCode) {
+    public Track updateTrack(long trackId, String name, int distance, int lapRecord, String lapRecordInfo,
+                             String website, BigDecimal latitude, BigDecimal longitude, String countryCode) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
@@ -162,6 +165,7 @@ public class TrackService {
         track.setName(name);
         track.setDistance(distance);
         track.setLapRecord(lapRecord);
+        track.setLapRecordInfo(lapRecordInfo);
         track.setWebsite(website);
         track.setLatitude(latitude);
         track.setLongitude(longitude);
