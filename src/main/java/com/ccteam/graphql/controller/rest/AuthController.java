@@ -88,6 +88,7 @@ public class AuthController {
      *   <li><b>500 Internal Server Error</b> : unexpected auth failure (anonymous token, etc.).
      *       Should not happen under normal usage but kept as a safety net.</li>
      *   <li><b>200 Ok</b> : authentication succeeded, JWT in body.</li>
+     *   <li><b>428 Precondition Required</b> : device not trusted, e-mail verification required.</li>
      * </ul>
      *
      * @param userRequest e-mail address + passcode
@@ -97,7 +98,7 @@ public class AuthController {
     public ResponseEntity<?> authenticate(@RequestBody JWTRequest userRequest) {
         log.info("Call to authenticate REST endpoint");
 
-        // check if the account is currently locked, we do this before the BCrypt comparison so a flood of
+        // check if the account is currently locked, we do this before the Bcrypt comparison so a flood of
         // attempts can't keep the CPU busy hashing during a lockout
         final Optional<Member> memberOptional = memberRepository.findByEmailCustom(userRequest.getEmail());
         if (memberOptional.isPresent()) {
@@ -170,10 +171,9 @@ public class AuthController {
                 }
             }
 
-            // device binding: the passcode is correct, but if the member already trusts at least one device,
-            // this device must be one of them. An unknown device gets a 428 so the client runs the e-mail OTP
-            // step (see /rest/verifyDevice) before it can obtain a token. Members with no trusted device yet
-            // (legacy installs, brand-new accounts) are allowed through so nothing breaks before enrollment.
+            // if the member already trusts at least one device, the passed device must be one of them,
+            // an unknown device gets a 428 so the client runs the e-mail OTP step,
+            // members with no trusted device yet (i.e. brand-new accounts) are allowed before enrollment.
             if (memberOptional.isPresent()) {
                 final long memberId = memberOptional.get().getId();
                 if (trustedDeviceService.memberHasAnyDevice(memberId)) {
