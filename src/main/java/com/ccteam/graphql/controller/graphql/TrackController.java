@@ -29,11 +29,10 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * {@link Track} GraphQL controller.
+ * {@link Track} GraphQL controller. A track is a single version (layout) of a circuit.
  *
  * @author yann39
  * @since 1.0.0
@@ -49,7 +48,7 @@ public class TrackController {
     }
 
     /**
-     * Get all tracks.
+     * Get all tracks (versions).
      *
      * @return A list of {@link Track} objects representing the tracks
      */
@@ -58,22 +57,6 @@ public class TrackController {
     public List<Track> getAllTracks() {
         log.info("Received call to getAllTracks");
         return trackService.getAllTracks();
-    }
-
-    /**
-     * Get all tracks according to the specified filter {@code text}.
-     * <p>
-     * Search is done on track name.
-     * If {@code text} filter is null, all records will be returned.
-     *
-     * @param text The text filter string
-     * @return A list of {@link Track} objects representing the tracks
-     */
-    @PreAuthorize("hasRole('USER')")
-    @QueryMapping
-    public List<Track> getTracksFiltered(@Argument String text) {
-        log.info("Received call to getTracksFiltered with parameter text = {}", text);
-        return trackService.getTracksFiltered(text);
     }
 
     /**
@@ -90,67 +73,57 @@ public class TrackController {
     }
 
     /**
-     * Create a new track.
+     * Create a new track (version) attached to a circuit.
      *
-     * @param name          The official name of the track
+     * @param circuitId     The ID of the parent circuit (mandatory)
+     * @param variantName   The version / layout label (optional, e.g. "5,8 km GP")
      * @param distance      The track distance (in meters)
      * @param lapRecord     The lap record (in milliseconds)
      * @param lapRecordInfo Additional information about the lap record (rider, bike, year, ...), optional
-     * @param website       The official website of the track
-     * @param latitude      The track latitude coordinate
-     * @param longitude     The track longitude coordinate
-     * @param countryCode   ISO 3166-1 alpha-2 code of the country where the
-     *                      track is located (mandatory, e.g. "FR")
+     * @param iconKey       Key selecting the version's map/shape icon, optional
      * @return A {@link Track} object representing the track just created
      */
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
-    public Track createTrack(@Argument String name,
+    public Track createTrack(@Argument Long circuitId,
+                             @Argument String variantName,
                              @Argument int distance,
                              @Argument int lapRecord,
                              @Argument String lapRecordInfo,
-                             @Argument String website,
-                             @Argument BigDecimal latitude,
-                             @Argument BigDecimal longitude,
-                             @Argument String countryCode) {
-        log.info("Received call to createTrack with parameters name = {}, distance = {}, lapRecord = {}, lapRecordInfo = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
-                name, distance, lapRecord, lapRecordInfo, website, latitude, longitude, countryCode);
-        return trackService.createTrack(name, distance, lapRecord, lapRecordInfo, website, latitude, longitude, countryCode);
+                             @Argument String iconKey) {
+        log.info("Received call to createTrack with parameters circuitId = {}, variantName = {}, distance = {}, lapRecord = {}, lapRecordInfo = {}, iconKey = {}",
+                circuitId, variantName, distance, lapRecord, lapRecordInfo, iconKey);
+        return trackService.createTrack(circuitId, variantName, distance, lapRecord, lapRecordInfo, iconKey);
     }
 
     /**
-     * Update the track represented by the given track ID with the specified data.
+     * Update the track (version) represented by the given track ID with the specified data.
      *
      * @param trackId       The ID of the {@link Track} to update
-     * @param name          The official name of the track
+     * @param circuitId     The ID of the parent circuit (mandatory)
+     * @param variantName   The version / layout label (optional)
      * @param distance      The track distance (in meters)
      * @param lapRecord     The lap record (in milliseconds)
      * @param lapRecordInfo Additional information about the lap record (rider, bike, year, ...), optional
-     * @param website       The official website of the track
-     * @param latitude      The track latitude coordinate
-     * @param longitude     The track longitude coordinate
-     * @param countryCode   ISO 3166-1 alpha-2 code of the country where the
-     *                      track is located (mandatory, e.g. "FR")
+     * @param iconKey       Key selecting the version's map/shape icon, optional
      * @return A {@link Track} object representing the track just updated
      */
     @PreAuthorize("hasRole('ADMIN')")
     @MutationMapping
     public Track updateTrack(@Argument long trackId,
-                             @Argument String name,
+                             @Argument Long circuitId,
+                             @Argument String variantName,
                              @Argument int distance,
                              @Argument int lapRecord,
                              @Argument String lapRecordInfo,
-                             @Argument String website,
-                             @Argument BigDecimal latitude,
-                             @Argument BigDecimal longitude,
-                             @Argument String countryCode) {
-        log.info("Received call to updateTrack with parameters trackId = {}, name = {}, distance = {}, lapRecord = {}, lapRecordInfo = {}, website = {}, latitude = {}, longitude = {}, countryCode = {}",
-                trackId, name, distance, lapRecord, lapRecordInfo, website, latitude, longitude, countryCode);
-        return trackService.updateTrack(trackId, name, distance, lapRecord, lapRecordInfo, website, latitude, longitude, countryCode);
+                             @Argument String iconKey) {
+        log.info("Received call to updateTrack with parameters trackId = {}, circuitId = {}, variantName = {}, distance = {}, lapRecord = {}, lapRecordInfo = {}, iconKey = {}",
+                trackId, circuitId, variantName, distance, lapRecord, lapRecordInfo, iconKey);
+        return trackService.updateTrack(trackId, circuitId, variantName, distance, lapRecord, lapRecordInfo, iconKey);
     }
 
     /**
-     * Delete the track represented by the given track ID.
+     * Delete the track (version) represented by the given track ID.
      *
      * @param trackId The ID of the {@link Track} to delete
      * @return A {@link Track} object representing the track just deleted
