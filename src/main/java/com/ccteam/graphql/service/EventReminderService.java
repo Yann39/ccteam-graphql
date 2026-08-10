@@ -93,8 +93,11 @@ public class EventReminderService {
                 log.info("Sending {} reminder for event {} ({})", offset.getKey(), event.getId(), event.getTitle());
 
                 final String when = REMINDER_DATE_FORMAT.format(event.getStartDate());
-                final String body = event.getTrack() != null && event.getTrack().getName() != null
-                        ? "C'est bientôt ! Rendez-vous le " + when + " sur le circuit " + event.getTrack().getName() + "."
+                final String circuitName = event.getTrack() != null && event.getTrack().getCircuit() != null
+                        ? event.getTrack().getCircuit().getName()
+                        : null;
+                final String body = circuitName != null
+                        ? "C'est bientôt ! Rendez-vous le " + when + " sur le circuit " + circuitName + "."
                         : "C'est bientôt ! Rendez-vous le " + when + ".";
 
                 final boolean sent = pushNotificationService.sendToTopic(

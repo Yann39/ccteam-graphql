@@ -24,9 +24,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 /**
+ * Track entity, a single version (layout) of a {@link Circuit}.
+ *
  * @author yann39
  * @since 1.0.0
  */
@@ -46,19 +46,34 @@ public class Track {
     private Long id;
 
     /**
-     * Track name, maximum 128 characters.
+     * Circuit (venue) this version belongs to.
+     * <p>
+     * Fetched eagerly so {@code track.circuit} (and, through it, the country) resolves everywhere a
+     * track is serialized without open-session-in-view, mirroring how {@code event.track} is loaded.
+     * <p>
+     * The join column is left nullable at the entity level so the schema migration can add it to the
+     * populated {@code track} table; it is enforced non-null by {@code TrackService} and tightened at
+     * the database level once every row has been linked to a circuit.
      */
-    @Column(length = 128, nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "circuit_id")
+    private Circuit circuit;
 
     /**
-     * Track length in meters.
+     * Version / layout label within the circuit (e.g. "5,8 km GP", "3,8 km", "Sens inversé").
+     * Null or blank when the circuit has a single version.
+     */
+    @Column(length = 128)
+    private String variantName;
+
+    /**
+     * Track length in meters (specific to this version).
      */
     @Column
     private int distance;
 
     /**
-     * Best lap time recorded on this track (expressed in milliseconds).
+     * Best lap time recorded on this version (expressed in milliseconds).
      */
     @Column
     private int lapRecord;
@@ -70,30 +85,10 @@ public class Track {
     private String lapRecordInfo;
 
     /**
-     * Track website link, max 2048 characters.
+     * Key selecting the small map/shape icon for this version (font-icon lookup on the client).
+     * Null falls back to the circuit's default icon.
      */
-    @Column(length = 2048)
-    private String website;
-
-    /**
-     * Latitude coordinate of the track location.
-     * <p>
-     * Stored with precision suitable for geographic coordinates.
-     */
-    @Column(precision = 10, scale = 8)
-    private BigDecimal latitude;
-
-    /**
-     * Longitude coordinate of the track location.
-     */
-    @Column(precision = 11, scale = 8)
-    private BigDecimal longitude;
-
-    /**
-     * Country where the track is located. References Country.code (ISO 3166-1 alpha-2).
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "country_code", nullable = false)
-    private Country country;
+    @Column(length = 64)
+    private String iconKey;
 
 }

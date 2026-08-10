@@ -38,41 +38,38 @@ import java.util.Optional;
 public interface TrackRepository extends JpaRepository<Track, Long> {
 
     /**
-     * Retrieve all tracks with their country loaded, ordered by name.
+     * Retrieve all tracks (versions) with their circuit and country loaded, ordered by circuit
+     * name then version label.
      *
-     * @return The list of tracks with country fetched
+     * @return The list of tracks with circuit fetched
      */
     @Query("select t " +
-            "from Track t " +
-            "join fetch t.country " +
-            "order by t.name")
+           "from Track t " +
+           "left join fetch t.circuit c " +
+           "left join fetch c.country " +
+           "order by c.name, t.variantName")
     List<Track> findAllCustom();
 
     /**
-     * Find a track by id and fetch its country eagerly.
+     * Find a track by id and fetch its circuit (and country) eagerly.
      *
      * @param id The track id
-     * @return The optional track with country fetched
+     * @return The optional track with circuit fetched
      */
     @Query("select t " +
-            "from Track t " +
-            "join fetch t.country " +
-            "where t.id = :id")
+           "from Track t " +
+           "left join fetch t.circuit c " +
+           "left join fetch c.country " +
+           "where t.id = :id")
     Optional<Track> findByIdCustom(long id);
 
     /**
-     * Find tracks filtered by text against the track name. When {@code text} is null, returns all tracks.
-     * Country is fetched eagerly.
+     * Whether at least one track (version) is attached to the given circuit. Used to block the
+     * deletion of a circuit that still has versions.
      *
-     * @param text The filter text (nullable)
-     * @return The list of tracks matching the filter
+     * @param circuitId The circuit id
+     * @return {@code true} when the circuit still has at least one version
      */
-    @Query("select t " +
-            "from Track t " +
-            "join fetch t.country " +
-            "where :text is null or ( " +
-            "t.name like %:text%" +
-            ") order by t.name")
-    List<Track> findFilteredCustom(String text);
+    boolean existsByCircuit_Id(Long circuitId);
 
 }

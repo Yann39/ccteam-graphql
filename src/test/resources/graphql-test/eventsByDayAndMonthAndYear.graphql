@@ -6,12 +6,15 @@ query GetEventsByDayAndMonthAndYear ($day: Int!, $month: Int!, $year: Int!) {
         startDate
         endDate
         track {
-            name
+            variantName
             distance
             lapRecord
-            website
-            latitude
-            longitude
+            circuit {
+                name
+                website
+                latitude
+                longitude
+            }
         }
         participants {
             member {

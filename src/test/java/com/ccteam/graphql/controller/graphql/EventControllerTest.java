@@ -76,23 +76,31 @@ class EventControllerTest {
         this.graphQlTester = HttpGraphQlTester.create(client);
 
 
+        final Circuit circuitBresse = new Circuit();
+        circuitBresse.setId(1L);
+        circuitBresse.setName("Bresse");
+        circuitBresse.setWebsite("https://www.circuitdebresse.com");
+        circuitBresse.setLatitude(BigDecimal.valueOf(46.551756882687776));
+        circuitBresse.setLongitude(BigDecimal.valueOf(5.3285273408879394));
+
         final Track trackBresse = new Track();
         trackBresse.setId(1L);
-        trackBresse.setName("Bresse");
+        trackBresse.setCircuit(circuitBresse);
         trackBresse.setLapRecord(84330);
         trackBresse.setDistance(3000);
-        trackBresse.setWebsite("https://www.circuitdebresse.com");
-        trackBresse.setLatitude(BigDecimal.valueOf(46.551756882687776));
-        trackBresse.setLongitude(BigDecimal.valueOf(5.3285273408879394));
+
+        final Circuit circuitMagnyCours = new Circuit();
+        circuitMagnyCours.setId(2L);
+        circuitMagnyCours.setName("Magny-cours");
+        circuitMagnyCours.setWebsite("https://www.circuitmagnycours.com/");
+        circuitMagnyCours.setLatitude(BigDecimal.valueOf(46.86390367017831));
+        circuitMagnyCours.setLongitude(BigDecimal.valueOf(3.162750730649732));
 
         final Track trackMagnyCours = new Track();
         trackMagnyCours.setId(2L);
-        trackMagnyCours.setName("Magny-cours");
+        trackMagnyCours.setCircuit(circuitMagnyCours);
         trackMagnyCours.setLapRecord(96950);
         trackMagnyCours.setDistance(4411);
-        trackMagnyCours.setWebsite("https://www.circuitmagnycours.com/");
-        trackMagnyCours.setLatitude(BigDecimal.valueOf(46.86390367017831));
-        trackMagnyCours.setLongitude(BigDecimal.valueOf(3.162750730649732));
 
         final Member memberBobAdmin = new Member();
         memberBobAdmin.setId(1L);
@@ -190,12 +198,15 @@ class EventControllerTest {
                             "startDate": "2018-07-13 08:00:00",
                             "endDate": "2018-07-13 16:30:00",
                             "track": {
-                              "name": "Bresse",
+                              "variantName": null,
                               "distance": 3000,
                               "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
+                              "circuit": {
+                                "name": "Bresse",
+                                "website": "https://www.circuitdebresse.com",
+                                "latitude": 46.551756882687776,
+                                "longitude": 5.3285273408879394
+                              }
                             },
                             "participants": [
                               {
@@ -230,12 +241,15 @@ class EventControllerTest {
                             "startDate": "2019-05-24 09:00:00",
                             "endDate": "2019-05-24 18:00:00",
                             "track": {
-                              "name": "Magny-cours",
+                              "variantName": null,
                               "distance": 4411,
                               "lapRecord": 96950,
-                              "website": "https://www.circuitmagnycours.com/",
-                              "latitude": 46.86390367017831,
-                              "longitude": 3.162750730649732
+                              "circuit": {
+                                "name": "Magny-cours",
+                                "website": "https://www.circuitmagnycours.com/",
+                                "latitude": 46.86390367017831,
+                                "longitude": 3.162750730649732
+                              }
                             },
                             "participants": [
                               {
@@ -291,12 +305,15 @@ class EventControllerTest {
                             "startDate": "2018-07-13 08:00:00",
                             "endDate": "2018-07-13 16:30:00",
                             "track": {
-                              "name": "Bresse",
+                              "variantName": null,
                               "distance": 3000,
                               "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
+                              "circuit": {
+                                "name": "Bresse",
+                                "website": "https://www.circuitdebresse.com",
+                                "latitude": 46.551756882687776,
+                                "longitude": 5.3285273408879394
+                              }
                             },
                             "participants": [
                               {
@@ -365,12 +382,15 @@ class EventControllerTest {
                             "startDate": "2018-07-13 08:00:00",
                             "endDate": "2018-07-13 16:30:00",
                             "track": {
-                              "name": "Bresse",
+                              "variantName": null,
                               "distance": 3000,
                               "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
+                              "circuit": {
+                                "name": "Bresse",
+                                "website": "https://www.circuitdebresse.com",
+                                "latitude": 46.551756882687776,
+                                "longitude": 5.3285273408879394
+                              }
                             },
                             "participants": [
                               {
@@ -441,12 +461,15 @@ class EventControllerTest {
                             "startDate": "2018-07-13 08:00:00",
                             "endDate": "2018-07-13 16:30:00",
                             "track": {
-                              "name": "Bresse",
+                              "variantName": null,
                               "distance": 3000,
                               "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
+                              "circuit": {
+                                "name": "Bresse",
+                                "website": "https://www.circuitdebresse.com",
+                                "latitude": 46.551756882687776,
+                                "longitude": 5.3285273408879394
+                              }
                             },
                             "participants": [
                               {
@@ -515,12 +538,15 @@ class EventControllerTest {
                           "startDate": "2019-05-24 09:00:00",
                           "endDate": "2019-05-24 18:00:00",
                           "track": {
-                            "name": "Magny-cours",
+                            "variantName": null,
                             "distance": 4411,
                             "lapRecord": 96950,
-                            "website": "https://www.circuitmagnycours.com/",
-                            "latitude": 46.86390367017831,
-                            "longitude": 3.162750730649732
+                            "circuit": {
+                              "name": "Magny-cours",
+                              "website": "https://www.circuitmagnycours.com/",
+                              "latitude": 46.86390367017831,
+                              "longitude": 3.162750730649732
+                            }
                           },
                           "participants": [
                             {
@@ -590,12 +616,15 @@ class EventControllerTest {
                             "startDate": "2018-07-13 08:00:00",
                             "endDate": "2018-07-13 16:30:00",
                             "track": {
-                              "name": "Bresse",
+                              "variantName": null,
                               "distance": 3000,
                               "lapRecord": 84330,
-                              "website": "https://www.circuitdebresse.com",
-                              "latitude": 46.551756882687776,
-                              "longitude": 5.3285273408879394
+                              "circuit": {
+                                "name": "Bresse",
+                                "website": "https://www.circuitdebresse.com",
+                                "latitude": 46.551756882687776,
+                                "longitude": 5.3285273408879394
+                              }
                             },
                             "participants": [
                               {

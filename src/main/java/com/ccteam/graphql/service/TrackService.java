@@ -21,21 +21,19 @@
 package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
-import com.ccteam.graphql.entities.Country;
-import com.ccteam.graphql.entities.News;
+import com.ccteam.graphql.entities.Circuit;
 import com.ccteam.graphql.entities.Track;
-import com.ccteam.graphql.repository.CountryRepository;
+import com.ccteam.graphql.repository.CircuitRepository;
 import com.ccteam.graphql.repository.TrackRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link News} service.
+ * {@link Track} service. A track is a single version (layout) of a {@link Circuit}.
  *
  * @author yann39
  * @since 1.0.0
@@ -45,52 +43,51 @@ import java.util.Optional;
 public class TrackService {
 
     private final TrackRepository trackRepository;
-    private final CountryRepository countryRepository;
+    private final CircuitRepository circuitRepository;
 
-    public TrackService(TrackRepository trackRepository, CountryRepository countryRepository) {
+    public TrackService(TrackRepository trackRepository, CircuitRepository circuitRepository) {
         this.trackRepository = trackRepository;
-        this.countryRepository = countryRepository;
+        this.circuitRepository = circuitRepository;
     }
 
     /**
-     * Resolve a {@link Country} from its ISO 3166-1 alpha-2 code. The country is mandatory on tracks,
-     * so a {@code null} or blank code is rejected.
+     * Resolve the parent {@link Circuit} from its id. The circuit is mandatory on a version,
+     * so a {@code null} id or an unknown circuit is rejected.
      *
-     * @param countryCode The country code (mandatory)
-     * @return The matching {@link Country}
-     * @throws CustomGraphQLException Tf the code is missing or does not match any known country
+     * @param circuitId The circuit id (mandatory)
+     * @return The matching {@link Circuit}
+     * @throws CustomGraphQLException If the id is missing or does not match any circuit
      */
-    private Country resolveCountry(String countryCode) {
-        if (countryCode == null || countryCode.isBlank()) {
-            log.error("Country code is required for track creation/update");
-            throw new CustomGraphQLException("country_required", "A country code is required");
+    private Circuit resolveCircuit(Long circuitId) {
+        if (circuitId == null) {
+            log.error("Circuit id is required for track creation/update");
+            throw new CustomGraphQLException("circuit_required", "A circuit is required");
         }
-        return countryRepository.findById(countryCode.toUpperCase())
+        return circuitRepository.findById(circuitId)
                 .orElseThrow(() -> {
-                    log.error("Country with code {} not found", countryCode);
-                    return new CustomGraphQLException("country_not_found", "Specified country code has not been found");
+                    log.error("Circuit with id {} not found", circuitId);
+                    return new CustomGraphQLException("circuit_not_found", "Specified circuit has not been found");
                 });
     }
 
     /**
-     * Get all tracks.
+     * Normalize an optional free-text value: trimmed, or {@code null} when blank.
+     */
+    private String normalizeOptional(String value) {
+        if (value == null) {
+            return null;
+        }
+        final String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /**
+     * Get all tracks (versions).
      *
      * @return A list of {@link Track} objects representing the tracks
      */
     public List<Track> getAllTracks() {
         return trackRepository.findAllCustom();
-    }
-
-    /**
-     * Get all tracks according to the specified filter {@code text}.<br/>
-     * Search is done on track name.<br/>
-     * If {@code text} filter is null, all records will be returned.
-     *
-     * @param text The text filter string
-     * @return A list of {@link Track} objects representing the tracks
-     */
-    public List<Track> getTracksFiltered(String text) {
-        return trackRepository.findFilteredCustom(text);
     }
 
     /**
@@ -109,51 +106,42 @@ public class TrackService {
     }
 
     /**
-     * Create a new track.
+     * Create a new track (version) attached to a circuit.
      *
-     * @param name          The official name of the track
+     * @param circuitId     The ID of the parent {@link Circuit} (mandatory)
+     * @param variantName   The version / layout label (optional, e.g. "5,8 km GP")
      * @param distance      The track distance (in meters)
      * @param lapRecord     The lap record (in milliseconds)
      * @param lapRecordInfo Additional information about the lap record (rider, bike, year, ...), optional
-     * @param website       The official website of the track
-     * @param latitude      The track latitude coordinate
-     * @param longitude     The track longitude coordinate
-     * @param countryCode   ISO 3166-1 alpha-2 code of the country where the
-     *                      track is located (optional)
+     * @param iconKey       Key selecting the version's map/shape icon, optional
      * @return A {@link Track} object representing the track just created
      */
     @Transactional
-    public Track createTrack(String name, int distance, int lapRecord, String lapRecordInfo, String website,
-                             BigDecimal latitude, BigDecimal longitude, String countryCode) {
+    public Track createTrack(Long circuitId, String variantName, int distance, int lapRecord, String lapRecordInfo, String iconKey) {
         final Track track = new Track();
-        track.setName(name);
+        track.setCircuit(resolveCircuit(circuitId));
+        track.setVariantName(normalizeOptional(variantName));
         track.setDistance(distance);
         track.setLapRecord(lapRecord);
-        track.setLapRecordInfo(lapRecordInfo);
-        track.setWebsite(website);
-        track.setLatitude(latitude);
-        track.setLongitude(longitude);
-        track.setCountry(resolveCountry(countryCode));
+        track.setLapRecordInfo(normalizeOptional(lapRecordInfo));
+        track.setIconKey(normalizeOptional(iconKey));
         return trackRepository.save(track);
     }
 
     /**
-     * Update the track represented by the given track ID with the specified data.
+     * Update the track (version) represented by the given track ID with the specified data.
      *
-     * @param name          The official name of the track
+     * @param trackId       The ID of the {@link Track} to update
+     * @param circuitId     The ID of the parent {@link Circuit} (mandatory)
+     * @param variantName   The version / layout label (optional)
      * @param distance      The track distance (in meters)
      * @param lapRecord     The lap record (in milliseconds)
      * @param lapRecordInfo Additional information about the lap record (rider, bike, year, ...), optional
-     * @param website       The official website of the track
-     * @param latitude      The track latitude coordinate
-     * @param longitude     The track longitude coordinate
-     * @param countryCode   ISO 3166-1 alpha-2 code of the country where the
-     *                      track is located (optional)
+     * @param iconKey       Key selecting the version's map/shape icon, optional
      * @return A {@link Track} object representing the track just updated
      */
     @Transactional
-    public Track updateTrack(long trackId, String name, int distance, int lapRecord, String lapRecordInfo,
-                             String website, BigDecimal latitude, BigDecimal longitude, String countryCode) {
+    public Track updateTrack(long trackId, Long circuitId, String variantName, int distance, int lapRecord, String lapRecordInfo, String iconKey) {
         final Optional<Track> trackOptional = trackRepository.findByIdCustom(trackId);
         if (trackOptional.isEmpty()) {
             log.error("Track with id {} not found in the database", trackId);
@@ -162,19 +150,17 @@ public class TrackService {
         }
 
         final Track track = trackOptional.get();
-        track.setName(name);
+        track.setCircuit(resolveCircuit(circuitId));
+        track.setVariantName(normalizeOptional(variantName));
         track.setDistance(distance);
         track.setLapRecord(lapRecord);
-        track.setLapRecordInfo(lapRecordInfo);
-        track.setWebsite(website);
-        track.setLatitude(latitude);
-        track.setLongitude(longitude);
-        track.setCountry(resolveCountry(countryCode));
+        track.setLapRecordInfo(normalizeOptional(lapRecordInfo));
+        track.setIconKey(normalizeOptional(iconKey));
         return trackRepository.save(track);
     }
 
     /**
-     * Delete the track represented by the given track ID.
+     * Delete the track (version) represented by the given track ID.
      *
      * @param trackId The ID of the {@link Track} to delete
      * @return A {@link Track} object representing the track just deleted

@@ -51,7 +51,10 @@ type Query {
 
     getAllTracks: [Track]
     getTrackById(id: Long!): Track
-    getTracksFiltered(text: String): [Track]
+
+    getAllCircuits: [Circuit]
+    getCircuitById(id: Long!): Circuit
+    getCircuitsFiltered(text: String): [Circuit]
 
     getAllLapRecords: [LapRecord]
     getMemberLapRecords(memberId: Long!): [LapRecord]
@@ -86,8 +89,12 @@ type Mutation {
 
     createOrganizer(name: String!): Organizer
 
-    createTrack(name: String!, distance: Int!, lapRecord: Int!, lapRecordInfo: String, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
-    updateTrack(trackId: Long!, name: String!, distance: Int!, lapRecord: Int!, lapRecordInfo: String, website: String!, latitude: Float!, longitude: Float!, countryCode: String!): Track
+    createCircuit(name: String!, countryCode: String!, latitude: Float!, longitude: Float!, website: String): Circuit
+    updateCircuit(circuitId: Long!, name: String!, countryCode: String!, latitude: Float!, longitude: Float!, website: String): Circuit
+    deleteCircuit(circuitId: Long!): Circuit
+
+    createTrack(circuitId: Long!, variantName: String, distance: Int!, lapRecord: Int!, lapRecordInfo: String, iconKey: String): Track
+    updateTrack(trackId: Long!, circuitId: Long!, variantName: String, distance: Int!, lapRecord: Int!, lapRecordInfo: String, iconKey: String): Track
     deleteTrack(trackId: Long!): Track
 
     createLapRecord(memberId: Long!, trackId: Long!, bikeId: Long!, recordDate: String!, lapTime: Int!, conditions: String!, comments: String, isPublic: Boolean): LapRecord
@@ -243,16 +250,24 @@ type News {
     modifiedBy: Member
 }
 
-type Track {
+type Circuit {
     id: ID!
     name: String!
+    country: Country!
+    latitude: Float
+    longitude: Float
+    website: String
+    tracks: [Track]
+}
+
+type Track {
+    id: ID!
+    circuit: Circuit
+    variantName: String
     distance: Int
     lapRecord: Int
     lapRecordInfo: String
-    website: String
-    latitude: Float
-    longitude: Float
-    country: Country!
+    iconKey: String
 }
 
 type Country {
