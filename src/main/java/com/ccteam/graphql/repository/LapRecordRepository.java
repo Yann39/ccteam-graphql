@@ -74,9 +74,10 @@ public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
     @Query("select lr from LapRecord lr " +
             "left join fetch lr.member m " +
             "left join fetch lr.track t " +
+            "left join fetch t.circuit c " +
             "where m.id = :id " +
             "and lr.isPublic = true " +
-            "order by t.name")
+            "order by c.name")
     List<LapRecord> findPublicByMemberIdCustom(long id);
 
     /**
@@ -89,8 +90,9 @@ public interface LapRecordRepository extends JpaRepository<LapRecord, Long> {
     @Query("select lr from LapRecord lr " +
             "left join fetch lr.member m " +
             "left join fetch lr.track t " +
+            "left join fetch t.circuit c " +
             "where lower(m.email) = lower(:email) " +
-            "order by t.name")
+            "order by c.name")
     List<LapRecord> findByMemberEmailCustom(String email);
 
     /**
