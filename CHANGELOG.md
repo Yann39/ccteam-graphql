@@ -26,3 +26,20 @@
 
 - Handle guest accounts (can view all content like members but in read-only)
 - Upgraded Spring Boot to version 4.1.0
+
+# 1.2.0
+
+2026-07-25
+
+- Link the account verification to the user device
+- Added possibility to list trusted devices and revoke a device
+- Allow to set the lap record details when creating or updating a track
+
+# 1.2.1
+
+2026-08-10
+
+- Handle multiple versions of a track (different layout, reverse mode, etc.)
+- Upgraded JaCoCo Maven plugin to version 0.8.15
+- Upgraded Maven Surefire plugin to version 3.5.6
+- Upgraded Maven Failsafe plugin to version 3.5.6
