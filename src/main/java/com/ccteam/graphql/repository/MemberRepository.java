@@ -137,4 +137,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * @return The list of members holding the given board role
      */
     List<Member> findByBoardRoleAndIdNot(BoardRole boardRole, Long excludedId);
+
+    /**
+     * Count the club members, i.e. every member whose role differs from the given one.
+     * Called with {@code ROLE_USER} to exclude the accounts still pending admin approval
+     * (and the store-review test account) from the home-page members stat.
+     *
+     * @param role The role to exclude from the count
+     * @return The number of members whose role differs from {@code role}
+     */
+    long countByRoleNot(Member.Role role);
 }

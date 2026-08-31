@@ -66,11 +66,13 @@ public class MemberService {
     }
 
     /**
-     * Lightweight count of all members. Exposed at
-     * the USER level so it can be accessible to non-MEMBER users.
+     * Lightweight count of the club members, every member whose role is not the default
+     * {@code ROLE_USER} (i.e. MEMBER, GUEST or ADMIN), so accounts still pending admin
+     * approval (and the store-review test account) are not counted. Exposed at the USER
+     * level so it can be accessible to non-MEMBER users.
      */
     public long getMembersCount() {
-        return memberRepository.count();
+        return memberRepository.countByRoleNot(Member.Role.ROLE_USER);
     }
 
     /**
