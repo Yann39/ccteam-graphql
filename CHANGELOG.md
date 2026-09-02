@@ -43,3 +43,14 @@
 - Upgraded JaCoCo Maven plugin to version 0.8.15
 - Upgraded Maven Surefire plugin to version 3.5.6
 - Upgraded Maven Failsafe plugin to version 3.5.6
+
+# 1.2.2
+
+2026-09-02
+
+- Added possibility to define sessions for track events (number of sessions and duration)
+- Do not count non-validated users in the club statistics card
+- Upgraded Spring Boot to version 4.1.1
+- Upgraded MariaDB Java client to version 3.5.10
+- Upgraded Java JWT library to version 4.6.0
+- Upgraded Firebase Admin SDK to version 9.10.0

@@ -6,7 +6,7 @@
 ![Static Badge](https://img.shields.io/badge/Last_update-10_August_2026-blue)
 
 ![Version](https://img.shields.io/badge/Open_JDK-25-red.svg)
-![Version](https://img.shields.io/badge/Spring_Boot-4.1.0-green.svg)
+![Version](https://img.shields.io/badge/Spring_Boot-4.1.1-green.svg)
 ![Version](https://img.shields.io/badge/MariaDB-10.5-teal.svg)
 
 ---
