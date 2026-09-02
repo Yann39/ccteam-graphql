@@ -23,10 +23,13 @@ package com.ccteam.graphql.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SortNatural;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author yann39
@@ -101,6 +104,19 @@ public class Event {
      */
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<EventMember> participants;
+
+    /**
+     * Track sessions scheduled for this event, kept ordered by rank in the day.
+     * <p>
+     * Empty when no schedule has been entered, participants then have nothing to tick and the client
+     * falls back to its own estimation heuristics.
+     * <p>
+     * A naturally sorted {@link SortedSet} rather than a list on purpose: this collection is fetched in the
+     * same queries as {@code participants}, and a list would collect duplicates from the resulting join.
+     */
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @SortNatural
+    private SortedSet<EventSession> sessions = new TreeSet<>();
 
     /**
      * Timestamp when the event was created.

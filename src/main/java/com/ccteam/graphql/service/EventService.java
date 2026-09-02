@@ -22,6 +22,7 @@ package com.ccteam.graphql.service;
 
 import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.*;
+import com.ccteam.graphql.model.EventSessionGroupInput;
 import com.ccteam.graphql.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@link Event} service.
@@ -41,6 +47,18 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class EventService {
+
+    /**
+     * Upper bound on the number of sessions a single event may hold, a guard against a typo in a group count
+     * ("500 x 20 min") generating thousands of rows.
+     */
+    private static final int MAX_SESSIONS_PER_EVENT = 50;
+
+    /**
+     * Upper bound on the duration of a single session, in minutes. Generous on purpose, endurance-style
+     * events do exist, it is only there to reject nonsense.
+     */
+    private static final int MAX_SESSION_DURATION_MINUTES = 600;
 
     private final EventRepository eventRepository;
     private final TrackRepository trackRepository;
@@ -356,6 +374,156 @@ public class EventService {
         participationOptional.get().setBike(bike);
 
         return eventRepository.save(event);
+    }
+
+    /**
+     * Replace the session schedule of event {@code eventId} with the given groups.
+     * <p>
+     * Groups are how a track day is described ("5 sessions of 20 min and 1 of 25"), they are expanded here into
+     * one {@link EventSession} per session so participants can tick individual sessions. Passing an empty list
+     * clears the schedule.
+     * <p>
+     * Rebuilding the schedule deletes the previous sessions, which would break the join rows pointing at them,
+     * so participants' skipped sessions are re-applied by rank afterwards. That way merely correcting a schedule
+     * doesn't silently discard what members already declared.
+     *
+     * @param eventId The event id
+     * @param groups  The session groups to expand, may be empty to clear the schedule
+     * @return The updated {@link Event}
+     */
+    @Transactional
+    public Event setEventSessions(long eventId, List<EventSessionGroupInput> groups) throws CustomGraphQLException {
+
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id {} not found in the database", eventId);
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
+        }
+
+        final List<EventSessionGroupInput> safeGroups = groups == null ? List.of() : groups;
+        validateSessionGroups(safeGroups);
+
+        final Event event = eventOptional.get();
+
+        // remember, per participation, which session ranks were marked as skipped, then drop the join rows
+        // so the sessions they point at can be deleted
+        final Map<Long, Set<Integer>> skippedPositionsByParticipation = new HashMap<>();
+        for (final EventMember participation : event.getParticipants()) {
+            if (participation.getSkippedSessions().isEmpty()) {
+                continue;
+            }
+            skippedPositionsByParticipation.put(participation.getId(), participation.getSkippedSessions().stream()
+                    .map(EventSession::getPosition)
+                    .collect(Collectors.toSet()));
+            participation.getSkippedSessions().clear();
+        }
+
+        // drop the old schedule and flush, so orphan removal deletes those rows before the new ones are inserted
+        event.getSessions().clear();
+        eventRepository.saveAndFlush(event);
+
+        int position = 1;
+        for (final EventSessionGroupInput group : safeGroups) {
+            for (int i = 0; i < group.count(); i++) {
+                final EventSession session = new EventSession();
+                session.setEvent(event);
+                session.setPosition(position++);
+                session.setDurationMinutes(group.durationMinutes());
+                event.getSessions().add(session);
+            }
+        }
+
+        // flush again so the new sessions get their ids, they are needed to rebuild the join rows below
+        eventRepository.saveAndFlush(event);
+
+        if (!skippedPositionsByParticipation.isEmpty()) {
+            for (final EventMember participation : event.getParticipants()) {
+                final Set<Integer> positions = skippedPositionsByParticipation.get(participation.getId());
+                if (positions == null) {
+                    continue;
+                }
+                event.getSessions().stream()
+                        .filter(session -> positions.contains(session.getPosition()))
+                        .forEach(participation.getSkippedSessions()::add);
+            }
+        }
+
+        return eventRepository.save(event);
+    }
+
+    /**
+     * Set which sessions of event {@code eventId} the given member did <em>not</em> ride.
+     * <p>
+     * Absences are stored rather than attendances, so an empty list means "rode everything", which is the
+     * default state of a participation and the one the UI shows with every session ticked.
+     *
+     * @param eventId           The event id
+     * @param memberId          The member id, must already be registered to the event
+     * @param skippedSessionIds The ids of the sessions the member skipped, all must belong to this event
+     * @return The updated {@link Event}
+     */
+    @Transactional
+    public Event setEventMemberSessions(long eventId, long memberId, List<Long> skippedSessionIds)
+            throws CustomGraphQLException {
+
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id {} not found in the database", eventId);
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+
+        final Optional<EventMember> participationOptional = event.getParticipants().stream()
+                .filter(em -> em.getMember().getId().equals(memberId)).findFirst();
+        if (participationOptional.isEmpty()) {
+            log.error("Member with id {} is not registered to event id {}, cannot set sessions", memberId, eventId);
+            throw new CustomGraphQLException("member_not_registered_to_event",
+                    "Specified member is not registered to specified event");
+        }
+
+        final Set<Long> requestedIds = skippedSessionIds == null ? Set.of() : new HashSet<>(skippedSessionIds);
+
+        // only sessions belonging to this event may be referenced, this is what stops a participation from
+        // being attached to another event's sessions
+        final Set<EventSession> skipped = event.getSessions().stream()
+                .filter(session -> requestedIds.contains(session.getId()))
+                .collect(Collectors.toSet());
+        if (skipped.size() != requestedIds.size()) {
+            log.error("Some of the sessions {} do not belong to event id {}", requestedIds, eventId);
+            throw new CustomGraphQLException("session_not_found",
+                    "Some of the specified sessions do not belong to the specified event");
+        }
+
+        final EventMember participation = participationOptional.get();
+        participation.getSkippedSessions().clear();
+        participation.getSkippedSessions().addAll(skipped);
+
+        return eventRepository.save(event);
+    }
+
+    /**
+     * Validate the session groups submitted for a schedule, rejecting non-positive or absurd values, and
+     * capping the total number of sessions so a typo cannot generate thousands of rows.
+     */
+    private void validateSessionGroups(List<EventSessionGroupInput> groups) throws CustomGraphQLException {
+        int total = 0;
+        for (final EventSessionGroupInput group : groups) {
+            if (group == null || group.count() == null || group.durationMinutes() == null
+                    || group.count() < 1 || group.durationMinutes() < 1
+                    || group.durationMinutes() > MAX_SESSION_DURATION_MINUTES) {
+                log.error("Invalid session group received : {}", group);
+                throw new CustomGraphQLException("invalid_session_group",
+                        "Session count and duration must be positive, and duration at most "
+                                + MAX_SESSION_DURATION_MINUTES + " minutes");
+            }
+            total += group.count();
+        }
+        if (total > MAX_SESSIONS_PER_EVENT) {
+            log.error("Too many sessions requested for a single event : {}", total);
+            throw new CustomGraphQLException("too_many_sessions",
+                    "An event cannot hold more than " + MAX_SESSIONS_PER_EVENT + " sessions");
+        }
     }
 
     /**

@@ -25,6 +25,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author yann39
@@ -66,6 +68,18 @@ public class EventMember {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_id")
     private Bike bike;
+
+    /**
+     * Sessions of the event the member did <em>not</em> ride.
+     * <p>
+     * Deliberately stores the absences rather than the attendances, so that the common case ("rode everything")
+     * costs no row at all and needs no action from the member.
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "event_member_skipped_session",
+            joinColumns = @JoinColumn(name = "event_member_id"),
+            inverseJoinColumns = @JoinColumn(name = "session_id"))
+    private Set<EventSession> skippedSessions = new HashSet<>();
 
     /**
      * Timestamp when the registration was created.

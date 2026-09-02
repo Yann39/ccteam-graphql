@@ -24,6 +24,7 @@ import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Event;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.entities.Track;
+import com.ccteam.graphql.model.EventSessionGroupInput;
 import com.ccteam.graphql.service.EventService;
 import com.ccteam.graphql.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
@@ -282,6 +283,50 @@ public class EventController {
             throw new CustomGraphQLException("member_not_found", "Authenticated member could not be resolved");
         }
         return eventService.setEventMemberBike(eventId, caller.getId(), bikeId);
+    }
+
+    /**
+     * Replace the session schedule of event {@code eventId}, given as groups of identical sessions
+     * ("5 x 20 min, then 1 x 25 min"), expanded server-side into individual sessions.
+     * <p>
+     * Reserved to admins, the schedule describes the event itself, not anyone's participation.
+     *
+     * @param eventId the event id
+     * @param groups  the session groups, an empty list clears the schedule
+     * @return the updated {@link Event}
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @MutationMapping
+    public Event setEventSessions(@Argument long eventId,
+                                  @Argument List<EventSessionGroupInput> groups) {
+        log.info("Received call to setEventSessions with parameters eventId = {}, groups = {}", eventId, groups);
+        return eventService.setEventSessions(eventId, groups);
+    }
+
+    /**
+     * Set which sessions of event {@code eventId} the caller did <em>not</em> ride, an empty list meaning
+     * they rode all of them (the default).
+     * <p>
+     * As for {@link #setEventMemberBike}, the acting member comes from {@link Authentication} rather than from
+     * an argument, a member can only edit their own participation.
+     *
+     * @param eventId           the event id
+     * @param skippedSessionIds the ids of the sessions the caller skipped
+     * @param authentication    the current authentication (auto-injected)
+     * @return the updated {@link Event}
+     */
+    @PreAuthorize("hasRole('MEMBER')")
+    @MutationMapping
+    public Event setEventMemberSessions(@Argument long eventId,
+                                        @Argument List<Long> skippedSessionIds,
+                                        Authentication authentication) {
+        log.info("Received call to setEventMemberSessions with parameters eventId = {}, skippedSessionIds = {}",
+                eventId, skippedSessionIds);
+        final Member caller = memberService.getMemberByEmail(authentication.getName());
+        if (caller == null || caller.getId() == null) {
+            throw new CustomGraphQLException("member_not_found", "Authenticated member could not be resolved");
+        }
+        return eventService.setEventMemberSessions(eventId, caller.getId(), skippedSessionIds);
     }
 
 }

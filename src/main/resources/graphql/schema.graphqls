@@ -86,6 +86,8 @@ type Mutation {
     registerToEvent(eventId: Long!, memberId: Long!, bikeId: Long): Event
     unregisterFromEvent(eventId: Long!, memberId: Long!): Event
     setEventMemberBike(eventId: Long!, bikeId: Long): Event
+    setEventSessions(eventId: Long!, groups: [EventSessionGroupInput!]!): Event
+    setEventMemberSessions(eventId: Long!, skippedSessionIds: [Long!]!): Event
 
     createOrganizer(name: String!): Organizer
 
@@ -154,6 +156,7 @@ type Event {
     organizer: Organizer
     price: Float
     participants: [EventMember]
+    sessions: [EventSession]
     createdOn: LocalDateTime!
     createdBy: Member!
     modifiedOn: LocalDateTime
@@ -170,7 +173,20 @@ type EventMember {
     member: Member!
     event: Event!
     bike: Bike
+    skippedSessions: [EventSession]
     createdOn: LocalDateTime!
+}
+
+type EventSession {
+    id: ID!
+    position: Int!
+    durationMinutes: Int!
+}
+
+"A group of identical sessions as entered by an admin, e.g. 5 x 20 min, expanded server-side into individual sessions."
+input EventSessionGroupInput {
+    count: Int!
+    durationMinutes: Int!
 }
 
 type LapRecord {
