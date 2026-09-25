@@ -180,6 +180,17 @@ curl -X POST "http://localhost:5001/ccteam-gql/graphql" \
   }'
 ```
 
+## Monitoring
+
+Metrics (GraphQL requests and data fetchers, JVM, HTTP, database pool, etc.) are exposed in the **Prometheus** format
+on `/actuator/prometheus`.
+
+Main GraphQL metrics:
+
+- `graphql_request_seconds_*`: duration of GraphQL requests, tagged by `graphql_outcome` and `graphql_operation_type`
+- `graphql_datafetcher_seconds_*`: duration of data fetchers (queries, mutations, schema mappings), tagged by
+  `graphql_field_name`, `graphql_outcome` and `graphql_error_type`
+
 # Documentation
 
 ## User roles
