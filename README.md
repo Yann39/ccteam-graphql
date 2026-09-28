@@ -7,7 +7,7 @@
 
 ![Version](https://img.shields.io/badge/Open_JDK-25-red.svg)
 ![Version](https://img.shields.io/badge/Spring_Boot-4.1.1-green.svg)
-![Version](https://img.shields.io/badge/MariaDB-10.5-teal.svg)
+![Version](https://img.shields.io/badge/MariaDB-12.3.3-teal.svg)
 
 ---
 
