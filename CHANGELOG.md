@@ -54,3 +54,10 @@
 - Upgraded MariaDB Java client to version 3.5.10
 - Upgraded Java JWT library to version 4.6.0
 - Upgraded Firebase Admin SDK to version 9.10.0
+
+# 1.2.3
+
+2026-09-29
+
+- Expose metrics through Prometheus to monitor GraphQL API
+- Updated MariaDB to version 12.3.3
