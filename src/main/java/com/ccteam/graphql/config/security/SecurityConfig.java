@@ -165,14 +165,12 @@ public class SecurityConfig {
                 // disable CSRF as we do not serve browser clients
                 .csrf(AbstractHttpConfigurer::disable)
                 // match only following requests
-                .securityMatcher("/requestDeleteAccount", "/rest/**", "/actuator/health")
+                .securityMatcher("/requestDeleteAccount", "/rest/**")
                 // allow restricting access to certain URL based on the HTTP servlet request
                 .authorizeHttpRequests(a -> a
                         // allow any request to REST endpoint
                         .requestMatchers("/requestDeleteAccount").permitAll()
                         .requestMatchers("/rest/**").permitAll()
-                        // allow any request to actuator health endpoint
-                        .requestMatchers("/actuator/health").permitAll()
                         // deny any other requests
                         .anyRequest().denyAll())
                 // make sure we use stateless session, session will not be used to store user's state
