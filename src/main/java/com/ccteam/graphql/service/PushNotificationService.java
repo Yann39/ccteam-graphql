@@ -67,6 +67,14 @@ public class PushNotificationService {
      */
     public static final String TOPIC_EVENT_PREFIX = "event-";
 
+    /**
+     * Prefix and suffix of the per-bike maintenance reminder topics ({@code bike-{id}-maintenance}), notified when
+     * the bike maintenance is approaching or overdue. The mobile application only subscribes the device to the
+     * topics of the logged member's own bikes. Must match the topic name used by the mobile application.
+     */
+    public static final String TOPIC_BIKE_PREFIX = "bike-";
+    public static final String TOPIC_MAINTENANCE_SUFFIX = "-maintenance";
+
     @Value("${ct.firebase.service-account-file:}")
     private String serviceAccountFile;
 
