@@ -62,6 +62,8 @@ type Query {
     getMyLapRecords: [LapRecord]
 
     getMyTrustedDevices(deviceSecret: String): [TrustedDevice]
+
+    getBikeMaintenance(bikeId: Long!): BikeMaintenance
 }
 
 type Mutation {
@@ -107,6 +109,13 @@ type Mutation {
     updateBike(bikeId: Long!, manufacturer: String!, modelName: String!, engineSize: Int, year: Int, current: Boolean): Bike
     deleteBike(bikeId: Long!): Bike
 
+    setMaintenancePlan(bikeId: Long!, intervalKm: Int, intervalMonths: Int): BikeMaintenance
+    deleteMaintenancePlan(bikeId: Long!): BikeMaintenance
+    createMaintenance(bikeId: Long!, maintenanceDate: String!, odometerKm: Int, resetsPlan: Boolean, comment: String, operations: [MaintenanceOperationInput!]!): BikeMaintenance
+    updateMaintenance(maintenanceId: Long!, maintenanceDate: String!, odometerKm: Int, resetsPlan: Boolean, comment: String, operations: [MaintenanceOperationInput!]!): BikeMaintenance
+    deleteMaintenance(maintenanceId: Long!): BikeMaintenance
+    updateBikeOdometer(bikeId: Long!, odometerKm: Int!): BikeMaintenance
+
     addMembershipFee(memberId: Long!, year: Int!, amount: Float!, paid: Boolean!): MembershipFee
     updateMembershipFee(feeId: Long!, year: Int!, amount: Float!, paid: Boolean!): MembershipFee
     deleteMembershipFee(feeId: Long!): MembershipFee
@@ -134,6 +143,94 @@ type Bike {
     engineSize: Int
     year: Int
     current: Boolean!
+}
+
+type BikeMaintenance {
+    bikeId: ID!
+    odometerKm: Int
+    odometerUpdatedOn: LocalDateTime
+    plan: MaintenancePlan
+    maintenances: [Maintenance!]!
+    nextDue: MaintenanceDue!
+}
+
+type MaintenancePlan {
+    id: ID!
+    intervalKm: Int
+    intervalMonths: Int
+}
+
+type Maintenance {
+    id: ID!
+    maintenanceDate: LocalDateTime!
+    odometerKm: Int
+    "Whether this maintenance is a service of the plan, restarting its countdown (false for a one-off repair)."
+    resetsPlan: Boolean!
+    comment: String
+    operations: [MaintenanceOperation!]!
+    "Sum of the operation prices, one amount per currency (amounts are never converted)."
+    totals: [MoneyAmount!]!
+}
+
+type MaintenanceOperation {
+    id: ID!
+    type: MaintenanceOperationType!
+    label: String
+    price: Float
+    currency: CurrencyCode!
+}
+
+type MoneyAmount {
+    currency: CurrencyCode!
+    amount: Float!
+}
+
+type MaintenanceDue {
+    status: MaintenanceDueStatus!
+    dueDate: LocalDateTime
+    dueKm: Int
+    remainingDays: Long
+    remainingKm: Int
+}
+
+input MaintenanceOperationInput {
+    type: MaintenanceOperationType!
+    label: String
+    price: Float
+    currency: CurrencyCode!
+}
+
+enum CurrencyCode {
+    CHF
+    EUR
+}
+
+enum MaintenanceDueStatus {
+    UNKNOWN
+    OK
+    DUE_SOON
+    OVERDUE
+}
+
+enum MaintenanceOperationType {
+    ENGINE_OIL
+    OIL_FILTER
+    AIR_FILTER
+    SPARK_PLUGS
+    COOLANT
+    BRAKE_PADS_FRONT
+    BRAKE_PADS_REAR
+    BRAKE_DISCS
+    BRAKE_FLUID
+    TIRE_FRONT
+    TIRE_REAR
+    CHAIN_KIT
+    FORK_SERVICE
+    SHOCK_SERVICE
+    VALVE_CLEARANCE
+    BATTERY
+    GENERAL_INSPECTION
+    OTHER
 }
 
 type MembershipFee {
