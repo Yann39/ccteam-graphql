@@ -68,10 +68,10 @@ public class MaintenanceOperation {
     private MaintenanceOperationType type;
 
     /**
-     * Free label, maximum 128 characters. Required for {@link MaintenanceOperationType#OTHER}, optional precision
-     * otherwise (e.g. the oil brand).
+     * Free label, maximum 500 characters, possibly on several lines. Required for
+     * {@link MaintenanceOperationType#OTHER}, optional precision otherwise (e.g. the oil brand and reference).
      */
-    @Column(length = 128)
+    @Column(length = 500)
     private String label;
 
     /**
