@@ -329,4 +329,28 @@ public class EventController {
         return eventService.setEventMemberSessions(eventId, caller.getId(), skippedSessionIds);
     }
 
+    /**
+     * Set the caller's comment about their participation to event {@code eventId}, a blank value clearing it.
+     * <p>
+     * As for {@link #setEventMemberBike}, the acting member comes from {@link Authentication} rather than from
+     * an argument, a member can only edit their own participation.
+     *
+     * @param eventId        the event id
+     * @param comment        the comment (optional)
+     * @param authentication the current authentication (auto-injected)
+     * @return the updated {@link Event}
+     */
+    @PreAuthorize("hasRole('MEMBER')")
+    @MutationMapping
+    public Event setEventMemberComment(@Argument long eventId,
+                                       @Argument String comment,
+                                       Authentication authentication) {
+        log.info("Received call to setEventMemberComment with parameters eventId = {}", eventId);
+        final Member caller = memberService.getMemberByEmail(authentication.getName());
+        if (caller == null || caller.getId() == null) {
+            throw new CustomGraphQLException("member_not_found", "Authenticated member could not be resolved");
+        }
+        return eventService.setEventMemberComment(eventId, caller.getId(), comment);
+    }
+
 }

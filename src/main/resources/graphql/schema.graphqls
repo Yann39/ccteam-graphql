@@ -90,6 +90,7 @@ type Mutation {
     setEventMemberBike(eventId: Long!, bikeId: Long): Event
     setEventSessions(eventId: Long!, groups: [EventSessionGroupInput!]!): Event
     setEventMemberSessions(eventId: Long!, skippedSessionIds: [Long!]!): Event
+    setEventMemberComment(eventId: Long!, comment: String): Event
 
     createOrganizer(name: String!): Organizer
 
@@ -271,6 +272,7 @@ type EventMember {
     event: Event!
     bike: Bike
     skippedSessions: [EventSession]
+    comment: String
     createdOn: LocalDateTime!
 }
 

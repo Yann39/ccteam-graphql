@@ -503,6 +503,42 @@ public class EventService {
     }
 
     /**
+     * Set the comment of the given member about their participation to event {@code eventId}.
+     *
+     * @param eventId  The event id
+     * @param memberId The member id, must already be registered to the event
+     * @param comment  The comment, a blank or {@code null} value clears it
+     * @return The updated {@link Event}
+     */
+    @Transactional
+    public Event setEventMemberComment(long eventId, long memberId, String comment) throws CustomGraphQLException {
+        final Optional<Event> eventOptional = eventRepository.findByIdCustom(eventId);
+        if (eventOptional.isEmpty()) {
+            log.error("Event with id {} not found in the database", eventId);
+            throw new CustomGraphQLException("event_not_found", "Specified event has not been found in the database");
+        }
+
+        final Event event = eventOptional.get();
+
+        final Optional<EventMember> participationOptional = event.getParticipants().stream()
+                .filter(em -> em.getMember().getId().equals(memberId)).findFirst();
+        if (participationOptional.isEmpty()) {
+            log.error("Member with id {} is not registered to event id {}, cannot set comment", memberId, eventId);
+            throw new CustomGraphQLException("member_not_registered_to_event",
+                    "Specified member is not registered to specified event");
+        }
+
+        final String trimmed = comment == null || comment.isBlank() ? null : comment.trim();
+        if (trimmed != null && trimmed.length() > EventMember.COMMENT_MAX_LENGTH) {
+            throw new CustomGraphQLException("comment_too_long",
+                    "The comment cannot exceed " + EventMember.COMMENT_MAX_LENGTH + " characters");
+        }
+        participationOptional.get().setComment(trimmed);
+
+        return eventRepository.save(event);
+    }
+
+    /**
      * Validate the session groups submitted for a schedule, rejecting non-positive or absurd values, and
      * capping the total number of sessions so a typo cannot generate thousands of rows.
      */
