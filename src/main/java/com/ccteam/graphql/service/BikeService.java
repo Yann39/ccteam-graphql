@@ -47,15 +47,18 @@ public class BikeService {
     private final MemberRepository memberRepository;
     private final EventMemberRepository eventMemberRepository;
     private final MaintenanceService maintenanceService;
+    private final BikeEquipmentService bikeEquipmentService;
 
     public BikeService(BikeRepository bikeRepository,
                        MemberRepository memberRepository,
                        EventMemberRepository eventMemberRepository,
-                       MaintenanceService maintenanceService) {
+                       MaintenanceService maintenanceService,
+                       BikeEquipmentService bikeEquipmentService) {
         this.bikeRepository = bikeRepository;
         this.memberRepository = memberRepository;
         this.eventMemberRepository = eventMemberRepository;
         this.maintenanceService = maintenanceService;
+        this.bikeEquipmentService = bikeEquipmentService;
     }
 
     /**
@@ -140,7 +143,8 @@ public class BikeService {
      * Delete a bike.
      * <p>
      * Any {@link com.ccteam.graphql.entities.EventMember} participation
-     * that had this bike pinned gets its bike reference cleared first, and its maintenance data is deleted.
+     * that had this bike pinned gets its bike reference cleared first, and its maintenance data and equipments are
+     * deleted.
      *
      * @param bikeId The ID of the bike to delete
      * @return The deleted {@link Bike}
@@ -159,6 +163,7 @@ public class BikeService {
         }
 
         maintenanceService.deleteBikeMaintenanceData(bikeId);
+        bikeEquipmentService.deleteBikeEquipments(bikeId);
 
         final Bike bike = bikeOptional.get();
         bikeRepository.delete(bike);

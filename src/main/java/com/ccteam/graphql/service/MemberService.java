@@ -49,13 +49,16 @@ public class MemberService {
     private final MembershipFeeRepository membershipFeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final MaintenanceService maintenanceService;
+    private final BikeEquipmentService bikeEquipmentService;
 
     public MemberService(MemberRepository memberRepository, MembershipFeeRepository membershipFeeRepository,
-                         PasswordEncoder passwordEncoder, MaintenanceService maintenanceService) {
+                         PasswordEncoder passwordEncoder, MaintenanceService maintenanceService,
+                         BikeEquipmentService bikeEquipmentService) {
         this.memberRepository = memberRepository;
         this.membershipFeeRepository = membershipFeeRepository;
         this.passwordEncoder = passwordEncoder;
         this.maintenanceService = maintenanceService;
+        this.bikeEquipmentService = bikeEquipmentService;
     }
 
     /**
@@ -242,9 +245,12 @@ public class MemberService {
         }
 
         final Member member = memberOptional.get();
-        // the bikes are deleted in cascade, their maintenance data references them and must go first
+        // the bikes are deleted in cascade, their maintenance data and equipments reference them and must go first
         if (member.getBikes() != null) {
-            member.getBikes().forEach(bike -> maintenanceService.deleteBikeMaintenanceData(bike.getId()));
+            member.getBikes().forEach(bike -> {
+                maintenanceService.deleteBikeMaintenanceData(bike.getId());
+                bikeEquipmentService.deleteBikeEquipments(bike.getId());
+            });
         }
         memberRepository.delete(member);
         return member;
