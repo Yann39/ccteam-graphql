@@ -30,6 +30,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,13 @@ public class EventReminderService {
 
     private static final DateTimeFormatter REMINDER_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy 'à' HH:mm");
 
+    /**
+     * Time zone of the event dates: the admins enter them in the club's local time and they are stored without zone,
+     * while the server may run in another one (UTC in a container), where the reminders would fire one or two hours
+     * late, the "1 hour before" one after the event started.
+     */
+    private static final ZoneId CLUB_ZONE = ZoneId.of("Europe/Paris");
+
     private final EventRepository eventRepository;
     private final EventReminderRepository eventReminderRepository;
     private final PushNotificationService pushNotificationService;
@@ -80,7 +88,7 @@ public class EventReminderService {
             return;
         }
 
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(CLUB_ZONE);
 
         for (final ReminderOffset offset : ReminderOffset.values()) {
             final List<Event> events = eventRepository.findEventsStartingBetween(now, now.plus(offset.getDuration()));
@@ -111,7 +119,7 @@ public class EventReminderService {
                     final EventReminder reminder = new EventReminder();
                     reminder.setEventId(event.getId());
                     reminder.setOffsetKey(offset.getKey());
-                    reminder.setSentOn(LocalDateTime.now());
+                    reminder.setSentOn(LocalDateTime.now(CLUB_ZONE));
                     eventReminderRepository.save(reminder);
                 }
             }

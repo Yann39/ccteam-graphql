@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,11 @@ public class MaintenanceReminderService {
     private static final LocalTime SEND_FROM = LocalTime.of(9, 0);
     private static final LocalTime SEND_UNTIL = LocalTime.of(20, 0);
 
+    /**
+     * Time zone of the sending hours above, the club's one rather than the server's (UTC in a container).
+     */
+    private static final ZoneId CLUB_ZONE = ZoneId.of("Europe/Paris");
+
     private final MaintenancePlanRepository maintenancePlanRepository;
     private final MaintenanceReminderRepository maintenanceReminderRepository;
     private final MaintenanceService maintenanceService;
@@ -82,7 +88,7 @@ public class MaintenanceReminderService {
         if (!pushNotificationService.isEnabled()) {
             return;
         }
-        final LocalTime now = LocalTime.now();
+        final LocalTime now = LocalTime.now(CLUB_ZONE);
         if (now.isBefore(SEND_FROM) || now.isAfter(SEND_UNTIL)) {
             return;
         }
@@ -115,7 +121,7 @@ public class MaintenanceReminderService {
                 reminder.setBikeId(bike.getId());
                 reminder.setMaintenanceId(nextDue.lastMaintenanceId());
                 reminder.setKind(kind);
-                reminder.setSentOn(LocalDateTime.now());
+                reminder.setSentOn(LocalDateTime.now(CLUB_ZONE));
                 maintenanceReminderRepository.save(reminder);
             }
         }
