@@ -151,6 +151,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <formats>html,xml</formats>
+                    <onlyUpgradable>true</onlyUpgradable>
+                    <processDependencyManagementTransitive>false</processDependencyManagementTransitive>
+                    <ignoredVersions>
+                        <ignoredVersion>(?i).*[.-](alpha|beta|rc|cr|m|milestone|preview|snapshot)[.-]?\d*</ignoredVersion>
+                    </ignoredVersions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
