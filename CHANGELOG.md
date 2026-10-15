@@ -61,3 +61,14 @@
 
 - Expose metrics through Prometheus to monitor GraphQL API
 - Updated MariaDB to version 12.3.3
+
+# 1.3.0
+
+2026-10-16
+
+- Added ability to manage motorcycle maintenance plans
+- Added ability to enter the motorcycle equipment details
+- Added possibility to add a comment for an event participation
+- Improved performance in retrieving member data
+- Fixed time zone issue when sending event notifications
+- Added Maven Versions plugin
