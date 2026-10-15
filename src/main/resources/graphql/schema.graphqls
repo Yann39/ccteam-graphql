@@ -64,6 +64,7 @@ type Query {
     getMyTrustedDevices(deviceSecret: String): [TrustedDevice]
 
     getBikeMaintenance(bikeId: Long!): BikeMaintenance
+    getBikeEquipments(bikeId: Long!): [BikeEquipment!]!
 }
 
 type Mutation {
@@ -116,6 +117,10 @@ type Mutation {
     updateMaintenance(maintenanceId: Long!, maintenanceDate: String!, odometerKm: Int, resetsPlan: Boolean, comment: String, operations: [MaintenanceOperationInput!]!): BikeMaintenance
     deleteMaintenance(maintenanceId: Long!): BikeMaintenance
     updateBikeOdometer(bikeId: Long!, odometerKm: Int!): BikeMaintenance
+
+    createBikeEquipment(bikeId: Long!, designation: String!, price: Float, currency: CurrencyCode!, comment: String): [BikeEquipment!]!
+    updateBikeEquipment(equipmentId: Long!, designation: String!, price: Float, currency: CurrencyCode!, comment: String): [BikeEquipment!]!
+    deleteBikeEquipment(equipmentId: Long!): [BikeEquipment!]!
 
     addMembershipFee(memberId: Long!, year: Int!, amount: Float!, paid: Boolean!): MembershipFee
     updateMembershipFee(feeId: Long!, year: Int!, amount: Float!, paid: Boolean!): MembershipFee
@@ -192,6 +197,15 @@ type MaintenanceDue {
     dueKm: Int
     remainingDays: Long
     remainingKm: Int
+}
+
+"A part fitted to a bike (racing exhaust, crash pads...), only available to the bike owner."
+type BikeEquipment {
+    id: ID!
+    designation: String!
+    price: Float
+    currency: CurrencyCode!
+    comment: String
 }
 
 input MaintenanceOperationInput {
