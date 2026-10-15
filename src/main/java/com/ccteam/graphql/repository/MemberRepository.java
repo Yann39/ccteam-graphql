@@ -21,12 +21,16 @@
 package com.ccteam.graphql.repository;
 
 import com.ccteam.graphql.entities.Attachment;
+import com.ccteam.graphql.entities.Event;
+import com.ccteam.graphql.entities.EventMember;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.enums.BoardRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,47 +60,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAllCustom();
 
     /**
-     * Get a members given its ID, with required fetched relations.
-     *
-     * @return The optional member with the specified ID
-     */
-    @Query("select m from Member m " +
-            "left join fetch m.avatar " +
-            "left join fetch m.eventMembers em " +
-            "left join fetch em.event e " +
-            "left join fetch e.participants " +
-            "left join fetch e.organizer " +
-            "left join fetch e.sessions " +
-            "left join fetch em.bike " +
-            "left join fetch em.skippedSessions " +
-            "left join fetch m.likedNews ln " +
-            "left join fetch ln.news " +
-            "left join fetch m.bikes " +
-            "left join fetch m.membershipFees " +
-            "where m.id = :id")
-    Optional<Member> findByIdCustom(long id);
-
-    /**
-     * Get a members given its email address, with required fetched relations.
-     *
-     * @return The optional member with the specified email address
-     */
-    @Query("select m from Member m " +
-            "left join fetch m.eventMembers em " +
-            "left join fetch em.event e " +
-            "left join fetch e.participants " +
-            "left join fetch e.organizer " +
-            "left join fetch e.sessions " +
-            "left join fetch em.bike " +
-            "left join fetch em.skippedSessions " +
-            "left join fetch m.likedNews ln " +
-            "left join fetch ln.news " +
-            "left join fetch m.bikes " +
-            "left join fetch m.membershipFees " +
-            "where m.email = :email")
-    Optional<Member> findByEmailCustom(String email);
-
-    /**
      * Get all members from the database corresponding to the specified text filter, with required fetched relations.
      *
      * @return The list of all members corresponding to the specified text filter
@@ -115,6 +78,146 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             ") " +
             "order by m.firstName, m.lastName")
     List<Member> findFilteredCustom(String text);
+
+    /**
+     * Get a member given its ID, with required fetched relations (see {@link #fetchRelations(Member)}).
+     *
+     * @param id The member ID
+     * @return The optional member with the specified ID
+     */
+    @Transactional(readOnly = true)
+    default Optional<Member> findByIdCustom(long id) {
+        final Optional<Member> member = findWithParticipationsById(id);
+        member.ifPresent(this::fetchRelations);
+        return member;
+    }
+
+    /**
+     * Get a member given its email address, with required fetched relations (see {@link #fetchRelations(Member)}).
+     *
+     * @param email The member email address
+     * @return The optional member with the specified email address
+     */
+    @Transactional(readOnly = true)
+    default Optional<Member> findByEmailCustom(String email) {
+        final Optional<Member> member = findWithParticipationsByEmail(email);
+        member.ifPresent(this::fetchRelations);
+        return member;
+    }
+
+    /**
+     * Load the relations of the given member, on top of its participations, that its GraphQL projections read: the
+     * participants and sessions of its events, its skipped sessions, liked news, bikes and membership fees.
+     * <p>
+     * Join fetching all of them in a single query would multiply their sizes (participations × participants ×
+     * sessions × bikes × fees × liked news rows), one query per collection only adds them up. The queries run in the
+     * transaction of the calling method, so each one completes the entities already loaded and the member is fully
+     * initialized once detached. The avatar is left out: its bytes are served by the avatar endpoint, and
+     * {@code hasAvatar} only needs the foreign key held by the member row.
+     *
+     * @param member The member, loaded with its participations in the current transaction
+     */
+    private void fetchRelations(Member member) {
+        if (!member.getEventMembers().isEmpty()) {
+            final List<Event> events = member.getEventMembers().stream().map(EventMember::getEvent).distinct().toList();
+            fetchParticipants(events);
+            fetchSessions(events);
+            fetchSkippedSessions(member.getEventMembers());
+        }
+        fetchLikedNews(member);
+        fetchBikes(member);
+        fetchMembershipFees(member);
+    }
+
+    /**
+     * Get a member given its ID with its participations, only joining single-valued associations past them so the
+     * query returns one row per participation. Use {@link #findByIdCustom(long)} to get the other relations too.
+     *
+     * @param id The member ID
+     * @return The optional member with the specified ID
+     */
+    @Query("select m from Member m " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event e " +
+            "left join fetch e.track t " +
+            "left join fetch t.circuit c " +
+            "left join fetch c.country " +
+            "left join fetch e.organizer " +
+            "left join fetch em.bike " +
+            "where m.id = :id")
+    Optional<Member> findWithParticipationsById(long id);
+
+    /**
+     * Get a member given its email address with its participations, see {@link #findWithParticipationsById(long)}.
+     * Use {@link #findByEmailCustom(String)} to get the other relations too.
+     *
+     * @param email The member email address
+     * @return The optional member with the specified email address
+     */
+    @Query("select m from Member m " +
+            "left join fetch m.eventMembers em " +
+            "left join fetch em.event e " +
+            "left join fetch e.track t " +
+            "left join fetch t.circuit c " +
+            "left join fetch c.country " +
+            "left join fetch e.organizer " +
+            "left join fetch em.bike " +
+            "where m.email = :email")
+    Optional<Member> findWithParticipationsByEmail(String email);
+
+    /**
+     * Load the participants of the given events, see {@link #fetchRelations(Member)}.
+     *
+     * @param events The events, already loaded in the current transaction
+     * @return The same events
+     */
+    @Query("select e from Event e left join fetch e.participants where e in :events")
+    List<Event> fetchParticipants(Collection<Event> events);
+
+    /**
+     * Load the sessions of the given events, see {@link #fetchRelations(Member)}.
+     *
+     * @param events The events, already loaded in the current transaction
+     * @return The same events
+     */
+    @Query("select e from Event e left join fetch e.sessions where e in :events")
+    List<Event> fetchSessions(Collection<Event> events);
+
+    /**
+     * Load the skipped sessions of the given participations, see {@link #fetchRelations(Member)}.
+     *
+     * @param eventMembers The participations, already loaded in the current transaction
+     * @return The same participations
+     */
+    @Query("select em from EventMember em left join fetch em.skippedSessions where em in :eventMembers")
+    List<EventMember> fetchSkippedSessions(Collection<EventMember> eventMembers);
+
+    /**
+     * Load the liked news of the given member, see {@link #fetchRelations(Member)}.
+     *
+     * @param member The member, already loaded in the current transaction
+     * @return The same member
+     */
+    @Query("select m from Member m left join fetch m.likedNews ln left join fetch ln.news where m = :member")
+    Member fetchLikedNews(Member member);
+
+    /**
+     * Load the bikes of the given member, see {@link #fetchRelations(Member)}.
+     *
+     * @param member The member, already loaded in the current transaction
+     * @return The same member
+     */
+    @Query("select m from Member m left join fetch m.bikes where m = :member")
+    Member fetchBikes(Member member);
+
+    /**
+     * Load the membership fees of the given member, see {@link #fetchRelations(Member)}.
+     *
+     * @param member The member, already loaded in the current transaction
+     * @return The same member
+     */
+    @Query("select m from Member m left join fetch m.membershipFees where m = :member")
+    Member fetchMembershipFees(Member member);
 
     /**
      * Fetch only the avatar attachment for the given member, with no Member graph load at all.
