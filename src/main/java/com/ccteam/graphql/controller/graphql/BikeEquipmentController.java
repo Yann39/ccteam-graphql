@@ -129,4 +129,22 @@ public class BikeEquipmentController {
         log.info("Received call to deleteBikeEquipment with parameters equipmentId = {}", equipmentId);
         return bikeEquipmentService.deleteBikeEquipment(equipmentId, authentication.getName());
     }
+
+    /**
+     * Reorder the equipments of a bike.
+     *
+     * @param bikeId         The bike ID
+     * @param equipmentIds   The IDs of the equipments of the bike, in their new order
+     * @param authentication The current Spring Security authentication
+     * @return The equipments of the bike, in their new order
+     */
+    @PreAuthorize("hasRole('MEMBER')")
+    @MutationMapping
+    public List<BikeEquipment> reorderBikeEquipments(@Argument Long bikeId,
+                                                     @Argument List<Long> equipmentIds,
+                                                     Authentication authentication) {
+        log.info("Received call to reorderBikeEquipments with parameters bikeId = {}, equipmentIds = {}",
+                bikeId, equipmentIds);
+        return bikeEquipmentService.reorderBikeEquipments(bikeId, equipmentIds, authentication.getName());
+    }
 }

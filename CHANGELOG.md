@@ -72,3 +72,9 @@
 - Improved performance in retrieving member data
 - Fixed time zone issue when sending event notifications
 - Added Maven Versions plugin
+
+# 1.3.1
+
+in progress
+
+- Added option to reorder the motorbike equipment list

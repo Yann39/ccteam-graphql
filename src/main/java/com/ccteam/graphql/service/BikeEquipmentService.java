@@ -33,7 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Bike equipment service: the parts fitted to a bike (racing exhaust, crash pads, ...).
@@ -71,12 +73,12 @@ public class BikeEquipmentService {
      *
      * @param bikeId The bike id
      * @param email  The e-mail of the authenticated member, who must own the bike
-     * @return The equipments of the bike, in the order they were entered
+     * @return The equipments of the bike, in the order set by the member
      */
     @Transactional(readOnly = true)
     public List<BikeEquipment> getBikeEquipments(Long bikeId, String email) {
         getOwnedBike(bikeId, email);
-        return bikeEquipmentRepository.findByBikeIdOrderByIdAsc(bikeId);
+        return bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
     }
 
     /**
@@ -94,14 +96,17 @@ public class BikeEquipmentService {
     public List<BikeEquipment> createBikeEquipment(Long bikeId, String designation, Double price,
                                                    CurrencyCode currency, String comment, String email) {
         final Bike bike = getOwnedBike(bikeId, email);
+        final List<BikeEquipment> equipments = bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
 
         final BikeEquipment equipment = new BikeEquipment();
         equipment.setBike(bike);
+        // added at the end of the list
+        equipment.setPosition(equipments.isEmpty() ? 0 : equipments.getLast().getPosition() + 1);
         equipment.setCreatedOn(LocalDateTime.now());
         fillEquipment(equipment, designation, price, currency, comment);
         bikeEquipmentRepository.save(equipment);
 
-        return bikeEquipmentRepository.findByBikeIdOrderByIdAsc(bikeId);
+        return bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
     }
 
     /**
@@ -124,7 +129,7 @@ public class BikeEquipmentService {
         equipment.setModifiedOn(LocalDateTime.now());
         bikeEquipmentRepository.save(equipment);
 
-        return bikeEquipmentRepository.findByBikeIdOrderByIdAsc(equipment.getBike().getId());
+        return bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(equipment.getBike().getId());
     }
 
     /**
@@ -140,7 +145,40 @@ public class BikeEquipmentService {
         final Long bikeId = equipment.getBike().getId();
         bikeEquipmentRepository.delete(equipment);
         bikeEquipmentRepository.flush();
-        return bikeEquipmentRepository.findByBikeIdOrderByIdAsc(bikeId);
+        return bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
+    }
+
+    /**
+     * Reorder the equipments of the given bike.
+     *
+     * @param bikeId       The bike id
+     * @param equipmentIds The ids of the equipments of the bike, in their new order. Equipments left out (added from
+     *                     another device in the meantime...) keep their relative order after the listed ones, and ids
+     *                     of other bikes are ignored
+     * @param email        The e-mail of the authenticated member, who must own the bike
+     * @return The equipments of the bike, in their new order
+     */
+    @Transactional
+    public List<BikeEquipment> reorderBikeEquipments(Long bikeId, List<Long> equipmentIds, String email) {
+        getOwnedBike(bikeId, email);
+        final List<BikeEquipment> equipments = bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
+
+        // in their current order, so the ones left out keep it
+        final Map<Long, BikeEquipment> unordered = new LinkedHashMap<>();
+        equipments.forEach(equipment -> unordered.put(equipment.getId(), equipment));
+        int position = 0;
+        for (final Long id : equipmentIds) {
+            final BikeEquipment equipment = unordered.remove(id);
+            if (equipment != null) {
+                equipment.setPosition(position++);
+            }
+        }
+        for (final BikeEquipment equipment : unordered.values()) {
+            equipment.setPosition(position++);
+        }
+        bikeEquipmentRepository.saveAll(equipments);
+
+        return bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
     }
 
     /**

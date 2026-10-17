@@ -121,6 +121,7 @@ type Mutation {
     createBikeEquipment(bikeId: Long!, designation: String!, price: Float, currency: CurrencyCode!, comment: String): [BikeEquipment!]!
     updateBikeEquipment(equipmentId: Long!, designation: String!, price: Float, currency: CurrencyCode!, comment: String): [BikeEquipment!]!
     deleteBikeEquipment(equipmentId: Long!): [BikeEquipment!]!
+    reorderBikeEquipments(bikeId: Long!, equipmentIds: [Long!]!): [BikeEquipment!]!
 
     addMembershipFee(memberId: Long!, year: Int!, amount: Float!, paid: Boolean!): MembershipFee
     updateMembershipFee(feeId: Long!, year: Int!, amount: Float!, paid: Boolean!): MembershipFee

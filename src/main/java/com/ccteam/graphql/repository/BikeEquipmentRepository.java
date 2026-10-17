@@ -37,12 +37,12 @@ import java.util.List;
 public interface BikeEquipmentRepository extends JpaRepository<BikeEquipment, Long> {
 
     /**
-     * Get the equipments of the given bike, in the order they were entered.
+     * Get the equipments of the given bike, in the order set by the member (entry order for equal positions).
      *
      * @param bikeId The bike id
      * @return The equipments of the bike
      */
-    List<BikeEquipment> findByBikeIdOrderByIdAsc(Long bikeId);
+    List<BikeEquipment> findByBikeIdOrderByPositionAscIdAsc(Long bikeId);
 
     /**
      * Delete all the equipments of the given bike, before the bike itself gets deleted.

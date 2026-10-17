@@ -55,6 +55,12 @@ public class BikeEquipment {
     private Bike bike;
 
     /**
+     * 0-based rank of the equipment in the list of the bike, in the order set by the member.
+     */
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer position = 0;
+
+    /**
      * Name of the part, maximum 128 characters (e.g. "Échappement Akrapovič Slip-On").
      */
     @Column(length = 128, nullable = false)
