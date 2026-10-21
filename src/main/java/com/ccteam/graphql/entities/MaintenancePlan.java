@@ -23,6 +23,8 @@ package com.ccteam.graphql.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -50,9 +52,13 @@ public class MaintenancePlan {
 
     /**
      * The bike this plan applies to.
+     * <p>
+     * The plan is deleted by the database with the bike ({@code ON DELETE CASCADE}): mapping the inverse side on
+     * {@link Bike} for a JPA cascade would make Hibernate fetch the plan each time a bike is loaded.
      */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Bike bike;
 
     /**

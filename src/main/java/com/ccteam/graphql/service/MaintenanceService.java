@@ -249,15 +249,16 @@ public class MaintenanceService {
     }
 
     /**
-     * Delete all the maintenance data of a bike, before the bike itself gets deleted.
+     * Delete the maintenance reminders sent for a bike, when the bike gets deleted.
+     * <p>
+     * Unlike the maintenances and the plan, reminders only store the bike id (no relation), so they are not deleted
+     * along with the bike.
      *
      * @param bikeId The bike id
      */
     @Transactional
-    public void deleteBikeMaintenanceData(Long bikeId) {
+    public void deleteBikeMaintenanceReminders(Long bikeId) {
         maintenanceReminderRepository.deleteByBikeId(bikeId);
-        maintenanceRepository.deleteAll(maintenanceRepository.findByBikeId(bikeId));
-        maintenancePlanRepository.findByBikeId(bikeId).ifPresent(maintenancePlanRepository::delete);
     }
 
     /**

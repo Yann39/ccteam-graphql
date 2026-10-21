@@ -78,3 +78,5 @@
 in progress
 
 - Added option to reorder the motorbike equipment list
+- Delete the motorbike related data (maintenances, maintenance plan, equipments, event participations bike) through
+  JPA cascades and database constraints instead of manual queries

@@ -25,6 +25,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Bike entity.
@@ -95,5 +97,21 @@ public class Bike {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    /**
+     * Maintenances of the bike, deleted with it.
+     * <p>
+     * Only mapped for the cascade, maintenances are created and fetched through their own repository.
+     */
+    @OneToMany(mappedBy = "bike", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Maintenance> maintenances = new ArrayList<>();
+
+    /**
+     * Equipments of the bike, deleted with it.
+     * <p>
+     * Only mapped for the cascade, equipments are created and fetched through their own repository.
+     */
+    @OneToMany(mappedBy = "bike", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<BikeEquipment> equipments = new ArrayList<>();
 
 }

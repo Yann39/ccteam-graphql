@@ -23,7 +23,6 @@ package com.ccteam.graphql.repository;
 import com.ccteam.graphql.entities.BikeEquipment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,13 +42,5 @@ public interface BikeEquipmentRepository extends JpaRepository<BikeEquipment, Lo
      * @return The equipments of the bike
      */
     List<BikeEquipment> findByBikeIdOrderByPositionAscIdAsc(Long bikeId);
-
-    /**
-     * Delete all the equipments of the given bike, before the bike itself gets deleted.
-     *
-     * @param bikeId The bike id
-     */
-    @Transactional
-    void deleteByBikeId(Long bikeId);
 
 }

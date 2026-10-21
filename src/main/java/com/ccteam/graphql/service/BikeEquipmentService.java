@@ -181,16 +181,6 @@ public class BikeEquipmentService {
         return bikeEquipmentRepository.findByBikeIdOrderByPositionAscIdAsc(bikeId);
     }
 
-    /**
-     * Delete all the equipments of a bike, before the bike itself gets deleted.
-     *
-     * @param bikeId The bike id
-     */
-    @Transactional
-    public void deleteBikeEquipments(Long bikeId) {
-        bikeEquipmentRepository.deleteByBikeId(bikeId);
-    }
-
     private void fillEquipment(BikeEquipment equipment, String designation, Double price, CurrencyCode currency,
                                String comment) {
         if (designation == null || designation.isBlank()) {

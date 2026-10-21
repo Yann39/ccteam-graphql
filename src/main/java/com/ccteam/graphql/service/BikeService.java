@@ -24,7 +24,6 @@ import com.ccteam.graphql.config.graphql.CustomGraphQLException;
 import com.ccteam.graphql.entities.Bike;
 import com.ccteam.graphql.entities.Member;
 import com.ccteam.graphql.repository.BikeRepository;
-import com.ccteam.graphql.repository.EventMemberRepository;
 import com.ccteam.graphql.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,20 +44,14 @@ public class BikeService {
 
     private final BikeRepository bikeRepository;
     private final MemberRepository memberRepository;
-    private final EventMemberRepository eventMemberRepository;
     private final MaintenanceService maintenanceService;
-    private final BikeEquipmentService bikeEquipmentService;
 
     public BikeService(BikeRepository bikeRepository,
                        MemberRepository memberRepository,
-                       EventMemberRepository eventMemberRepository,
-                       MaintenanceService maintenanceService,
-                       BikeEquipmentService bikeEquipmentService) {
+                       MaintenanceService maintenanceService) {
         this.bikeRepository = bikeRepository;
         this.memberRepository = memberRepository;
-        this.eventMemberRepository = eventMemberRepository;
         this.maintenanceService = maintenanceService;
-        this.bikeEquipmentService = bikeEquipmentService;
     }
 
     /**
@@ -142,9 +135,9 @@ public class BikeService {
     /**
      * Delete a bike.
      * <p>
-     * Any {@link com.ccteam.graphql.entities.EventMember} participation
-     * that had this bike pinned gets its bike reference cleared first, and its maintenance data and equipments are
-     * deleted.
+     * Its maintenances and equipments are deleted in cascade, and its maintenance plan by the database
+     * ({@code ON DELETE CASCADE}). Any {@link com.ccteam.graphql.entities.EventMember} participation that had this
+     * bike pinned is kept, the database clears its bike reference ({@code ON DELETE SET NULL}).
      *
      * @param bikeId The ID of the bike to delete
      * @return The deleted {@link Bike}
@@ -157,13 +150,7 @@ public class BikeService {
             throw new CustomGraphQLException("bike_not_found", "Specified bike has not been found");
         }
 
-        final int clearedParticipations = eventMemberRepository.clearBikeRef(bikeId);
-        if (clearedParticipations > 0) {
-            log.info("Cleared bike id {} from {} event participation(s) before deletion", bikeId, clearedParticipations);
-        }
-
-        maintenanceService.deleteBikeMaintenanceData(bikeId);
-        bikeEquipmentService.deleteBikeEquipments(bikeId);
+        maintenanceService.deleteBikeMaintenanceReminders(bikeId);
 
         final Bike bike = bikeOptional.get();
         bikeRepository.delete(bike);

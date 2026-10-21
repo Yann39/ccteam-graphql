@@ -49,16 +49,13 @@ public class MemberService {
     private final MembershipFeeRepository membershipFeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final MaintenanceService maintenanceService;
-    private final BikeEquipmentService bikeEquipmentService;
 
     public MemberService(MemberRepository memberRepository, MembershipFeeRepository membershipFeeRepository,
-                         PasswordEncoder passwordEncoder, MaintenanceService maintenanceService,
-                         BikeEquipmentService bikeEquipmentService) {
+                         PasswordEncoder passwordEncoder, MaintenanceService maintenanceService) {
         this.memberRepository = memberRepository;
         this.membershipFeeRepository = membershipFeeRepository;
         this.passwordEncoder = passwordEncoder;
         this.maintenanceService = maintenanceService;
-        this.bikeEquipmentService = bikeEquipmentService;
     }
 
     /**
@@ -236,6 +233,7 @@ public class MemberService {
      * @param memberId The ID of the {@link Member} to delete
      * @return A {@link Member} object representing the member just deleted
      */
+    @Transactional
     public Member deleteMember(long memberId) {
         final Optional<Member> memberOptional = memberRepository.findByIdCustom(memberId);
         if (memberOptional.isEmpty()) {
@@ -245,12 +243,10 @@ public class MemberService {
         }
 
         final Member member = memberOptional.get();
-        // the bikes are deleted in cascade, their maintenance data and equipments reference them and must go first
+        // the bikes are deleted in cascade with their maintenance data and equipments, except the maintenance
+        // reminders which only store the bike id
         if (member.getBikes() != null) {
-            member.getBikes().forEach(bike -> {
-                maintenanceService.deleteBikeMaintenanceData(bike.getId());
-                bikeEquipmentService.deleteBikeEquipments(bike.getId());
-            });
+            member.getBikes().forEach(bike -> maintenanceService.deleteBikeMaintenanceReminders(bike.getId()));
         }
         memberRepository.delete(member);
         return member;

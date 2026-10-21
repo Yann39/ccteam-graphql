@@ -57,12 +57,4 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
      */
     Optional<Maintenance> findFirstByBikeIdAndResetsPlanTrueOrderByMaintenanceDateDescIdDesc(Long bikeId);
 
-    /**
-     * Get all the maintenances of the given bike, used to delete them along with the bike.
-     *
-     * @param bikeId The bike id
-     * @return The maintenances of the bike
-     */
-    List<Maintenance> findByBikeId(Long bikeId);
-
 }

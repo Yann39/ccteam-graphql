@@ -23,6 +23,8 @@ package com.ccteam.graphql.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -69,9 +71,12 @@ public class EventMember {
 
     /**
      * Optional bike used for the event by the member.
+     * <p>
+     * Deleting the bike keeps the participation, the database just clears this reference ({@code ON DELETE SET NULL}).
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Bike bike;
 
     /**
