@@ -173,6 +173,12 @@ public class Member {
     private Set<EventMember> eventMembers;
 
     /**
+     * Lap records of the member.
+     */
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LapRecord> lapRecords;
+
+    /**
      * Account creation timestamp.
      */
     @Column(nullable = false)
