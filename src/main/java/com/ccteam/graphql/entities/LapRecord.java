@@ -23,6 +23,8 @@ package com.ccteam.graphql.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -61,9 +63,12 @@ public class LapRecord {
 
     /**
      * Bike used to record the lap.
+     * <p>
+     * Deleting the bike keeps the lap record, the database just clears this reference ({@code ON DELETE SET NULL}).
      */
     @ManyToOne
     @JoinColumn(name = "bike_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Bike bike;
 
     /**

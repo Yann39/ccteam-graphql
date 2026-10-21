@@ -78,5 +78,6 @@
 in progress
 
 - Added option to reorder the motorbike equipment list
+- Fixed deletion of a motorbike used for a lap record, the lap record is kept without the motorbike
 - Delete the motorbike related data (maintenances, maintenance plan, equipments, event participations bike) through
   JPA cascades and database constraints instead of manual queries

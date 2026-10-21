@@ -307,7 +307,7 @@ type LapRecord {
     id: ID!
     track: Track!
     member: Member
-    bike: Bike!
+    bike: Bike
     lapTime: Int!
     recordDate: LocalDateTime!
     conditions: String!
