@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ccteam</groupId>
     <artifactId>ccteam-graphql</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
     <name>ccteam-graphql</name>
     <description>Spring Boot application to expose GraphQL endpoint for CCTeam mobile application</description>
 

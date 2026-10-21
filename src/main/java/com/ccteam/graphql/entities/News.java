@@ -23,6 +23,8 @@ package com.ccteam.graphql.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -83,10 +85,12 @@ public class News {
     private LocalDateTime createdOn = LocalDateTime.now();
 
     /**
-     * Member who created the news item.
+     * Member who created the news item, cleared by the database when the member is deleted
+     * ({@code ON DELETE SET NULL}).
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member createdBy;
 
     /**
@@ -96,10 +100,12 @@ public class News {
     private LocalDateTime modifiedOn;
 
     /**
-     * Member who last modified the news item.
+     * Member who last modified the news item, cleared by the database when the member is deleted
+     * ({@code ON DELETE SET NULL}).
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modified_by")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member modifiedBy;
 
 }

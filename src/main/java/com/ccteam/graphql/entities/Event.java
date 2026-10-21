@@ -23,6 +23,8 @@ package com.ccteam.graphql.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.SortNatural;
 
 import java.math.BigDecimal;
@@ -125,10 +127,12 @@ public class Event {
     private LocalDateTime createdOn = LocalDateTime.now();
 
     /**
-     * Reference to the {@link Member} who created the event.
+     * Reference to the {@link Member} who created the event, cleared by the database when the member is deleted
+     * ({@code ON DELETE SET NULL}).
      */
     @ManyToOne
     @JoinColumn(name = "created_by")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member createdBy;
 
     /**
@@ -138,10 +142,12 @@ public class Event {
     private LocalDateTime modifiedOn;
 
     /**
-     * Reference to the {@link Member} who last modified the event.
+     * Reference to the {@link Member} who last modified the event, cleared by the database when the member is
+     * deleted ({@code ON DELETE SET NULL}).
      */
     @ManyToOne
     @JoinColumn(name = "modified_by")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member modifiedBy;
 
 }
